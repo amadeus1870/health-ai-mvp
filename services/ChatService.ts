@@ -30,7 +30,7 @@ export const ChatService = {
 
             // 3. Construct System Prompt / Context Block
             let contextPrompt = `
-      SEI L'ASSISTENTE PROACTIVE LAB.
+      SEI PROACTIVE LAB AI.
       
       IL TUO RUOLO:
       - Aiutare l'utente a comprendere i suoi dati.

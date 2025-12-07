@@ -4,6 +4,8 @@ import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { SoftCard } from '../../components/ui/SoftCard';
 import { BlurView } from 'expo-blur'; import { Ionicons } from '@expo/vector-icons';
+import { GlobalStyles } from '../../constants/GlobalStyles';
+
 import { useRouter, useFocusEffect } from 'expo-router';
 import { InfoModal } from '../../components/ui/InfoModal';
 import { ShoppingListModal } from '../../components/ui/ShoppingListModal';
@@ -211,11 +213,14 @@ export default function Dashboard() {
             <SafeAreaView style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
+
+
                     {/* 1. HEADER PERSONALE */}
-                    <View style={styles.header}>
+                    {/* 1. HEADER PERSONALE */}
+                    <View style={[GlobalStyles.headerContainer, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }]}>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.greeting}>Buongiorno, {userName}</Text>
-                            <Text style={styles.date}>{new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
+                            <Text style={GlobalStyles.headerTitle}>Buongiorno, {userName}</Text>
+                            <Text style={GlobalStyles.headerSubtitle}>{new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -410,7 +415,7 @@ export default function Dashboard() {
                             )}
 
                             {/* 5. PROSSIMO PASTO (Nested - Map Page Style / Glass) */}
-                            <SoftCard style={[styles.vitalCard, { height: 'auto', minHeight: 180, marginTop: 24, marginBottom: 0, padding: 0, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'transparent' }]}>
+                            <SoftCard style={[styles.vitalCard, { height: 'auto', minHeight: 180, marginTop: 24, marginBottom: 0, padding: 0, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'transparent', marginHorizontal: 10 }]}>
                                 <BlurView
                                     intensity={60}
                                     tint="dark"
@@ -447,7 +452,7 @@ export default function Dashboard() {
                                                 <Text style={styles.mealKcal}>{nextMeal.calories} kcal</Text>
                                             </View>
                                             {/* Reduced Font Size */}
-                                            <Text style={[styles.mealName, { fontSize: 18, marginBottom: 16 }]}>{nextMeal.name}</Text>
+                                            <Text style={[styles.mealName, { fontSize: 16, marginBottom: 16 }]}>{nextMeal.name}</Text>
 
                                             <TouchableOpacity
                                                 style={[styles.actionButton, { paddingVertical: 10, borderRadius: 12, width: '100%', backgroundColor: '#2ecc71' }]}
@@ -511,8 +516,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        padding: 20,
-        paddingTop: 10,
+        paddingBottom: 40,
     },
     header: {
         flexDirection: 'row',
@@ -614,9 +618,10 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.5)',
     },
     vitalCard: {
-        width: '100%',
+
         height: 250,
         marginBottom: 20,
+        marginHorizontal: 20,
         backgroundColor: 'transparent',
         borderRadius: 24,
         shadowColor: '#000',
@@ -788,11 +793,13 @@ const styles = StyleSheet.create({
     // Actions Grid
     section: {
         marginBottom: 0,
+        marginHorizontal: 20,
     },
     actionsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
+        marginHorizontal: 20,
     },
     actionItem: {
         width: '23%',
@@ -820,6 +827,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 241, 118, 0.05)',
         borderColor: 'rgba(255, 241, 118, 0.2)',
         borderWidth: 1,
+        marginHorizontal: 20,
     },
     tipText: {
         fontSize: 15,

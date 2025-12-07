@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
+// import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -90,15 +90,15 @@ export default function WellnessScreen() {
       style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.content}>
 
-          <View style={styles.header}>
-            <Text style={styles.title}>Mappa Biomarcatori</Text>
+          <View style={[GlobalStyles.headerContainer, { marginBottom: 30 }]}>
+            <Text style={GlobalStyles.headerTitle}>Mappa Biomarcatori</Text>
             {!results ? (
-              <Text style={styles.subtitle}>Carica le tue analisi nella scheda "Analisi" per attivare la mappa.</Text>
+              <Text style={GlobalStyles.headerSubtitle}>Carica le tue analisi nella scheda "Analisi" per attivare la mappa.</Text>
             ) : (
-              <Text style={styles.subtitle}>Esplora lo stato di salute dei tuoi organi basato sui tuoi biomarcatori.</Text>
+              <Text style={GlobalStyles.headerSubtitle}>Esplora lo stato di salute dei tuoi organi basato sui tuoi biomarcatori.</Text>
             )}
           </View>
 

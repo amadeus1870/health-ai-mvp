@@ -23,6 +23,7 @@ import { MealSwapModal } from '../../components/ui/MealSwapModal';
 import { Meal } from '../../types/Diet';
 import { PdfService } from '../../services/PdfService';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GlobalStyles } from '../../constants/GlobalStyles';
 
 export default function NutritionScreen() {
   const { isBackgroundUpdating, results, pendingProfileUpdate, setPendingProfileUpdate, setResults } = useAnalysis();
@@ -390,15 +391,15 @@ export default function NutritionScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
         >
 
+          {/* Header */}
+          <View style={GlobalStyles.headerContainer}>
+            <Text style={GlobalStyles.headerTitle}>Strategia Nutrizionale</Text>
+            <Text style={GlobalStyles.headerSubtitle}>Il tuo piano alimentare personalizzato</Text>
+          </View>
+
           {/* Strategy Section */}
           <View style={styles.sectionContainer}>
-            <View style={styles.titleRow}>
-              <Ionicons name="compass" size={24} color="#FFB142" style={{ marginRight: 10 }} />
-              <View>
-                <Text style={styles.sectionTitle}>Strategia Nutrizionale</Text>
-                <Text style={styles.sectionSubtitle}>Compatibile con le tue analisi</Text>
-              </View>
-            </View>
+
 
             {strategy && (
               <ScrollView
@@ -702,22 +703,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 20,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    color: '#FFF',
-    fontFamily: Typography.fontFamily.bold,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
-    fontFamily: Typography.fontFamily.regular,
-  },
+
   carouselContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,

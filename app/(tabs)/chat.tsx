@@ -131,7 +131,7 @@ export default function ChatScreen() {
                 {
                     id: 'welcome',
                     role: 'assistant',
-                    content: "Ciao! 👋 Sono il tuo Assistente Proactive Lab.\n\nHo analizzato il tuo profilo e sono qui per aiutarti a ottimizzare il tuo benessere e raggiungere i tuoi obiettivi.\n\nCome posso esserti utile oggi?",
+                    content: "Ciao! 👋 Sono il tuo Assistente Proactive Lab AI.\n\nHo analizzato il tuo profilo e sono qui per aiutarti a ottimizzare il tuo benessere e raggiungere i tuoi obiettivi.\n\nCome posso esserti utile oggi?",
                     timestamp: new Date()
                 }
             ]);
@@ -203,7 +203,7 @@ export default function ChatScreen() {
                 <Animated.View style={{ flex: 1, paddingBottom: paddingBottomAnim }}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>my Proactive Lab AI</Text>
+                        <Text style={styles.headerTitle}>Proactive Lab AI</Text>
                         <View style={styles.onlineBadge}>
                             <View style={styles.dot} />
                             <Text style={styles.onlineText}>Online</Text>
