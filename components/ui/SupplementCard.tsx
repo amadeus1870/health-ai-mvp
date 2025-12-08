@@ -4,6 +4,7 @@ import { Colors } from '../../constants/Colors';
 import { SoftCard } from './SoftCard';
 import { Ionicons } from '@expo/vector-icons';
 import { Typography } from '../../constants/Typography';
+import { MarkdownText } from './MarkdownText';
 
 interface Supplement {
     name: string;
@@ -38,7 +39,7 @@ export const SupplementCard: React.FC<{ supplement: Supplement, textColor?: stri
     return (
         <View style={containerStyle}>
             <Text style={[styles.name, { color: mainTextColor }]}>{supplement.name}</Text>
-            <Text style={[styles.reason, { color: bodyTextColor }]}>{supplement.reason}</Text>
+            <MarkdownText style={[styles.reason, { color: bodyTextColor }]}>{supplement.reason}</MarkdownText>
             <View style={[styles.dosageContainer, { backgroundColor: dosageBgColor }]}>
                 <Ionicons name="time-outline" size={14} color={dosageTextColor} />
                 <Text style={[styles.dosage, { color: dosageTextColor }]}>{supplement.dosage}</Text>

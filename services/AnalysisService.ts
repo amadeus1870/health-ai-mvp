@@ -71,13 +71,23 @@ export const AnalysisService = {
         let biomarkerPenalty = 0;
         let riskPenalty = 0;
         let lipidPenalty = 0;
+        let tumorBonus = 0;
 
         // 1. Biomarkers (Max Penalty: 50)
+        // Bonus for optimal Tumor Markers
+        const tumorMarkers = ['PSA', 'CEA', 'CA-125', 'CA-19.9', 'CA-15.3', 'AFP', 'B2M', 'TPA'];
+
         data.biomarkers?.forEach((b: any) => {
             if (b.status === 'critical') biomarkerPenalty += 5;
             else if (b.status === 'warning') biomarkerPenalty += 2;
+
+            // Bonus check
+            if (tumorMarkers.some(tm => b.name.toUpperCase().includes(tm)) && b.status === 'optimal') {
+                tumorBonus += 5;
+            }
         });
         biomarkerPenalty = Math.min(biomarkerPenalty, 50);
+        tumorBonus = Math.min(tumorBonus, 15); // Cap bonus at 15
 
         // 2. Risks (Max Penalty: 50)
         data.fattoriDiRischio?.forEach((r: any) => {
@@ -93,14 +103,37 @@ export const AnalysisService = {
             const q = data.cholesterolAnalysis.quantitative;
             const parse = (v: string) => parseFloat(v?.replace(/[^0-9.]/g, '') || '0');
 
-            if (parse(q.total) > 200) lipidPenalty += 3;
-            if (parse(q.ldl) > 100) lipidPenalty += 3;
-            if (parse(q.hdl) < 40) lipidPenalty += 3;
-            if (parse(q.triglycerides) > 150) lipidPenalty += 3;
+            const total = parse(q.total);
+            const ldl = parse(q.ldl);
+            const hdl = parse(q.hdl);
+            const trig = parse(q.triglycerides);
+
+            // Smart Penalty Logic based on TG/HDL Ratio
+            let tgHdlRatio = 0;
+            if (hdl > 0) tgHdlRatio = trig / hdl;
+
+            const isMetabolicallyHealthy = tgHdlRatio < 3; // Modern research threshold
+
+            if (total > 200) {
+                // If metabolically healthy, reduce penalty significantly
+                lipidPenalty += isMetabolicallyHealthy ? 1 : 3;
+            }
+            if (ldl > 100) {
+                // If metabolically healthy, reduce penalty significantly
+                lipidPenalty += isMetabolicallyHealthy ? 1 : 3;
+            }
+            if (hdl < 40) lipidPenalty += 3; // Low HDL is always bad
+            if (trig > 150) lipidPenalty += 3; // High Triglycerides is always bad
         }
         lipidPenalty = Math.min(lipidPenalty, 20);
 
-        const totalScore = 100 - (biomarkerPenalty + riskPenalty + lipidPenalty);
+        // Calculate Total
+        // Base 100 - Penalties + Bonus
+        let totalScore = 100 - (biomarkerPenalty + riskPenalty + lipidPenalty) + tumorBonus;
+
+        // Cap at 100 (cannot exceed perfect health)
+        totalScore = Math.min(100, totalScore);
+
         return Math.max(10, Math.round(totalScore));
     },
 

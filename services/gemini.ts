@@ -76,6 +76,14 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
     - SAFETY: You are an AI consultant.
     - PERSONALIZATION: Tailor recommendations to the profile.
     - LANGUAGE: MUST BE ITALIAN. Translate everything.
+    - FORMATTING: Use Markdown for all text fields (bold **text**, lists -, etc.) to improve readability.
+    
+    CRITICAL MEDICAL CONTEXT (MODERN RESEARCH):
+    - CHOLESTEROL: High Total Cholesterol is NOT a standalone risk factor if metabolic health is good.
+    - KEY INDICATOR: Triglycerides/HDL Ratio.
+      - If TG/HDL < 3: High cholesterol is likely NOT dangerous (large buoyant LDL).
+      - If TG/HDL > 3: Indicates insulin resistance and small dense LDL (dangerous).
+    - APPLY THIS LOGIC in: General Evaluation, Risk Factors, and Recommendations. Do NOT be alarmist about high cholesterol if TG/HDL is low.
     
     ACTION:
     1.  **TRANSCRIPTION PHASE**: Go through the documents line by line.
@@ -312,7 +320,16 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
     - RE-EVALUATE "status", "meaning", "cause", "remedy" for each biomarker based on the NEW PROFILE.
     - RE-CALCULATE Risks, Recommendations, and Supplement advice based on the NEW PROFILE.
     - CONCISE OUTPUT: Keep explanations brief and to the point.
+    - CONCISE OUTPUT: Keep explanations brief and to the point.
     - LANGUAGE: MUST BE ITALIAN.
+    - FORMATTING: Use Markdown for all text fields (bold **text**, lists -, etc.) to improve readability.
+
+    CRITICAL MEDICAL CONTEXT (MODERN RESEARCH):
+    - CHOLESTEROL: High Total Cholesterol is NOT a standalone risk factor if metabolic health is good.
+    - KEY INDICATOR: Triglycerides/HDL Ratio.
+      - If TG/HDL < 3: High cholesterol is likely NOT dangerous (large buoyant LDL).
+      - If TG/HDL > 3: Indicates insulin resistance and small dense LDL (dangerous).
+    - APPLY THIS LOGIC in: General Evaluation, Risk Factors, and Recommendations. Do NOT be alarmist about high cholesterol if TG/HDL is low.
     
     OUTPUT FORMAT:
     Return ONLY a JSON object with this exact structure (same as original analysis):

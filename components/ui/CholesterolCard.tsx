@@ -6,6 +6,7 @@ import { Typography } from '../../constants/Typography';
 
 import { SoftCard } from './SoftCard';
 import { Ionicons } from '@expo/vector-icons';
+import { MarkdownText } from './MarkdownText';
 
 interface CholesterolData {
     quantitative: {
@@ -139,7 +140,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                 <Ionicons name="stats-chart" size={18} color={Colors.orange} />
                 <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>Analisi Quantitativa</Text>
             </View>
-            <Text style={[styles.description, { color: descColor }]}>{data.quantitative.description}</Text>
+            <MarkdownText style={[styles.description, { color: descColor }]}>{data.quantitative.description}</MarkdownText>
 
             <View style={{ marginBottom: 24, marginTop: 10 }}>
                 <ComparisonRow
@@ -185,7 +186,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                 <Ionicons name="flask" size={18} color={Colors.orange} />
                 <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>Analisi Qualitativa Avanzata</Text>
             </View>
-            <Text style={[styles.description, { color: descColor }]}>{data.qualitative.description}</Text>
+            <MarkdownText style={[styles.description, { color: descColor }]}>{data.qualitative.description}</MarkdownText>
 
             {data.qualitative.metrics.map((metric, index) => {
                 // Determine target based on metric name
@@ -211,7 +212,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                             statusOverride={metric.status}
                             labelColor={labelColor}
                         />
-                        <Text style={[styles.metricInterpretation, { color: secondaryColor }]}>{metric.interpretation}</Text>
+                        <MarkdownText style={[styles.metricInterpretation, { color: secondaryColor }]}>{metric.interpretation}</MarkdownText>
                     </View>
                 );
             })}

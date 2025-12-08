@@ -1,1 +1,1 @@
-export const GEMINI_API_KEY = 'AIzaSyAr-65FWjzAftrWg_pcUiGwHCS_SG98m3c';
+export const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';

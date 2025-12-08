@@ -11,6 +11,7 @@ import { BiomarkerRow } from './BiomarkerRow';
 import { SupplementCard } from './SupplementCard';
 import { CholesterolCard } from './CholesterolCard';
 import { CurrentSupplementCard } from './CurrentSupplementCard';
+import { MarkdownText } from './MarkdownText';
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.65; // Increased width
@@ -168,19 +169,19 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                     ['#E65100', '#F57C00', '#FFB74D'], // Dark Orange -> Orange -> Light Orange
                     <>
                         <Text style={styles.subHeader}>Panoramica Completa</Text>
-                        <Text style={styles.bodyText}>{results.valutazioneGenerale?.panoramica}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.panoramica}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Principali Risultati</Text>
-                        <Text style={styles.bodyText}>{results.valutazioneGenerale?.risultati}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.risultati}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Tendenze e Pattern</Text>
-                        <Text style={styles.bodyText}>{results.valutazioneGenerale?.tendenze}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.tendenze}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Correlazioni</Text>
-                        <Text style={styles.bodyText}>{results.valutazioneGenerale?.correlazioni}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.correlazioni}</MarkdownText>
                     </>
                 )}
 
@@ -203,19 +204,19 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                     ['#1B5E20', '#388E3C', '#66BB6A'], // Dark Green -> Green -> Light Green
                     <>
                         <Text style={styles.subHeader}>Mediche</Text>
-                        <Text style={styles.bodyText}>{results.raccomandazioni?.mediche}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.mediche}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Stile di Vita e Dieta</Text>
-                        <Text style={styles.bodyText}>{results.raccomandazioni?.stileDiVita}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.stileDiVita}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Follow-up Consigliati</Text>
-                        <Text style={styles.bodyText}>{results.raccomandazioni?.followUp}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.followUp}</MarkdownText>
 
                         <View style={styles.divider} />
                         <Text style={styles.subHeader}>Specialisti</Text>
-                        <Text style={styles.bodyText}>{results.raccomandazioni?.specialisti}</Text>
+                        <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.specialisti}</MarkdownText>
                     </>
                 )}
 
@@ -290,7 +291,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                     "Conclusione",
                     "checkmark-done-circle",
                     ['#263238', '#455A64', '#78909C'], // Dark Gray -> Gray -> Light Gray
-                    <Text style={styles.bodyText}>{results.conclusione}</Text>
+                    <MarkdownText style={styles.bodyText}>{results.conclusione}</MarkdownText>
                 )}
 
             </ScrollView>

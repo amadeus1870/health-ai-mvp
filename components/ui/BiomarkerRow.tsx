@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UI
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
+import { MarkdownText } from './MarkdownText';
 
 if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -95,7 +96,7 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                     {meaning && (
                         <View style={styles.detailRow}>
                             <Text style={styles.detailLabel}>Significato:</Text>
-                            <Text style={styles.detailValue}>{meaning}</Text>
+                            <MarkdownText style={styles.detailValue}>{meaning}</MarkdownText>
                         </View>
                     )}
 
@@ -105,13 +106,13 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                             {cause && (
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Possibili Cause:</Text>
-                                    <Text style={styles.detailValue}>{cause}</Text>
+                                    <MarkdownText style={styles.detailValue}>{cause}</MarkdownText>
                                 </View>
                             )}
                             {remedy && (
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Rimedi Consigliati:</Text>
-                                    <Text style={styles.detailValue}>{remedy}</Text>
+                                    <MarkdownText style={styles.detailValue}>{remedy}</MarkdownText>
                                 </View>
                             )}
                         </>

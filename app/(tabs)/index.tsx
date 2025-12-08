@@ -219,7 +219,7 @@ export default function Dashboard() {
                     {/* 1. HEADER PERSONALE */}
                     <View style={[GlobalStyles.headerContainer, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }]}>
                         <View style={{ flex: 1 }}>
-                            <Text style={GlobalStyles.headerTitle}>Buongiorno, {userName}</Text>
+                            <Text style={GlobalStyles.headerTitle}>Ciao, {userName}</Text>
                             <Text style={GlobalStyles.headerSubtitle}>{new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
                         </View>
 
@@ -255,48 +255,55 @@ export default function Dashboard() {
                             style={[StyleSheet.absoluteFill, { borderRadius: 24 }]}
                         />
 
-                        {/* 1. Chart Centered Absolutely */}
-                        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', zIndex: 0 }]} pointerEvents="none">
-                            <VitalScoreChart score={healthScore} size={160} />
-                        </View>
+                        {/* Content Overlay */}
+                        <View style={{ padding: 24, flex: 1, justifyContent: 'space-between', zIndex: 10 }}>
+                            {/* Header Row */}
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={styles.vitalTitle}>Vital Score (by AI)</Text>
+                                <TouchableOpacity
+                                    onPress={() => showInfo(
+                                        "Vital Score",
+                                        "Il Vital Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale."
+                                    )}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                >
+                                    <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                                </TouchableOpacity>
+                            </View>
 
-                        {/* 2. Content Overlay (Text & Button) */}
-                        <View style={{ padding: 24, flex: 1, justifyContent: 'space-between', zIndex: 10 }} pointerEvents="box-none">
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }} pointerEvents="box-none">
-                                <View style={{ marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                                    <Text style={styles.vitalTitle}>Vital Score (by AI)</Text>
+                            {/* Score & Bar */}
+                            <View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                                        <Text style={{ color: '#FFF', fontSize: 42, fontFamily: Typography.fontFamily.bold }}>{healthScore}</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontFamily: Typography.fontFamily.medium, marginLeft: 4 }}>/100</Text>
+                                    </View>
+
+                                    {/* Link Moved Here */}
                                     <TouchableOpacity
-                                        onPress={() => showInfo(
-                                            "Vital Score",
-                                            "Il Vital Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale."
-                                        )}
-                                        // hitSlop for better touch area
-                                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+                                        onPress={() => router.push('/(tabs)/biomarkers')}
                                     >
-                                        <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>Visualizza</Text>
+                                        <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
                                     </TouchableOpacity>
                                 </View>
-                            </View>
 
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }} pointerEvents="none">
-                                <View>
-                                    <Text style={{ color: '#FFF', fontSize: 32, fontFamily: Typography.fontFamily.bold }}>{healthScore}<Text style={{ fontSize: 16, opacity: 0.7 }}>/100</Text></Text>
+                                {/* Linear Progress Bar */}
+                                <View style={{ height: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 6, overflow: 'hidden' }}>
+                                    <LinearGradient
+                                        colors={['#FF453A', '#FFD60A', '#32D74B']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                        style={{ width: `${healthScore}%`, height: '100%', borderRadius: 6 }}
+                                    />
                                 </View>
                             </View>
-
-                            {/* Absolute Link to ensure clickability */}
-                            <TouchableOpacity
-                                style={{ position: 'absolute', bottom: 24, right: 24, flexDirection: 'row', alignItems: 'center', zIndex: 20 }}
-                                onPress={() => router.push('/(tabs)/biomarkers')}
-                            >
-                                <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>Visualizza</Text>
-                                <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
-                            </TouchableOpacity>
                         </View>
                     </SoftCard>
 
                     {/* 3. STATO ORGANI (Redesigned) */}
-                    <SoftCard style={[styles.vitalCard, { height: 140, padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
+                    <SoftCard style={[styles.vitalCard, { height: 170, padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
                         <LinearGradient
                             colors={['#1e3c72', '#9b59b6', '#fdbb2d']}
                             start={{ x: 0, y: 0 }}
@@ -315,13 +322,13 @@ export default function Dashboard() {
                                         <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
                                     </TouchableOpacity>
                                 </View>
-                                {/* Image anchored strictly to bottom with large negative margin to ensure visual contact */}
-                                <Image
-                                    source={require('../../assets/images/body_map.png')}
-                                    style={{ width: 120, height: 160, position: 'absolute', right: -10, bottom: -50, resizeMode: 'contain' }}
-                                />
                             </View>
                         </View>
+                        {/* Image anchored strictly to bottom of the CARD */}
+                        <Image
+                            source={require('../../assets/images/body_map.png')}
+                            style={{ width: 140, height: 190, position: 'absolute', right: -10, bottom: -20, resizeMode: 'contain' }}
+                        />
                     </SoftCard>
 
                     {/* 4. STRATEGIA NUTRIZIONALE (Redesigned) */}
@@ -619,7 +626,7 @@ const styles = StyleSheet.create({
     },
     vitalCard: {
 
-        height: 250,
+        height: 170,
         marginBottom: 20,
         marginHorizontal: 20,
         backgroundColor: 'transparent',

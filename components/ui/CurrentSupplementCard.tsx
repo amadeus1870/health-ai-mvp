@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Typography } from '../../constants/Typography';
+import { MarkdownText } from './MarkdownText';
 
 interface CurrentSupplement {
     name: string;
@@ -42,7 +43,7 @@ export const CurrentSupplementCard: React.FC<{ supplement: CurrentSupplement, te
                     <Text style={[styles.badgeText, { color: statusColor }]}>{supplement.action}</Text>
                 </View>
             </View>
-            <Text style={[styles.reason, { color: reasonColor }]}>{supplement.reason}</Text>
+            <MarkdownText style={[styles.reason, { color: reasonColor }]}>{supplement.reason}</MarkdownText>
         </View>
     );
 };

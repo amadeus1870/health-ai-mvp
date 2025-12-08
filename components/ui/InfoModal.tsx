@@ -50,9 +50,10 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
                 />
                 <Animated.View style={[styles.card, animatedStyle]}>
                     <BlurView
-                        intensity={80}
+                        intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
+                        experimentalBlurMethod='dimezisBlurView'
                     />
                     <View style={styles.contentContainer}>
                         <View style={styles.iconContainer}>

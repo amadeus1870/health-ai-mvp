@@ -15,6 +15,7 @@ import { DietStrategyCards } from '../../components/ui/DietStrategyCards';
 import { useAnalysis } from '../../context/AnalysisContext';
 import { DietPlanView } from '../../components/ui/DietPlanView';
 import { DietPlan } from '../../types/Diet';
+import { CustomAlert, AlertType } from '../../components/ui/CustomAlert';
 import { SoftCard } from '../../components/ui/SoftCard';
 import { BlurView } from 'expo-blur';
 import { ShoppingListModal } from '../../components/ui/ShoppingListModal';
@@ -49,6 +50,20 @@ export default function NutritionScreen() {
   const [shoppingListVisible, setShoppingListVisible] = useState(false);
   const [filteredShoppingListPlan, setFilteredShoppingListPlan] = useState<DietPlan | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  // Custom Alert State
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{
+    title: string;
+    message: string;
+    type: AlertType;
+    actions?: { text: string; onPress: () => void; style?: 'default' | 'cancel' | 'destructive' }[];
+  }>({ title: '', message: '', type: 'info' });
+
+  const showAlert = (title: string, message: string, type: AlertType = 'info', actions?: any[]) => {
+    setAlertConfig({ title, message, type, actions });
+    setAlertVisible(true);
+  };
 
   // Meal Swap State
   const [swapModalVisible, setSwapModalVisible] = useState(false);
@@ -365,6 +380,14 @@ export default function NutritionScreen() {
     return (
       <ImageBackground source={require('../../assets/images/custom_bg.jpg')} style={styles.container}>
         <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 50 }} />
+        <CustomAlert
+          visible={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          actions={alertConfig.actions}
+        />
       </ImageBackground>
     );
   }
@@ -459,7 +482,7 @@ export default function NutritionScreen() {
           <View style={styles.sectionContainer}>
             <SoftCard style={[styles.dietPlanCard, { padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
               <LinearGradient
-                colors={['#11998e', '#f2994a', '#f6d365']} // Green, Orange, Yellow
+                colors={['#11998e', '#11998e', '#f2994a', '#f6d365']} // Green (long), Orange, Yellow
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -492,19 +515,19 @@ export default function NutritionScreen() {
                       style={{
                         backgroundColor: 'rgba(255,255,255,0.2)',
                         borderRadius: 12,
-                        paddingHorizontal: 12,
+                        paddingHorizontal: 8,
                         paddingVertical: 6,
                         flexDirection: 'row',
                         alignItems: 'center',
-                        marginRight: 10
+                        marginRight: 8
                       }}
                     >
-                      <Ionicons name="cart-outline" size={16} color="#FFF" />
+                      <Ionicons name="cart-outline" size={14} color="#FFF" />
                       <Text style={{
                         color: '#FFF',
                         fontFamily: Typography.fontFamily.bold,
-                        fontSize: 12,
-                        marginLeft: 6
+                        fontSize: 10,
+                        marginLeft: 4
                       }}>
                         Settimana
                       </Text>
@@ -516,7 +539,7 @@ export default function NutritionScreen() {
                       style={{
                         backgroundColor: 'rgba(255,255,255,0.2)',
                         borderRadius: 12,
-                        paddingHorizontal: 12,
+                        paddingHorizontal: 8,
                         paddingVertical: 6,
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -524,17 +547,51 @@ export default function NutritionScreen() {
                       }}
                     >
                       {isGeneratingPdf ? (
-                        <ActivityIndicator size="small" color="#FFF" style={{ marginRight: 6 }} />
+                        <ActivityIndicator size="small" color="#FFF" style={{ marginRight: 4 }} />
                       ) : (
-                        <Ionicons name="share-outline" size={16} color="#FFF" style={{ marginRight: 6 }} />
+                        <Ionicons name="share-outline" size={14} color="#FFF" style={{ marginRight: 4 }} />
                       )}
 
                       <Text style={{
                         color: '#FFF',
                         fontFamily: Typography.fontFamily.bold,
-                        fontSize: 12,
+                        fontSize: 10,
                       }}>
                         Esporta
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        showAlert(
+                          "Rigenera Piano",
+                          "Il piano settimanale sarà aggiornato completamente. L'operazione richiederà del tempo (anche minuti). Sei sicuro di voler continuare?",
+                          "warning",
+                          [
+                            { text: "Annulla", onPress: () => { }, style: "cancel" },
+                            { text: "Rigenera", onPress: handleGenerateDiet, style: "destructive" }
+                          ]
+                        );
+                      }}
+                      disabled={loadingDiet}
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        borderRadius: 12,
+                        paddingHorizontal: 8,
+                        paddingVertical: 6,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 8,
+                        opacity: loadingDiet ? 0.7 : 1
+                      }}
+                    >
+                      <Ionicons name="refresh-outline" size={14} color="#FFF" style={{ marginRight: 4 }} />
+                      <Text style={{
+                        color: '#FFF',
+                        fontFamily: Typography.fontFamily.bold,
+                        fontSize: 10,
+                      }}>
+                        Rigenera
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -560,24 +617,7 @@ export default function NutritionScreen() {
                       onDailyShoppingList={handleDailyShoppingList}
                     />
 
-                    {!loadingDiet && (
-                      <TouchableOpacity
-                        style={styles.regenerateButton}
-                        onPress={() => {
-                          Alert.alert(
-                            "Rigenera Piano",
-                            "Sei sicuro? Il piano attuale verrà sovrascritto.",
-                            [
-                              { text: "Annulla", style: "cancel" },
-                              { text: "Rigenera", style: "destructive", onPress: handleGenerateDiet }
-                            ]
-                          );
-                        }}
-                        disabled={loadingDiet}
-                      >
-                        <Text style={styles.regenerateButtonText}>Rigenera Piano</Text>
-                      </TouchableOpacity>
-                    )}
+
                   </View>
                 ) : (
                   <View style={styles.generateContainer}>
@@ -681,6 +721,15 @@ export default function NutritionScreen() {
           userProfile={profile}
           onSwap={handleConfirmSwap}
         />
+
+        <CustomAlert
+          visible={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          actions={alertConfig.actions}
+        />
       </SafeAreaView >
     </ImageBackground >
   );
@@ -702,6 +751,17 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontFamily: Typography.fontFamily.bold,
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    fontFamily: Typography.fontFamily.regular,
+    color: 'rgba(255,255,255,0.8)',
   },
 
   carouselContent: {

@@ -4,6 +4,7 @@ import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { SoftCard } from './SoftCard';
 import { Ionicons } from '@expo/vector-icons';
+import { MarkdownText } from './MarkdownText';
 
 import Svg, { Path, Circle, Text as SvgText } from 'react-native-svg';
 
@@ -131,7 +132,7 @@ export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ ris
             </View>
 
             <Text style={[styles.probability, { color: secondaryColor }]}>Probabilità Rischio: {risk.probabilita}</Text>
-            <Text style={[styles.explanation, { color: bodyColor }]}>{risk.spiegazione}</Text>
+            <MarkdownText style={[styles.explanation, { color: bodyColor }]}>{risk.spiegazione}</MarkdownText>
         </SoftCard>
     );
 };
