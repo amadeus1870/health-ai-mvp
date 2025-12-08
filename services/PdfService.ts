@@ -6,10 +6,42 @@ import { ShoppingListService } from './ShoppingListService';
 import { AnalysisService } from './AnalysisService';
 
 export const PdfService = {
+    // Helper to convert basic Markdown to HTML
+    formatMarkdown: (text: string): string => {
+        if (!text) return '';
+        let html = text
+            // Bold (**text**)
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            // Italic (*text*)
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Lists (- item)
+            .replace(/^- (.*$)/gm, '<li>$1</li>');
+
+        // Wrap lists in <ul> (simple heuristic: if contains <li>, wrap)
+        // A better approach for simple lists:
+        if (html.includes('<li>')) {
+            // Check if it's just a list or mixed content.
+            // For simplicity in this context, we'll just wrap the whole thing if it looks like a list block,
+            // or replace consecutive <li>s with <ul>...</ul>.
+            // Let's try to wrap groups of <li>
+            html = html.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+        }
+
+        // Newlines to <br> (but not inside <ul> or after </li>)
+        html = html.replace(/\n/g, '<br>');
+        // Cleanup <br> after </ul> or </li>
+        html = html.replace(/<\/ul><br>/g, '</ul>');
+        html = html.replace(/<\/li><br>/g, '</li>');
+
+        return html;
+    },
+
     generateAndShareDietPdf: async (dietPlan: DietPlan, userProfile: UserProfile) => {
         try {
             const strategy = AnalysisService.calculateNutritionalStrategy(userProfile);
             const shoppingList = await ShoppingListService.generateList(dietPlan);
+
+            const formatMarkdown = PdfService.formatMarkdown;
 
             const html = `
         <!DOCTYPE html>
@@ -37,6 +69,8 @@ export const PdfService = {
                 .shopping-list-category { margin-top: 15px; }
                 .shopping-list-item { font-size: 14px; margin-bottom: 4px; }
                 .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #999; }
+                ul { margin: 5px 0; padding-left: 20px; }
+                li { margin-bottom: 2px; }
             </style>
         </head>
         <body>
@@ -68,7 +102,7 @@ export const PdfService = {
                             <div class="meal-info">
                                 <div style="color: #FF9F43; font-size: 12px; font-weight: bold; text-transform: uppercase;">${meal.type}</div>
                                 <div class="meal-name">${meal.name}</div>
-                                ${meal.description ? `<div class="meal-desc">${meal.description}</div>` : ''}
+                                ${meal.description ? `<div class="meal-desc">${formatMarkdown(meal.description)}</div>` : ''}
                                 <div class="meal-ingredients">
                                     <strong>Ingredienti:</strong> ${meal.ingredients.join(', ')}
                                 </div>
@@ -141,6 +175,7 @@ export const PdfService = {
             analysis.conclusione = analysis.conclusione || '';
 
             // --- Helper Functions for Chart Logic ---
+            const formatMarkdown = PdfService.formatMarkdown;
 
             // 1. Vital Score SVG Generator (Ticks)
             const generateVitalScoreSvg = (score: number, size: number) => {
@@ -424,6 +459,8 @@ export const PdfService = {
                         .status-suspend { background-color: rgba(255, 82, 82, 0.15); color: #FF5252; }
                         .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #bbb; border-top: 1px solid #f0f0f0; padding-top: 20px; }
                         .disclaimer { font-size: 10px; color: #999; margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; text-align: justify; }
+                        ul { margin: 5px 0; padding-left: 20px; }
+                        li { margin-bottom: 2px; }
                     </style>
                 </head>
                 <body>
@@ -475,7 +512,7 @@ export const PdfService = {
                                     <span style="font-size: 18px; margin-right: 8px;">📊</span>
                                     <h3 style="margin: 0; color: #E65100;">Analisi Quantitativa</h3>
                                 </div>
-                                <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${analysis.profiloLipidico.quantitative?.description || analysis.profiloLipidico.analisi || 'Dati non disponibili.'}</p>
+                                <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${formatMarkdown(analysis.profiloLipidico.quantitative?.description || analysis.profiloLipidico.analisi || 'Dati non disponibili.')}</p>
 
                                 <div style="margin-bottom: 20px;">
                                     ${generateComparisonRow('Colesterolo Totale', analysis.profiloLipidico.colesteroloTotale || analysis.profiloLipidico.quantitative?.total, 200, 'mg/dL')}
@@ -492,7 +529,7 @@ export const PdfService = {
                                         <span style="font-size: 18px; margin-right: 8px;">🧪</span>
                                         <h3 style="margin: 0; color: #E65100;">Analisi Qualitativa Avanzata</h3>
                                     </div>
-                                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${analysis.profiloLipidico.qualitative.description || ''}</p>
+                                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${formatMarkdown(analysis.profiloLipidico.qualitative.description || '')}</p>
 
                                     ${analysis.profiloLipidico.qualitative.metrics ? analysis.profiloLipidico.qualitative.metrics.map((metric: any) => {
                 // Logic from CholesterolCard.tsx to determine targets
@@ -517,7 +554,7 @@ export const PdfService = {
                                             <div style="margin-bottom: 15px;">
                                                 ${generateComparisonRow(metric.name, metric.value, target, unit, isLowerBetter, isWarning)}
                                                 <div style="font-size: 12px; color: #888; font-style: italic; margin-top: -5px; padding-left: 5px;">
-                                                    ${metric.interpretation}
+                                                    ${formatMarkdown(metric.interpretation)}
                                                 </div>
                                             </div>
                                         `;
@@ -530,10 +567,10 @@ export const PdfService = {
                         <h2>Valutazione Generale</h2>
                         <div class="card-section">
                             <div class="card-content">
-                                <p><strong>Panoramica: </strong> ${analysis.valutazioneGenerale.panoramica || 'N/A'}</p>
-                                <p><strong>Risultati Principali: </strong> ${analysis.valutazioneGenerale.risultati || 'N/A'}</p>
-                                <p><strong>Tendenze: </strong> ${analysis.valutazioneGenerale.tendenze || 'N/A'}</p>
-                                <p><strong>Correlazioni: </strong> ${analysis.valutazioneGenerale.correlazioni || 'N/A'}</p>
+                                <p><strong>Panoramica: </strong> ${formatMarkdown(analysis.valutazioneGenerale.panoramica || 'N/A')}</p>
+                                <p><strong>Risultati Principali: </strong> ${formatMarkdown(analysis.valutazioneGenerale.risultati || 'N/A')}</p>
+                                <p><strong>Tendenze: </strong> ${formatMarkdown(analysis.valutazioneGenerale.tendenze || 'N/A')}</p>
+                                <p><strong>Correlazioni: </strong> ${formatMarkdown(analysis.valutazioneGenerale.correlazioni || 'N/A')}</p>
                             </div>
                         </div>
 
@@ -542,11 +579,9 @@ export const PdfService = {
                         <div class="card-section">
                             ${analysis.fattoriDiRischio.length > 0 ? analysis.fattoriDiRischio.map((risk: any) => `
                                 <div class="risk-item ${risk.gravita.toLowerCase().includes('alto') ? 'risk-high' : risk.gravita.toLowerCase().includes('medio') ? 'risk-med' : 'risk-low'}">
-                                    <div style="font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span style="font-size: 16px;">${risk.identificazione}</span>
-                                        <span style="font-weight: bold; text-transform: uppercase;">${risk.gravita}</span>
-                                    </div>
-                                    <div style="font-size: 14px; color: #555;">${risk.spiegazione}</div>
+                                    <div style="font-weight: bold; text-transform: uppercase; font-size: 12px; margin-bottom: 2px;">${risk.gravita}</div>
+                                    <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">${formatMarkdown(risk.identificazione)}</div>
+                                    <div style="font-size: 14px; color: #555;">${formatMarkdown(risk.spiegazione)}</div>
                                 </div>
                             `).join('') : '<div style="padding: 10px; font-style: italic; color: #666;">Nessun fattore di rischio rilevato.</div>'}
                         </div>
@@ -555,14 +590,14 @@ export const PdfService = {
                         <h2>Raccomandazioni</h2>
                         <div class="card-section">
                             <div class="card-content">
-                                <h3>Mediche</h3>
-                                <p>${analysis.raccomandazioni.mediche || 'N/A'}</p>
+                                <h3>Considerazioni</h3>
+                                <p>${formatMarkdown(analysis.raccomandazioni.mediche || 'N/A')}</p>
                                 <h3>Stile di Vita</h3>
-                                <p>${analysis.raccomandazioni.stileDiVita || 'N/A'}</p>
+                                <p>${formatMarkdown(analysis.raccomandazioni.stileDiVita || 'N/A')}</p>
                                 <h3>Follow Up</h3>
-                                <p>${analysis.raccomandazioni.followUp || 'N/A'}</p>
+                                <p>${formatMarkdown(analysis.raccomandazioni.followUp || 'N/A')}</p>
                                 <h3>Specialisti</h3>
-                                <p>${analysis.raccomandazioni.specialisti || 'N/A'}</p>
+                                <p>${formatMarkdown(analysis.raccomandazioni.specialisti || 'N/A')}</p>
                             </div>
                         </div>
 
@@ -582,7 +617,7 @@ export const PdfService = {
                                             <span class="status-badge ${badgeClass}">${badgeText}</span>
                                         </div>
                                         ${s.dosage ? `<div class="supp-dose">${s.dosage}</div>` : ''}
-                                        <div class="supp-reason">${s.reason || 'Attualmente assunto'}</div>
+                                        <div class="supp-reason">${formatMarkdown(s.reason || 'Attualmente assunto')}</div>
                                     </div>
                                     `;
             }).join('')}
@@ -596,7 +631,7 @@ export const PdfService = {
                                     <div class="supp-card" style="border-left: 3px solid #E65100;">
                                         <div class="supp-name">⭐ ${s.name}</div>
                                         <div class="supp-dose">${s.dosage}</div>
-                                        <div class="supp-reason">${s.reason}</div>
+                                        <div class="supp-reason">${formatMarkdown(s.reason)}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -607,7 +642,7 @@ export const PdfService = {
                         <h2>Conclusione</h2>
                         <div class="card-section">
                             <div class="card-content" style="background-color: #f0f8ff; border: 1px solid #bcdff1;">
-                                ${analysis.conclusione || 'Nessuna conclusione disponibile.'}
+                                ${formatMarkdown(analysis.conclusione || 'Nessuna conclusione disponibile.')}
                             </div>
                         </div>
 
@@ -665,7 +700,7 @@ th, td { padding: 12px; text - align: left; border - bottom: 1px solid #eee; }
     < body >
     <h1>Dettaglio Biomarcatori </h1>
         < div class="header-info" >
-            Paziente: <strong>${userProfile.name} </strong><br>
+            Utente: <strong>${userProfile.name} </strong><br>
                         Generato il ${new Date().toLocaleDateString('it-IT')}
 </div>
 

@@ -29,18 +29,16 @@ const RiskGauge = ({ severity }: { severity: string }) => {
     let percentage = 0;
     let color = Colors.success;
 
-    switch (severity?.toLowerCase()) {
-        case 'alto':
-        case 'medio alto':
-        case 'medio-alto':
-        case 'medio/alto': percentage = 0.85; color = Colors.error; break;
-        case 'medio':
-        case 'medio basso':
-        case 'medio-basso':
-        case 'basso-medio':
-        case 'basso/medio': percentage = 0.5; color = Colors.warning; break;
-        case 'basso': percentage = 0.2; color = Colors.success; break;
-        default: percentage = 0.1; color = Colors.textSecondary;
+    const cleanSeverity = severity?.toLowerCase().replace(/[*_]/g, '').trim();
+
+    if (cleanSeverity?.includes('alto')) {
+        percentage = 0.85; color = Colors.error;
+    } else if (cleanSeverity?.includes('medio')) {
+        percentage = 0.5; color = Colors.warning;
+    } else if (cleanSeverity?.includes('basso')) {
+        percentage = 0.2; color = Colors.success;
+    } else {
+        percentage = 0.1; color = Colors.textSecondary;
     }
 
     const strokeDashoffset = circumference * (1 - percentage);
@@ -85,19 +83,12 @@ const RiskGauge = ({ severity }: { severity: string }) => {
 
 export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ risk, textColor }) => {
     const getSeverityColor = (severity: string) => {
-        switch (severity?.toLowerCase()) {
-            case 'alto':
-            case 'medio alto':
-            case 'medio-alto':
-            case 'medio/alto': return Colors.error;
-            case 'medio':
-            case 'medio basso':
-            case 'medio-basso':
-            case 'basso-medio':
-            case 'basso/medio': return Colors.warning;
-            case 'basso': return Colors.success;
-            default: return Colors.textSecondary;
-        }
+        const cleanSeverity = severity?.toLowerCase().replace(/[*_]/g, '').trim();
+        if (cleanSeverity?.includes('alto')) return Colors.error;
+        if (cleanSeverity?.includes('medio') && !cleanSeverity?.includes('basso')) return Colors.warning; // Medio pure
+        if (cleanSeverity?.includes('medio') && cleanSeverity?.includes('basso')) return Colors.warning; // Medio-basso
+        if (cleanSeverity?.includes('basso')) return Colors.success;
+        return Colors.textSecondary;
     };
 
     const titleColor = textColor || Colors.text;
@@ -107,7 +98,7 @@ export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ ris
     const severityColor = getSeverityColor(risk.gravita);
 
     const containerStyle = textColor ? {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: severityColor + '33',
         borderWidth: 1,
         borderColor: severityColor,
     } : {

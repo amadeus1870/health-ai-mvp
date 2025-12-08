@@ -46,7 +46,7 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
 
     const statusColor = getStatusColor();
     const containerStyle = textColor ? {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: statusColor + '33', // Transparent colored background
         borderWidth: 1,
         borderColor: statusColor,
     } : {
@@ -95,8 +95,8 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                     {/* Meaning - Always show */}
                     {meaning && (
                         <View style={styles.detailRow}>
-                            <Text style={styles.detailLabel}>Significato:</Text>
-                            <MarkdownText style={styles.detailValue}>{meaning}</MarkdownText>
+                            <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Significato:</Text>
+                            <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{meaning}</MarkdownText>
                         </View>
                     )}
 
@@ -105,14 +105,14 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                         <>
                             {cause && (
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Possibili Cause:</Text>
-                                    <MarkdownText style={styles.detailValue}>{cause}</MarkdownText>
+                                    <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Possibili Cause:</Text>
+                                    <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{cause}</MarkdownText>
                                 </View>
                             )}
                             {remedy && (
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Rimedi Consigliati:</Text>
-                                    <MarkdownText style={styles.detailValue}>{remedy}</MarkdownText>
+                                    <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Rimedi Consigliati:</Text>
+                                    <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{remedy}</MarkdownText>
                                 </View>
                             )}
                         </>

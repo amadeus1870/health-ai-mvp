@@ -96,12 +96,12 @@ export default function SettingsScreen() {
                     <SettingsItem
                         icon="shield-checkmark-outline"
                         label="Privacy Policy"
-                        onPress={() => router.push('/settings/privacy')}
+                        onPress={() => router.push('/legal/privacy')}
                     />
                     <SettingsItem
                         icon="document-outline"
                         label="Termini di Servizio"
-                        onPress={() => router.push('/settings/terms')}
+                        onPress={() => router.push('/legal/terms')}
                     />
                     <SettingsItem
                         icon="warning-outline"

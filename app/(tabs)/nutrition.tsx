@@ -222,7 +222,7 @@ export default function NutritionScreen() {
       for (let day = 1; day <= 7; day++) {
         // Add delay to avoid hitting Gemini API rate limits (approx 15 RPM)
         if (day > 1) {
-          await new Promise(resolve => setTimeout(resolve, 6000));
+          await new Promise(resolve => setTimeout(resolve, 15000));
         }
         try {
           // Calculate strategy to get targets

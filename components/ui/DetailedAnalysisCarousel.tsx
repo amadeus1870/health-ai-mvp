@@ -203,7 +203,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                     "medkit",
                     ['#1B5E20', '#388E3C', '#66BB6A'], // Dark Green -> Green -> Light Green
                     <>
-                        <Text style={styles.subHeader}>Mediche</Text>
+                        <Text style={styles.subHeader}>Considerazioni</Text>
                         <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.mediche}</MarkdownText>
 
                         <View style={styles.divider} />

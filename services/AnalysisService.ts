@@ -82,7 +82,7 @@ export const AnalysisService = {
             else if (b.status === 'warning') biomarkerPenalty += 2;
 
             // Bonus check
-            if (tumorMarkers.some(tm => b.name.toUpperCase().includes(tm)) && b.status === 'optimal') {
+            if (tumorMarkers.some(tm => b.name?.toUpperCase().includes(tm)) && b.status === 'optimal') {
                 tumorBonus += 5;
             }
         });

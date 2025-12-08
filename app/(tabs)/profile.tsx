@@ -545,6 +545,16 @@ export default function ProfileScreen() {
               <Text style={styles.saveButtonText}>CONFERMA PROFILO</Text>
             </TouchableOpacity>
 
+            <View style={styles.legalContainer}>
+              <TouchableOpacity onPress={() => router.push('/legal/privacy')}>
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </TouchableOpacity>
+              <Text style={styles.legalSeparator}>•</Text>
+              <TouchableOpacity onPress={() => router.push('/legal/terms')}>
+                <Text style={styles.legalLink}>Termini di Servizio</Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={{ height: 100 }} />
 
           </ScrollView>
@@ -789,5 +799,23 @@ const styles = StyleSheet.create({
   activityTextActive: {
     color: '#FFFFFF',
     fontFamily: Typography.fontFamily.bold,
+  },
+  legalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontFamily: Typography.fontFamily.medium,
+    textDecorationLine: 'underline',
+  },
+  legalSeparator: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.4)',
+    marginHorizontal: 10,
   },
 });

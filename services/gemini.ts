@@ -1,25 +1,44 @@
 import { Colors } from '../constants/Colors';
 import { ProfileService } from './ProfileService';
 import { UserProfile } from '../types/Profile';
-import { GEMINI_API_KEY } from '../config/env';
+import { GEMINI_API_KEY, BACKEND_URL } from '../config/env';
 
 // Using gemini-2.5-flash as explicitly requested by user
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// BACKEND_URL is currently ignored to avoid shared IP rate limits on Firebase Functions.
+// We use the local API key with client-side calls for better stability (unique IP per user).
+const USE_BACKEND = false;
+const GEMINI_URL = USE_BACKEND
+  ? BACKEND_URL
+  : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
 const GEMINI_FLASH_URL = GEMINI_URL;
 
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, backoff = 1000): Promise<Response> => {
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 2000): Promise<Response> => {
   try {
     const response = await fetch(url, options);
-    if (response.status === 429 && retries > 0) {
-      console.warn(`Gemini API Rate Limit (429). Waiting 60 seconds before retry...`);
-      await new Promise(resolve => setTimeout(resolve, 60000));
-      return fetchWithRetry(url, options, retries - 1, backoff);
+
+    if (response.status === 429) {
+      if (retries > 0) {
+        // 429: Too Many Requests. Wait significantly longer.
+        // If header "Retry-After" exists, use it (though Gemini might not send it standardly).
+        // Default wait: 60 seconds + backoff.
+        const waitTime = 60000 + backoff;
+        console.warn(`Gemini API Rate Limit (429). Waiting ${waitTime / 1000}s before retry... (Retries left: ${retries})`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+      } else {
+        // No retries left for 429
+        console.error("Gemini API Rate Limit (429) - Max retries exceeded.");
+        throw new Error("Quota exceeded. Please try again in a few minutes.");
+      }
     }
+
     if (response.status >= 500 && retries > 0) {
       console.warn(`Gemini API Error (${response.status}). Retrying in ${backoff}ms...`);
       await new Promise(resolve => setTimeout(resolve, backoff));
       return fetchWithRetry(url, options, retries - 1, backoff * 2);
     }
+
     return response;
   } catch (error) {
     if ((error as any).name === 'AbortError') {
@@ -117,7 +136,7 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
         }
       ],
       "raccomandazioni": {
-        "mediche": "Raccomandazioni Mediche Basate sui Risultati (No prescrizioni).",
+        "mediche": "Considerazioni basate sui risultati (evidenze scientifiche, no diagnosi).",
         "stileDiVita": "Suggerimenti per lo Stile di Vita e la Dieta, altamente personalizzati sul Profilo (es. se fuma, se dorme male).",
         "followUp": "Test e Procedure di Follow-up Consigliati.",
         "specialisti": "Rinvio a Specialisti se Necessario."
@@ -349,7 +368,7 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
         }
       ],
       "raccomandazioni": {
-        "mediche": "Raccomandazioni...",
+        "mediche": "Considerazioni basate sui risultati (evidenze scientifiche, no diagnosi).",
         "stileDiVita": "Suggerimenti Stile di Vita aggiornati...",
         "followUp": "Follow-up...",
         "specialisti": "Specialisti..."
@@ -508,6 +527,7 @@ export const generateDietPlan = async (userProfile: any, analysisResults: any) =
         - NO composites (e.g., "Broccoli" AND "Carote" separately, NOT "Mix broccoli e carote").
         - Use STANDARD names (e.g., "Olio EVO", "Pollo", "Riso", "Pasta").
     7.  **LANGUAGE**: ITALIAN.
+    8.  **FORMATTING**: You can use basic Markdown (bold **text**) in descriptions for emphasis if needed.
 
     OUTPUT FORMAT:
     Return ONLY a JSON object with this structure:

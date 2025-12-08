@@ -115,7 +115,7 @@ export default function BiomarkersScreen() {
       await new Promise(resolve => setTimeout(resolve, 100));
       const profile = await ProfileService.getProfile();
       if (profile) {
-        const score = calculateVitalScore(results);
+        const score = AnalysisService.calculateVitalScore(results);
         await PdfService.generateAndShareAnalysisPdf(results, profile, score);
       } else {
         showAlert("Errore", "Impossibile recuperare il profilo utente.", "error");

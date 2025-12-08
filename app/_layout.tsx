@@ -5,6 +5,7 @@ import { useFonts, Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold, Outf
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { AnalysisProvider } from '../context/AnalysisContext';
+import { DisclaimerModal } from '../components/DisclaimerModal';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -36,7 +37,10 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false }} initialRouteName="welcome">
             <Stack.Screen name="welcome" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="legal/privacy" options={{ headerShown: true, title: 'Privacy Policy', headerBackTitle: 'Indietro', headerTransparent: true, headerTintColor: '#FFF' }} />
+            <Stack.Screen name="legal/terms" options={{ headerShown: true, title: 'Termini di Servizio', headerBackTitle: 'Indietro', headerTransparent: true, headerTintColor: '#FFF' }} />
           </Stack>
+          <DisclaimerModal />
         </View>
       </AnalysisProvider>
     </SafeAreaProvider>
