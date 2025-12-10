@@ -5,25 +5,14 @@ import { BlurView } from 'expo-blur';
 import { Colors } from '../../constants/Colors';
 import { SoftCard } from './SoftCard';
 
-const QUOTES = [
-    "La salute è il primo dovere della vita.",
-    "Abbi cura del tuo corpo, è l'unico posto in cui devi vivere.",
-    "La felicità è la forma più alta di salute.",
-    "Ogni giorno è una nuova opportunità per stare meglio.",
-    "Il benessere non è una destinazione, ma un modo di viaggiare.",
-    "Ascolta il tuo corpo, ti parla continuamente.",
-    "Fa che il cibo sia la tua medicina e non la medicina sia il tuo cibo.",
-    "La calma è la culla della forza.",
-    "Un corpo sano è una camera per l'anima.",
-    "Investire nella salute produce i migliori interessi."
-];
+import i18n from '../../config/i18n';
 
 export const QuoteCard = () => {
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setIndex((prev) => (prev + 1) % QUOTES.length);
+            setIndex((prev) => (prev + 1) % 10); // 10 quotes
         }, 15000); // 15 seconds
 
         return () => clearInterval(interval);
@@ -47,7 +36,7 @@ export const QuoteCard = () => {
                     />
                     <View style={styles.cardContent}>
                         <Text style={styles.quoteMark}>“</Text>
-                        <Text style={styles.quote}>{QUOTES[index]}</Text>
+                        <Text style={styles.quote}>{i18n.t(`loading.quotes.${index}`)}</Text>
                         <Text style={styles.quoteMark}>”</Text>
                     </View>
                 </SoftCard>

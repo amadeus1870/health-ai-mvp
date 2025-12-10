@@ -5,9 +5,10 @@ import { useFonts, Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold, Outf
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { AnalysisProvider } from '../context/AnalysisContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { DisclaimerModal } from '../components/DisclaimerModal';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,20 +30,42 @@ export default function RootLayout() {
     return null;
   }
 
+  const headerBlur = () => (
+    <BlurView intensity={90} tint="dark" style={{ flex: 1 }} />
+  );
+
   return (
     <SafeAreaProvider>
-      <AnalysisProvider>
-        <View style={{ flex: 1 }}>
-          <StatusBar style="auto" />
-          <Stack screenOptions={{ headerShown: false }} initialRouteName="welcome">
-            <Stack.Screen name="welcome" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="legal/privacy" options={{ headerShown: true, title: 'Privacy Policy', headerBackTitle: 'Indietro', headerTransparent: true, headerTintColor: '#FFF' }} />
-            <Stack.Screen name="legal/terms" options={{ headerShown: true, title: 'Termini di Servizio', headerBackTitle: 'Indietro', headerTransparent: true, headerTintColor: '#FFF' }} />
-          </Stack>
-          <DisclaimerModal />
-        </View>
-      </AnalysisProvider>
+      <LanguageProvider>
+        <AnalysisProvider>
+          <View style={{ flex: 1 }}>
+            <StatusBar style="auto" />
+            <Stack screenOptions={{ headerShown: false }} initialRouteName="welcome">
+              <Stack.Screen name="welcome" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="legal/privacy"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="legal/terms"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="settings/disclaimer"
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+            <DisclaimerModal />
+          </View>
+        </AnalysisProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

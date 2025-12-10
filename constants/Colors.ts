@@ -27,7 +27,7 @@ export const Colors = {
     text: '#2D3436',
     textSecondary: '#636E72',
     success: '#00b894',
-    warning: '#FFD700', // Gold/Yellow
+    warning: '#FFB142', // Orange (was Gold/Yellow)
     orange: '#F39C12',
     error: '#ff7675',
 

@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { SoftCard } from './SoftCard';
+import i18n from '../../config/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -30,11 +31,16 @@ export const DietPlanView: React.FC<DietPlanViewProps> = ({ plan, onSwapMeal, on
     // plan.days might be incomplete during generation
     const currentDayPlan = plan.days.find(d => Number(d.day) === selectedDay);
 
+
+
+
+
     const renderTimelineItem = (day: number) => {
         const dayPlan = plan.days.find(d => Number(d.day) === day);
         const isGenerated = !!dayPlan;
         const isSelected = day === selectedDay;
-        const dayName = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'][(day - 1) % 7];
+        const dayNames = i18n.t('common.days.short') as unknown as string[];
+        const dayName = dayNames[(day - 1) % 7];
 
         return (
             <TouchableOpacity
@@ -80,7 +86,7 @@ export const DietPlanView: React.FC<DietPlanViewProps> = ({ plan, onSwapMeal, on
                     <>
                         <View style={styles.dayHeaderRow}>
                             <Text style={styles.dayTitle}>
-                                Giorno {selectedDay} - {['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'][(selectedDay - 1) % 7]}
+                                {i18n.t('nutrition.day')} {selectedDay} - {(i18n.t('common.days.long') as unknown as string[])[(selectedDay - 1) % 7]}
                             </Text>
                             {onDailyShoppingList && (
                                 <TouchableOpacity
@@ -101,7 +107,7 @@ export const DietPlanView: React.FC<DietPlanViewProps> = ({ plan, onSwapMeal, on
                                         fontSize: 12,
                                         marginLeft: 6
                                     }}>
-                                        Giorno
+                                        {i18n.t('nutrition.day')}
                                     </Text>
                                 </TouchableOpacity>
                             )}
@@ -117,7 +123,7 @@ export const DietPlanView: React.FC<DietPlanViewProps> = ({ plan, onSwapMeal, on
                     </>
                 ) : (
                     <View style={styles.loadingContainer}>
-                        <Text style={styles.loadingText}>Stiamo generando il Giorno {selectedDay}...</Text>
+                        <Text style={styles.loadingText}>{i18n.t('nutrition.generatingDay', { day: selectedDay })}</Text>
                     </View>
                 )}
             </View>

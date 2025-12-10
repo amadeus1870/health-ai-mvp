@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { DietPlan } from '../../types/Diet';
-import { ActivityIndicator } from 'react-native';
+
 import { ShoppingListService, Category } from '../../services/ShoppingListService';
+import i18n from '../../config/i18n';
 
 interface ShoppingListModalProps {
     visible: boolean;
@@ -19,24 +20,27 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (visible && dietPlan) {
-            loadList();
-        }
-    }, [visible, dietPlan]);
 
-    const loadList = async () => {
+
+    const loadList = useCallback(async () => {
         if (!dietPlan) return;
         setLoading(true);
         try {
-            const list = await ShoppingListService.generateList(dietPlan);
+            // Pass current language to service
+            const list = await ShoppingListService.generateList(dietPlan, i18n.locale);
             setCategories(list);
         } catch (error) {
             console.error("Failed to generate shopping list", error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [dietPlan]);
+
+    useEffect(() => {
+        if (visible && dietPlan) {
+            loadList();
+        }
+    }, [visible, dietPlan, loadList]);
 
     const toggleIngredient = (categoryIndex: number, itemIndex: number) => {
         const newCategories = [...categories];
@@ -71,7 +75,7 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
                         <View style={styles.header}>
                             <View style={styles.titleRow}>
                                 <Ionicons name="cart" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
-                                <Text style={styles.title}>Lista della Spesa</Text>
+                                <Text style={styles.title}>{i18n.t('shoppingList.title')}</Text>
                             </View>
                             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                                 <Ionicons name="close" size={24} color="#FFF" />
@@ -80,14 +84,14 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
 
                         <Text style={styles.subtitle}>
                             {dietPlan?.days?.length === 1
-                                ? "Ingredienti estratti dal tuo piano giornaliero."
-                                : "Ingredienti estratti dal tuo piano settimanale."}
+                                ? i18n.t('shoppingList.subtitleDaily')
+                                : i18n.t('shoppingList.subtitleWeekly')}
                         </Text>
 
                         {loading ? (
                             <View style={styles.loadingContainer}>
                                 <ActivityIndicator size="large" color={Colors.primary} />
-                                <Text style={styles.loadingText}>Organizzo la lista...</Text>
+                                <Text style={styles.loadingText}>{i18n.t('shoppingList.loading')}</Text>
                             </View>
                         ) : (
                             <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
@@ -119,7 +123,7 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
                                         </View>
                                     ))
                                 ) : (
-                                    <Text style={styles.emptyText}>Nessun ingrediente trovato.</Text>
+                                    <Text style={styles.emptyText}>{i18n.t('shoppingList.empty')}</Text>
                                 )}
                             </ScrollView>
                         )}
@@ -127,7 +131,7 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
                         <View style={styles.footer}>
                             <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
                                 <Ionicons name="copy-outline" size={20} color="#FFF" style={{ marginRight: 8 }} />
-                                <Text style={styles.copyButtonText}>Copia Tutto</Text>
+                                <Text style={styles.copyButtonText}>{i18n.t('shoppingList.copyAll')}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -136,7 +140,7 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
                             <View style={styles.toastContainer}>
                                 <BlurView intensity={90} tint="light" style={styles.toastBlur}>
                                     <Ionicons name="checkmark-circle" size={24} color="#4caf50" style={{ marginRight: 8 }} />
-                                    <Text style={styles.toastText}>Copiato negli appunti!</Text>
+                                    <Text style={styles.toastText}>{i18n.t('shoppingList.copied')}</Text>
                                 </BlurView>
                             </View>
                         )}

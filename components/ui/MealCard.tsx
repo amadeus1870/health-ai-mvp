@@ -1,13 +1,15 @@
+import i18n from '../../config/i18n';
+import { useLanguage } from '../../context/LanguageContext';
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/Colors';
-import { Typography } from '../../constants/Typography';
-import Animated, { useAnimatedStyle, withTiming, useSharedValue, interpolate, Extrapolate } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Meal } from '../../types/Diet';
 import { BlurView } from 'expo-blur';
 import { SoftCard } from './SoftCard';
+import { Colors } from '../../constants/Colors';
+import { Typography } from '../../constants/Typography';
+import { Meal } from '../../types/Diet';
 
 interface MealCardProps {
     meal: Meal;
@@ -16,38 +18,40 @@ interface MealCardProps {
 }
 
 export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
+    const { language } = useLanguage();
     const [expanded, setExpanded] = useState(false);
-    const animation = useSharedValue(0);
+    const rotation = useSharedValue(0);
 
     const toggleExpand = () => {
-        const target = expanded ? 0 : 1;
-        animation.value = withTiming(target, { duration: 300 });
         setExpanded(!expanded);
+        rotation.value = withTiming(expanded ? 0 : 180);
     };
-
-    const bodyStyle = useAnimatedStyle(() => {
-        return {
-            maxHeight: interpolate(animation.value, [0, 1], [0, 1000], Extrapolate.CLAMP),
-            opacity: animation.value,
-            marginTop: interpolate(animation.value, [0, 1], [0, 10], Extrapolate.CLAMP),
-        };
-    });
 
     const arrowStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ rotate: `${interpolate(animation.value, [0, 1], [0, 180])}deg` }],
+            transform: [{ rotate: `${rotation.value}deg` }],
+        };
+    });
+
+    const bodyStyle = useAnimatedStyle(() => {
+        return {
+            height: expanded ? 'auto' : 0,
+            opacity: withTiming(expanded ? 1 : 0),
         };
     });
 
     const getMealIcon = (type: string) => {
-        switch (type.toLowerCase()) {
-            case 'colazione': return 'cafe-outline';
-            case 'spuntino': return 'nutrition-outline';
-            case 'pranzo': return 'restaurant-outline';
-            case 'merenda': return 'ice-cream-outline';
-            case 'cena': return 'moon-outline';
-            default: return 'restaurant-outline';
-        }
+        // ... existing switch
+    };
+
+    // Helper to translate meal type if it's in English/Italian from DB
+    const getTranslatedMealType = (type: string) => {
+        const t = type.toLowerCase();
+        if (t.includes('colazione') || t.includes('breakfast')) return i18n.t('nutrition.mealTypes.breakfast');
+        if (t.includes('pranzo') || t.includes('lunch')) return i18n.t('nutrition.mealTypes.lunch');
+        if (t.includes('cena') || t.includes('dinner')) return i18n.t('nutrition.mealTypes.dinner');
+        if (t.includes('spuntino') || t.includes('snack') || t.includes('merenda')) return i18n.t('nutrition.mealTypes.snack');
+        return type; // Fallback
     };
 
     return (
@@ -58,10 +62,10 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                             <View style={styles.typeBadge}>
-                                <Text style={styles.typeText}>{meal.type}</Text>
+                                <Text style={styles.typeText}>{getTranslatedMealType(meal.type)}</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
+                                <Text style={styles.caloriesText}>{meal.calories} {i18n.t('nutrition.calories')}</Text>
                                 <Animated.View style={[arrowStyle, { marginLeft: 8 }]}>
                                     <Ionicons name="chevron-down" size={20} color="rgba(255,255,255,0.6)" />
                                 </Animated.View>
@@ -71,40 +75,25 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
 
                     <Text style={styles.mealName}>{meal.name}</Text>
 
-                    {/* Action Row */}
-                    <View style={styles.actionRow}>
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
-                            {onSwap && (
-                                <TouchableOpacity
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        onSwap();
-                                    }}
-                                    style={styles.actionButton}
-                                >
-                                    <Ionicons name="swap-horizontal" size={20} color={Colors.primary} />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
+                    {/* ... Action Row ... */}
 
                     {/* Macros Badges (Visible always) */}
                     <View style={styles.macrosRow}>
                         <View style={[styles.macroBadge, { backgroundColor: 'rgba(79, 195, 247, 0.2)' }]}>
-                            <Text style={[styles.macroText, { color: '#4FC3F7' }]}>{meal.macros.protein}g Prot</Text>
+                            <Text style={[styles.macroText, { color: '#4FC3F7' }]}>{meal.macros.protein}g {i18n.t('nutrition.protein')}</Text>
                         </View>
                         <View style={[styles.macroBadge, { backgroundColor: 'rgba(46, 204, 113, 0.2)' }]}>
-                            <Text style={[styles.macroText, { color: '#2ecc71' }]}>{meal.macros.carbs}g Carb</Text>
+                            <Text style={[styles.macroText, { color: '#2ecc71' }]}>{meal.macros.carbs}g {i18n.t('nutrition.carbs')}</Text>
                         </View>
                         <View style={[styles.macroBadge, { backgroundColor: 'rgba(241, 196, 15, 0.2)' }]}>
-                            <Text style={[styles.macroText, { color: '#f1c40f' }]}>{meal.macros.fats}g Gras</Text>
+                            <Text style={[styles.macroText, { color: '#f1c40f' }]}>{meal.macros.fats}g {i18n.t('nutrition.fats')}</Text>
                         </View>
                     </View>
 
                     {/* Expanded Content */}
                     <Animated.View style={[styles.body, bodyStyle]}>
                         <View style={styles.divider} />
-                        <Text style={styles.sectionTitle}>Ingredienti</Text>
+                        <Text style={styles.sectionTitle}>{i18n.t('nutrition.ingredients')}</Text>
                         <View style={styles.ingredientsList}>
                             {meal.ingredients.map((ing, i) => (
                                 <Text key={i} style={styles.ingredientText}>• {ing}</Text>
@@ -113,7 +102,7 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
 
                         {meal.description && (
                             <>
-                                <Text style={[styles.sectionTitle, { marginTop: 12 }]}>Preparazione</Text>
+                                <Text style={[styles.sectionTitle, { marginTop: 12 }]}>{i18n.t('nutrition.preparation')}</Text>
                                 <Text style={styles.descriptionText}>{meal.description}</Text>
                             </>
                         )}

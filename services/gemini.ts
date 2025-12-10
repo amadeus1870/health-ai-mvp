@@ -53,7 +53,28 @@ const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, ba
   }
 };
 
-export const analyzeBiomarkers = async (files: { base64: string, mimeType: string }[]) => {
+const cleanJsonString = (jsonStr: string): string => {
+  // 1. Remove Markdown code blocks
+  let clean = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+
+  // 2. Escape control characters inside strings
+  // Regex matches a JSON string: " (escaped char OR any char except " or \) * "
+  // We use a function to replace control chars ONLY inside the matched string
+  return clean.replace(/"(?:\\.|[^"\\])*"/g, (match) => {
+    return match.replace(/[\u0000-\u001F]/g, (char) => {
+      switch (char) {
+        case '\b': return '\\b';
+        case '\f': return '\\f';
+        case '\n': return '\\n';
+        case '\r': return '\\r';
+        case '\t': return '\\t';
+        default: return ''; // Remove other control chars
+      }
+    });
+  });
+};
+
+export const analyzeBiomarkers = async (files: { base64: string, mimeType: string }[], language: string = 'it') => {
   // 1. Fetch User Profile
   let profileContext = "USER PROFILE: Not available.";
   try {
@@ -94,7 +115,7 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
     - REQUIRED: COMPLETE RAW EXTRACTION. Do not summarize. Do not skip "normal" values.
     - SAFETY: You are an AI consultant.
     - PERSONALIZATION: Tailor recommendations to the profile.
-    - LANGUAGE: MUST BE ITALIAN. Translate everything.
+    - LANGUAGE: MUST BE ${language.toUpperCase()}. Translate everything.
     - FORMATTING: Use Markdown for all text fields (bold **text**, lists -, etc.) to improve readability.
     
     CRITICAL MEDICAL CONTEXT (MODERN RESEARCH):
@@ -130,7 +151,7 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
       "fattoriDiRischio": [
         { 
           "identificazione": "Identificazione dei Potenziali Rischi (basati su Test + Profilo)", 
-          "gravita": "Basso/Medio/Alto", 
+          "gravita": "low/medium/high", 
           "probabilita": "Percentuale", 
           "spiegazione": "Analisi della Gravità e delle Probabilità di Rischio, spiegando PERCHÉ è un rischio per QUESTO utente specifico." 
         }
@@ -173,7 +194,7 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
           "name": "Biomarker/Finding Name", 
           "value": "Value or Finding Result", 
           "unit": "Unit (or empty if N/A)", 
-          "status": "optimal/warning/critical", 
+          "status": "optimal/warning/critical", // DO NOT TRANSLATE 
           "target": "Target Value (e.g. '< 100', 'Negative'). Leave empty ONLY if no target exists.",
           "meaning": "Brief explanation of what this marker indicates.",
           "cause": "Possible causes (only if status is warning/critical, else empty string).",
@@ -185,8 +206,10 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
     
     IMPORTANT:
     - If LDL is missing, calculate Friedewald LDL = (Total - HDL - (Triglycerides / 5)).
-    - For "status", use strictly "optimal", "warning", or "critical".
-    - LANGUAGE: ITALIAN. All text values must be in Italian.
+    - For "status", use strictly "optimal", "warning", or "critical". DO NOT TRANSLATE THESE VALUES.
+    - For "gravita", use strictly "low", "medium", or "high". DO NOT TRANSLATE THESE VALUES.
+    - For supplements "action", use strictly "Conferma" or "Sospendi".
+    - LANGUAGE: ${language.toUpperCase()}. All text values must be in ${language.toUpperCase()} EXCEPT for "status", "gravita" and "action" fields mentioned above.
   `;
 
   const imageParts = files.map(file => ({
@@ -227,7 +250,7 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
     }
 
     const textResponse = data.candidates[0].content.parts[0].text;
-    const jsonString = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+    const jsonString = cleanJsonString(textResponse);
 
     return JSON.parse(jsonString);
 
@@ -237,12 +260,16 @@ export const analyzeBiomarkers = async (files: { base64: string, mimeType: strin
   }
 };
 
-export const categorizeIngredients = async (ingredients: string[]): Promise<{ category: string, items: string[] }[]> => {
+export const categorizeIngredients = async (ingredients: string[], language: string = 'it'): Promise<{ category: string, items: string[] }[]> => {
   if (ingredients.length === 0) return [];
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+    const prompt = language === 'it'
+      ? `Raggruppa i seguenti ingredienti per categoria merceologica (es. "Frutta e Verdura", "Carne e Pesce", "Latticini", "Cereali", "Dispensa", "Altro").`
+      : `Group the following ingredients by category (e.g. "Fruit & Veg", "Meat & Fish", "Dairy", "Grains", "Pantry", "Other"). Language: ${language.toUpperCase()}.`;
 
     const response = await fetchWithRetry(GEMINI_URL, {
       method: 'POST',
@@ -252,13 +279,13 @@ export const categorizeIngredients = async (ingredients: string[]): Promise<{ ca
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Raggruppa i seguenti ingredienti per categoria merceologica (es. "Frutta e Verdura", "Carne e Pesce", "Latticini", "Cereali", "Dispensa", "Altro").
+            text: `${prompt}
             
-            Ingredienti: ${JSON.stringify(ingredients)}
+            Ingredients: ${JSON.stringify(ingredients)}
 
-            Rispondi SOLO con un JSON valido:
+            Response ONLY with valid JSON:
             [
-              { "category": "Nome Categoria", "items": ["100g ingrediente 1", "2 pz ingrediente 2"] }
+              { "category": "Category Name", "items": ["100g item 1", "2 item 2"] }
             ]`
           }]
         }]
@@ -274,16 +301,24 @@ export const categorizeIngredients = async (ingredients: string[]): Promise<{ ca
 
     const data = await response.json();
     const text = data.candidates[0].content.parts[0].text;
-    const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const jsonStr = cleanJsonString(text);
     return JSON.parse(jsonStr);
   } catch (error) {
     console.warn("Categorization failed (using fallback):", error);
     // Fallback: return single category
-    return [{ category: "Tutti gli ingredienti", items: ingredients.sort() }];
+    const fallbackMap: { [key: string]: string } = {
+      it: "Tutti gli ingredienti",
+      en: "All Ingredients",
+      es: "Todos los ingredientes",
+      fr: "Tous les ingrédients",
+      de: "Alle Zutaten"
+    };
+    const fallbackCategory = fallbackMap[language] || "All Ingredients";
+    return [{ category: fallbackCategory, items: ingredients.sort() }];
   }
 };
 
-export const reAnalyzeBiomarkers = async (existingResults: any) => {
+export const reAnalyzeBiomarkers = async (existingResults: any, language: string = 'it') => {
   // 1. Fetch User Profile
   let profileContext = "USER PROFILE: Not available.";
   try {
@@ -315,10 +350,11 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
   }
 
   // 2. Prepare Existing Data Context
-  const existingBiomarkers = existingResults.biomarkers || [];
-  const existingCholesterol = existingResults.cholesterolAnalysis?.quantitative || {};
+  try {
+    const existingBiomarkers = existingResults.biomarkers || [];
+    const existingCholesterol = existingResults.cholesterolAnalysis?.quantitative || {};
 
-  const dataContext = `
+    const dataContext = `
     EXISTING BIOMARKERS DATA:
     ${JSON.stringify(existingBiomarkers, null, 2)}
 
@@ -326,7 +362,7 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
     ${JSON.stringify(existingCholesterol, null, 2)}
   `;
 
-  const prompt = `
+    const prompt = `
     ROLE: Medical Analyst & Health Consultant.
     OBJECTIVE: Re-evaluate the health status based on EXISTING BIOMARKER DATA and a NEW USER PROFILE.
     
@@ -340,7 +376,8 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
     - RE-CALCULATE Risks, Recommendations, and Supplement advice based on the NEW PROFILE.
     - CONCISE OUTPUT: Keep explanations brief and to the point.
     - CONCISE OUTPUT: Keep explanations brief and to the point.
-    - LANGUAGE: MUST BE ITALIAN.
+    - LANGUAGE: MUST BE ${language.toUpperCase()}.
+    - CRITICAL: "status" fields MUST remain "optimal", "warning", or "critical". DO NOT TRANSLATE.
     - FORMATTING: Use Markdown for all text fields (bold **text**, lists -, etc.) to improve readability.
 
     CRITICAL MEDICAL CONTEXT (MODERN RESEARCH):
@@ -381,41 +418,39 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
             { "name": "Non-HDL Cholesterol", "value": "Calc...", "status": "...", "interpretation": "..." },
             { "name": "TG/HDL Ratio", "value": "Calc...", "status": "...", "interpretation": "..." },
             { "name": "Remnant Cholesterol", "value": "Calc...", "status": "...", "interpretation": "..." },
-            { "name": "Lipid Accumulation Product (LAP)", "value": "Calc...", "status": "...", "interpretation": "..." }
+            { "name": "Lipid Accumulation Product (LAP)", "value": "Calculate...", "status": "...", "interpretation": "..." }
           ]
         }
       },
       "supplements": {
-        "analysis": "Analisi aggiornata...",
+        "analysis": "Analysis of current supplements vs needs.",
         "current": [
-          { "name": "Supplement Name (from Profile)", "action": "Conferma/Sospendi", "reason": "Reason..." }
+          { "name": "Supplement Name", "action": "Conferma/Sospendi", "reason": "Explanation." }
         ],
         "recommended": [
-          { "name": "Supplement Name", "reason": "Reason...", "dosage": "Dosage..." }
+          { "name": "Supplement Name", "reason": "Specific reason.", "dosage": "Dosage" }
         ]
       },
       "biomarkers": [
         { 
-          "name": "Biomarker Name (Keep original)", 
-          "value": "Value (Keep original)", 
-          "unit": "Unit (Keep original)", 
-          "status": "optimal/warning/critical (Re-evaluate)", 
-          "target": "Target (Keep original)",
-          "meaning": "Meaning...",
-          "cause": "Possible causes (Update based on profile)...",
-          "remedy": "Possible remedies (Update based on profile)..."
+          "name": "Biomarker Name", 
+          "value": "Value", 
+          "unit": "Unit", 
+          "status": "optimal/warning/critical", // DO NOT TRANSLATE 
+          "target": "Target",
+          "meaning": "Explanation",
+          "cause": "Possible causes",
+          "remedy": "Possible remedies"
         }
       ],
-      "conclusione": "Conclusione aggiornata..."
+      "conclusione": "Sintesi dei Risultati e Raccomandazioni Finali."
     }
   `;
 
-  try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 300 second timeout (5 mins)
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes timeout
 
-    console.log("Sending RE-ANALYSIS request to Gemini...", GEMINI_URL);
-    const response = await fetchWithRetry(GEMINI_URL, {
+    const response = await fetchWithRetry(GEMINI_FLASH_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -428,13 +463,12 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API Error: ${response.status} - ${errorText}`);
+      throw new Error(`Gemini API Error: ${response.status}`);
     }
 
     const data = await response.json();
     if (!data.candidates || !data.candidates[0].content) {
-      throw new Error('No analysis result in response');
+      throw new Error('No result in response');
     }
 
     const textResponse = data.candidates[0].content.parts[0].text;
@@ -447,7 +481,7 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
       throw new Error("Invalid JSON response from AI: No JSON object found.");
     }
 
-    const jsonString = textResponse.substring(firstOpenBrace, lastCloseBrace + 1);
+    const jsonString = cleanJsonString(textResponse.substring(firstOpenBrace, lastCloseBrace + 1));
 
     return JSON.parse(jsonString);
 
@@ -461,26 +495,26 @@ export const reAnalyzeBiomarkers = async (existingResults: any) => {
   }
 };
 
-export const generateDietPlan = async (userProfile: any, analysisResults: any) => {
+export const generateDietPlan = async (userProfile: any, analysisResults: any, language: string = 'it') => {
   const profileContext = `
     USER PROFILE:
-    - Name: ${userProfile.name}
-    - Age: ${userProfile.age}
-    - Gender: ${userProfile.gender}
-    - Height: ${userProfile.height} cm
+  - Name: ${userProfile.name}
+  - Age: ${userProfile.age}
+  - Gender: ${userProfile.gender}
+  - Height: ${userProfile.height} cm
     - Weight: ${userProfile.weight} kg
-    - Activity Level: ${userProfile.activityLevel}
-    - Diet Type: ${userProfile.dietType}
-    - Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'} ${userProfile.otherDietaryRestriction ? `(${userProfile.otherDietaryRestriction})` : ''}
-    - Goal: ${userProfile.goal || 'General Health'}
-    - Meals per Day: ${userProfile.mealsPerDay}
-    - Snacks per Day: ${userProfile.snacksPerDay}
+      - Activity Level: ${userProfile.activityLevel}
+  - Diet Type: ${userProfile.dietType}
+  - Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'} ${userProfile.otherDietaryRestriction ? `(${userProfile.otherDietaryRestriction})` : ''}
+  - Goal: ${userProfile.goal || 'General Health'}
+  - Meals per Day: ${userProfile.mealsPerDay}
+  - Snacks per Day: ${userProfile.snacksPerDay}
   `;
 
   const analysisContext = analysisResults ? `
     BLOOD ANALYSIS INSIGHTS:
-    - Deficiencies/Issues: ${JSON.stringify(analysisResults.biomarkers?.filter((b: any) => b.status !== 'optimal').map((b: any) => b.name) || [])}
-    - Recommendations: ${JSON.stringify(analysisResults.raccomandazioni?.stileDiVita || '')}
+  - Deficiencies / Issues: ${JSON.stringify(analysisResults.biomarkers?.filter((b: any) => b.status !== 'optimal').map((b: any) => b.name) || [])}
+  - Recommendations: ${JSON.stringify(analysisResults.raccomandazioni?.stileDiVita || '')}
   ` : "No blood analysis available.";
 
   const mealsCount = parseInt(userProfile.mealsPerDay) || 3;
@@ -508,56 +542,56 @@ export const generateDietPlan = async (userProfile: any, analysisResults: any) =
   }
 
   const prompt = `
-    ROLE: Expert Nutritionist & Chef.
-    OBJECTIVE: Create a detailed 14-DAY MEAL PLAN (Bi-Weekly) for this user.
-    
-    ${profileContext}
+  ROLE: Expert Nutritionist & Chef.
+    OBJECTIVE: Create a detailed 14 - DAY MEAL PLAN(Bi - Weekly) for this user.
+
+      ${profileContext}
     
     ${analysisContext}
 
     CRITICAL REQUIREMENTS:
-    1.  **STRICT ADHERENCE TO DIET TYPE**: User is "${userProfile.dietType}". Do NOT include any forbidden foods.
-    2.  **STRICT ADHERENCE TO RESTRICTIONS**: User has "${userProfile.dietaryRestrictions.join(', ') || 'None'}". RESPECT THIS ABSOLUTELY.
-    3.  **MEAL STRUCTURE**: You MUST generate exactly these meals per day: ${mealStructure}.
-    4.  **HEALTH FOCUSED**: Incorporate foods that help with identified deficiencies.
-    5.  **CONCISE OUTPUT**: Keep descriptions VERY brief (max 15 words).
-    6.  **INGREDIENT NAMING RULES**:
-        - Use SINGLE nouns (e.g., "Carota" NOT "Carote").
-        - NO adjectives (e.g., "Mela" NOT "Mela rossa croccante", "Merluzzo" NOT "Filetto di Merluzzo fresco").
-        - NO composites (e.g., "Broccoli" AND "Carote" separately, NOT "Mix broccoli e carote").
-        - Use STANDARD names (e.g., "Olio EVO", "Pollo", "Riso", "Pasta").
-    7.  **LANGUAGE**: ITALIAN.
-    8.  **FORMATTING**: You can use basic Markdown (bold **text**) in descriptions for emphasis if needed.
+  1. ** STRICT ADHERENCE TO DIET TYPE **: User is "${userProfile.dietType}".Do NOT include any forbidden foods.
+    2. ** STRICT ADHERENCE TO RESTRICTIONS **: User has "${userProfile.dietaryRestrictions.join(', ') || 'None'}".RESPECT THIS ABSOLUTELY.
+    3. ** MEAL STRUCTURE **: You MUST generate exactly these meals per day: ${mealStructure}.
+  4. ** HEALTH FOCUSED **: Incorporate foods that help with identified deficiencies.
+    5. ** CONCISE OUTPUT **: Keep descriptions VERY brief(max 15 words).
+    6. ** INGREDIENT NAMING RULES **:
+  - Use SINGLE nouns(e.g., "Carota" NOT "Carote").
+        - NO adjectives(e.g., "Mela" NOT "Mela rossa croccante", "Merluzzo" NOT "Filetto di Merluzzo fresco").
+        - NO composites(e.g., "Broccoli" AND "Carote" separately, NOT "Mix broccoli e carote").
+        - Use STANDARD names(e.g., "Olio EVO", "Pollo", "Riso", "Pasta").
+    7. ** LANGUAGE **: ${language.toUpperCase()}.
+  8. ** FORMATTING **: You can use basic Markdown(bold ** text **) in descriptions for emphasis if needed.
 
     OUTPUT FORMAT:
     Return ONLY a JSON object with this structure:
-    {
-      "week1": [
-        {
-          "day": 1,
-          "meals": [
-            {
-              "type": "Meal Type",
-              "name": "Dish Name",
-              "description": "Brief prep (max 15 words)",
-              "ingredients": ["100g Main Item 1", "200g Main Item 2"],
-              "calories": 300,
-              "macros": { "protein": 10, "carbs": 40, "fats": 10 }
-            },
-            ... (Repeat for all meals in structure: ${mealStructure})
-          ]
-        },
-        ... (Days 2-7)
+  {
+    "week1": [
+      {
+        "day": 1,
+        "meals": [
+          {
+            "type": "Meal Type",
+            "name": "Dish Name",
+            "description": "Brief prep (max 15 words)",
+            "ingredients": ["100g Main Item 1", "200g Main Item 2"],
+            "calories": 300,
+            "macros": { "protein": 10, "carbs": 40, "fats": 10 }
+          },
+          ... (Repeat for all meals in structure: ${mealStructure})
+    ]
+  },
+        ... (Days 2 - 7)
       ],
-      "week2": [
-        ... (Days 8-14)
-      ]
+"week2": [
+  ... (Days 8 - 14)
+]
     }
-  `;
+`;
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 300 second timeout (5 mins)
+    const timeoutId = setTimeout(() => controller.abort(), 600000); // 600 second timeout (10 mins)
 
     console.log("Sending DIET PLAN request to Gemini...", GEMINI_URL);
     const response = await fetchWithRetry(GEMINI_URL, {
@@ -574,7 +608,7 @@ export const generateDietPlan = async (userProfile: any, analysisResults: any) =
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API Error: ${response.status} - ${errorText}`);
+      throw new Error(`Gemini API Error: ${response.status} - ${errorText} `);
     }
 
     const data = await response.json();
@@ -599,34 +633,42 @@ export const generateDietPlan = async (userProfile: any, analysisResults: any) =
   }
 };
 
-export const generateDayDiet = async (userProfile: any, analysisResults: any, dayNumber: number, previousDays: any[] = [], targetCalories: number, targetMacros: any) => {
+export const generateDayDiet = async (
+  dayNumber: number,
+  userProfile: any,
+  targetCalories: number,
+  targetMacros: any,
+  previousDays: any[] = [],
+  analysisResults: any = null,
+  language: string = 'it'
+) => {
   const profileContext = `
     USER PROFILE:
-    - Name: ${userProfile.name}
-    - Age: ${userProfile.age}
-    - Gender: ${userProfile.gender}
-    - Height: ${userProfile.height} cm
-    - Weight: ${userProfile.weight} kg
+- Name: Utente
+- Age: ${userProfile.age}
+- Gender: ${userProfile.gender}
+- Height: ${userProfile.height} cm
+  - Weight: ${userProfile.weight} kg
     - Activity Level: ${userProfile.activityLevel}
-    - Diet Type: ${userProfile.dietType}
-    - Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'} ${userProfile.otherDietaryRestriction ? `(${userProfile.otherDietaryRestriction})` : ''}
-    - Goal: ${userProfile.goal || 'General Health'}
-    - Meals per Day: ${userProfile.mealsPerDay}
-    - Snacks per Day: ${userProfile.snacksPerDay}
-    - TARGET CALORIES: ${targetCalories} kcal (STRICT LIMIT)
-    - TARGET MACROS: Protein ${targetMacros.protein}%, Carbs ${targetMacros.carbs}%, Fats ${targetMacros.fats}%
-  `;
+- Diet Type: ${userProfile.dietType}
+- Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'} ${userProfile.otherDietaryRestriction ? `(${userProfile.otherDietaryRestriction})` : ''}
+- Goal: ${userProfile.goal || 'General Health'}
+- Meals per Day: ${userProfile.mealsPerDay}
+- Snacks per Day: ${userProfile.snacksPerDay}
+- TARGET CALORIES: ${targetCalories} kcal(STRICT LIMIT)
+  - TARGET MACROS: Protein ${targetMacros.protein}%, Carbs ${targetMacros.carbs}%, Fats ${targetMacros.fats}%
+    `;
 
   const analysisContext = analysisResults ? `
     BLOOD ANALYSIS INSIGHTS:
-    - Deficiencies/Issues: ${JSON.stringify(analysisResults.biomarkers?.filter((b: any) => b.status !== 'optimal').map((b: any) => b.name) || [])}
-    - Recommendations: ${JSON.stringify(analysisResults.raccomandazioni?.stileDiVita || '')}
-  ` : "No blood analysis available.";
+- Deficiencies / Issues: ${JSON.stringify(analysisResults.biomarkers?.filter((b: any) => b.status !== 'optimal').map((b: any) => b.name) || [])}
+- Recommendations: ${JSON.stringify(analysisResults.raccomandazioni?.stileDiVita || '')}
+` : "No blood analysis available.";
 
   const previousDaysContext = previousDays.length > 0 ? `
-    PREVIOUS DAYS MEALS (Do not repeat exact same main dishes if possible):
+    PREVIOUS DAYS MEALS(Do not repeat exact same main dishes if possible):
     ${JSON.stringify(previousDays.map(d => d.meals.map((m: any) => m.name)), null, 2)}
-  ` : "No previous days generated yet.";
+` : "No previous days generated yet.";
 
   const mealsCount = parseInt(userProfile.mealsPerDay) || 3;
   const snacksCount = parseInt(userProfile.snacksPerDay) || 0;
@@ -652,9 +694,9 @@ export const generateDayDiet = async (userProfile: any, analysisResults: any, da
   }
 
   const prompt = `
-    ROLE: Expert Nutritionist & Chef.
-    OBJECTIVE: Create a meal plan for DAY ${dayNumber} of a 7-day plan.
-    
+ROLE: Expert Nutritionist & Chef.
+  OBJECTIVE: Create a meal plan for DAY ${dayNumber} of a 7 - day plan.
+
     ${profileContext}
     
     ${analysisContext}
@@ -663,47 +705,47 @@ export const generateDayDiet = async (userProfile: any, analysisResults: any, da
 
     RANDOM SEED: ${Date.now()} (Use this to vary the output from previous runs)
 
-    IMPORTANT: You must calculate the sum of calories for the generated meals.
-    TARGET: ${targetCalories} kcal.
+IMPORTANT: You must calculate the sum of calories for the generated meals.
+  TARGET: ${targetCalories} kcal.
     ALLOWED RANGE: ${targetCalories - 50} - ${targetCalories + 50} kcal.
 
     CRITICAL REQUIREMENTS:
-    1.  **CALORIE SUM CHECK**: The sum of calories of all meals MUST be between ${targetCalories - 50} and ${targetCalories + 50}. THIS IS THE MOST IMPORTANT RULE. FAIL IF NOT MET.
-    2.  **STRICT ADHERENCE TO DIET TYPE**: User is "${userProfile.dietType}".
-    3.  **STRICT ADHERENCE TO RESTRICTIONS**: User has "${userProfile.dietaryRestrictions.join(', ') || 'None'}".
-    4.  **MEAL STRUCTURE**: Generate exactly: ${mealStructure}.
-    5.  **VARIETY**: Try to vary from previous days.
-    6.  **CONCISE**: Max 15 words per description. Max 5 ingredients WITH QUANTITIES.
-    7.  **INGREDIENT NAMING RULES**:
-        - CRITICAL: Use GENERIC, SINGULAR names.
+1. ** CALORIE SUM CHECK **: The sum of calories of all meals MUST be between ${targetCalories - 50} and ${targetCalories + 50}. THIS IS THE MOST IMPORTANT RULE.FAIL IF NOT MET.
+    2. ** STRICT ADHERENCE TO DIET TYPE **: User is "${userProfile.dietType}".
+    3. ** STRICT ADHERENCE TO RESTRICTIONS **: User has "${userProfile.dietaryRestrictions.join(', ') || 'None'}".
+    4. ** MEAL STRUCTURE **: Generate exactly: ${mealStructure}.
+5. ** VARIETY **: Try to vary from previous days.
+    6. ** CONCISE **: Max 15 words per description.Max 5 ingredients WITH QUANTITIES.
+    7. ** INGREDIENT NAMING RULES **:
+- CRITICAL: Use GENERIC, SINGULAR names.
         - BAD: "Filetto di Salmone", "Uova medie", "Spinaci freschi", "Mix verdure".
         - GOOD: "Salmone", "Uovo", "Spinaci", "Verdure".
-        - ALWAYS separate mixed ingredients (e.g., "100g Carote", "100g Broccoli" INSTEAD OF "200g Mix carote e broccoli").
-    8.  **LANGUAGE**: ITALIAN.
+        - ALWAYS separate mixed ingredients(e.g., "100g Carote", "100g Broccoli" INSTEAD OF "200g Mix carote e broccoli").
+    8. ** LANGUAGE **: ${language.toUpperCase()}.
 
     OUTPUT FORMAT:
     Return ONLY a JSON object for this single day:
-    {
-      "day": ${dayNumber},
-      "meals": [
-        {
-          "type": "Meal Type",
-          "name": "Dish Name",
-          "description": "Brief prep",
-          "ingredients": ["100g Item 1", "1 Item 2"],
-          "calories": 300, // Ensure this contributes correctly to the total
-          "macros": { "protein": 10, "carbs": 40, "fats": 10 }
-        },
-        ... (Repeat for: ${mealStructure})
+  {
+    "day": ${dayNumber},
+    "meals": [
+      {
+        "type": "Meal Type",
+        "name": "Dish Name",
+        "description": "Brief prep",
+        "ingredients": ["100g Item 1", "1 Item 2"],
+        "calories": 300, // Ensure this contributes correctly to the total
+        "macros": { "protein": 10, "carbs": 40, "fats": 10 }
+      },
+      ... (Repeat for: ${mealStructure})
       ]
-    }
-  `;
+  }
+`;
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes timeout to allow for rate limit waits
 
-    // console.log(`Sending DAY ${dayNumber} request to Gemini...`);
+    // console.log(`Sending DAY ${ dayNumber } request to Gemini...`);
     const response = await fetchWithRetry(GEMINI_FLASH_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -718,7 +760,7 @@ export const generateDayDiet = async (userProfile: any, analysisResults: any, da
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API Error: ${response.status} - ${errorText}`);
+      throw new Error(`Gemini API Error: ${response.status} - ${errorText} `);
     }
 
     const data = await response.json();
@@ -738,56 +780,56 @@ export const generateDayDiet = async (userProfile: any, analysisResults: any, da
     return JSON.parse(jsonString);
 
   } catch (error) {
-    console.warn(`Gemini Day ${dayNumber} Error:`, error);
+    console.warn(`Gemini Day ${dayNumber} Error: `, error);
     throw error;
   }
 };
-export const generateAlternativeMeals = async (originalMeal: any, userProfile: any) => {
+export const generateAlternativeMeals = async (originalMeal: any, userProfile: any, language: string = 'it') => {
   const profileContext = `
     USER PROFILE:
-    - Name: ${userProfile.name}
-    - Diet Type: ${userProfile.dietType}
-    - Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'}
-    - Goal: ${userProfile.goal || 'General Health'}
-  `;
+- Name: Utente
+- Diet Type: ${userProfile.dietType}
+- Restrictions: ${userProfile.dietaryRestrictions.join(', ') || 'None'}
+- Goal: ${userProfile.goal || 'General Health'}
+`;
 
   const prompt = `
-    ROLE: Expert Nutritionist.
-    OBJECTIVE: Generate 3 ALTERNATIVE MEAL OPTIONS to replace the following meal:
+ROLE: Expert Nutritionist.
+  OBJECTIVE: Generate 3 ALTERNATIVE MEAL OPTIONS to replace the following meal:
     
     ORIGINAL MEAL:
-    - Type: ${originalMeal.type}
-    - Name: ${originalMeal.name}
-    - Calories: ${originalMeal.calories}
-    - Macros: P:${originalMeal.macros.protein}g, C:${originalMeal.macros.carbs}g, F:${originalMeal.macros.fats}g
+- Type: ${originalMeal.type}
+- Name: ${originalMeal.name}
+- Calories: ${originalMeal.calories}
+- Macros: P:${originalMeal.macros.protein} g, C:${originalMeal.macros.carbs} g, F:${originalMeal.macros.fats} g
 
     ${profileContext}
 
     CRITICAL REQUIREMENTS:
-    1.  **SAME MEAL TYPE**: Must be "${originalMeal.type}".
-    2.  **SIMILAR MACROS**: Try to keep calories and macros within +/- 10% of the original.
-    3.  **DIET COMPLIANCE**: Strictly adhere to "${userProfile.dietType}" and restrictions.
-    4.  **VARIETY**: Options must be different from the original and from each other.
-    5.  **INGREDIENT NAMING RULES**:
-        - Use generic names: "Pollo", "Merluzzo", "Zucchine" (No "Filetto di...", "fresco", etc.).
-    6.  **LANGUAGE**: ITALIAN.
+1. ** SAME MEAL TYPE **: Must be "${originalMeal.type}".
+    2. ** SIMILAR MACROS **: Try to keep calories and macros within +/- 10% of the original.
+3. ** DIET COMPLIANCE **: Strictly adhere to "${userProfile.dietType}" and restrictions.
+    4. ** VARIETY **: Options must be different from the original and from each other.
+    5. ** INGREDIENT NAMING RULES **:
+- Use generic names: "Pollo", "Merluzzo", "Zucchine"(No "Filetto di...", "fresco", etc.).
+    6. ** LANGUAGE **: ${language.toUpperCase()}.
 
     OUTPUT FORMAT:
     Return ONLY a JSON object with this structure:
+{
+  "alternatives": [
     {
-      "alternatives": [
-        {
-          "type": "${originalMeal.type}",
-          "name": "Option 1 Name",
-          "description": "Brief prep",
-          "ingredients": ["100g Item 1", "1 Item 2"],
-          "calories": 300,
-          "macros": { "protein": 10, "carbs": 40, "fats": 10 }
-        },
-        ... (Option 2 and 3)
-      ]
-    }
-  `;
+      "type": "${originalMeal.type}",
+      "name": "Option 1 Name",
+      "description": "Brief prep",
+      "ingredients": ["100g Item 1", "1 Item 2"],
+      "calories": 300,
+      "macros": { "protein": 10, "carbs": 40, "fats": 10 }
+    },
+    ... (Option 2 and 3)
+  ]
+}
+`;
 
   try {
     const controller = new AbortController();
@@ -806,7 +848,7 @@ export const generateAlternativeMeals = async (originalMeal: any, userProfile: a
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Gemini API Error: ${response.status}`);
+      throw new Error(`Gemini API Error: ${response.status} `);
     }
 
     const data = await response.json();

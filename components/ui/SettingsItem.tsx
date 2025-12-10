@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, View, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
-import { BlurView } from 'expo-blur';
+
 
 interface SettingsItemProps {
     icon: keyof typeof Ionicons.glyphMap;
@@ -26,8 +26,9 @@ export default function SettingsItem({
     isSwitch = false,
     switchValue,
     onSwitchChange,
-    color
-}: SettingsItemProps) {
+    color,
+    rightElement
+}: SettingsItemProps & { rightElement?: React.ReactNode }) {
     const itemColor = isDestructive ? '#FF453A' : (color || '#FFF');
 
     return (
@@ -55,6 +56,7 @@ export default function SettingsItem({
                     />
                 ) : (
                     <View style={styles.rightContainer}>
+                        {rightElement}
                         {value && <Text style={styles.value}>{value}</Text>}
                         {onPress && <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.3)" />}
                     </View>
@@ -66,14 +68,14 @@ export default function SettingsItem({
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 10,
+        marginBottom: 2, // Reduced from 10
         borderRadius: 12,
         overflow: 'hidden',
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
+        padding: 12, // Reduced from 16
         // backgroundColor: 'rgba(255,255,255,0.05)', // Removed as requested
     },
     iconContainer: {

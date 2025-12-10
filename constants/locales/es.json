@@ -1,0 +1,735 @@
+{
+    "welcomeScreen": {
+        "welcomeTitle": "¡Hola! Soy my Proactive Lab AI",
+        "welcomeBackTitle": "¡Qué gusto verte de nuevo!",
+        "welcomeSubtitle": "Estoy aquí para ayudarte a entender mejor tu cuerpo y alcanzar tus objetivos de bienestar.",
+        "welcomeBackSubtitle": "¿Listo para nuevos conocimientos sobre tu bienestar? Continuemos donde lo dejamos.",
+        "continue": "Continuar",
+        "incompleteProfile": "Para continuar, completa tu perfil o sube un análisis.",
+        "acceptPrivacy": "Acepto la",
+        "accept": "Acepto",
+        "privacyPolicy": "Política de Privacidad",
+        "termsOfService": "Términos de Servicio",
+        "medicalDisclaimer": "Descargo Médico"
+    },
+    "profileOptions": {
+        "gender": {
+            "M": "M",
+            "F": "F"
+        },
+        "activity": {
+            "sedentary": "Sedentario",
+            "lightly_active": "Ligeramente activo",
+            "moderately_active": "Moderadamente activo",
+            "very_active": "Muy activo",
+            "extreme": "Extremo"
+        },
+        "diet": {
+            "omnivore": "Omnívoro",
+            "vegetarian": "Vegetariano",
+            "vegan": "Vegano",
+            "pescatarian": "Pescatariano",
+            "keto": "Keto",
+            "paleo": "Paleo",
+            "gluten_free": "Sin gluten",
+            "lactose_free": "Sin lactosa",
+            "other": "Otro"
+        },
+        "restrictions": {
+            "none": "Ninguno",
+            "vegetarian": "Vegetariano",
+            "vegan": "Vegano",
+            "gluten_free": "Sin gluten",
+            "dairy_free": "Sin lácteos",
+            "no_red_meat": "Sin carne roja",
+            "nut_allergy": "Alergia a las nueces",
+            "religious": "Restricción religiosa",
+            "other": "Otro"
+        },
+        "conditions": {
+            "fatty_liver": "Hígado graso",
+            "hypertension": "Hipertensión",
+            "pre_hypertension": "Prehipertensión",
+            "diabetes": "Diabetes",
+            "heart_disease": "Enfermedad cardíaca",
+            "kidney_issues": "Problemas renales",
+            "ibs": "SII",
+            "hypothyroidism": "Hipotiroidismo",
+            "hyperthyroidism": "Hipertiroidismo",
+            "high_cholesterol": "Colesterol alto",
+            "other": "Otro"
+        },
+        "symptoms": {
+            "fatigue": "Fatiga",
+            "abdominal_pain": "Dolor abdominal",
+            "migraine": "Migraña",
+            "muscle_pain": "Dolor muscular",
+            "back_pain": "Dolor de espalda",
+            "pelvic_pain": "Dolor pélvico",
+            "jaundice": "Ictericia",
+            "tiredness": "Cansancio",
+            "insomnia": "Insomnio",
+            "weight_loss": "Pérdida de peso",
+            "physical_change": "Cambio físico",
+            "nausea": "Náuseas",
+            "dizziness": "Mareos"
+        },
+        "habits": {
+            "cold_showers": "Duchas frías",
+            "meditation": "Meditación",
+            "walking": "Caminar",
+            "gym": "Gimnasio",
+            "sauna": "Sauna",
+            "fasting": "Ayuno"
+        },
+        "supplements": {
+            "multivitamin": "Multivitamínico",
+            "multimineral": "Multimineral",
+            "vitamin_d": "Vitamina D",
+            "vitamin_c": "Vitamina C",
+            "vitamin_e": "Vitamina E",
+            "omega_3": "Omega-3",
+            "magnesium": "Magnesio",
+            "potassium": "Potasio",
+            "mineral_salts": "Sales minerales",
+            "probiotics": "Probióticos",
+            "zinc": "Zinc",
+            "iron": "Hierro",
+            "b_complex": "Complejo B",
+            "protein_powder": "Proteína en polvo",
+            "creatine": "Creatina",
+            "melatonin": "Melatonina"
+        },
+        "physical": {
+            "very_defined": "Muy definido/Venas visibles",
+            "athletic": "Atlético/Tonificado",
+            "average": "Forma media",
+            "soft": "Suave/Unos kilos de más",
+            "overweight": "Sobrepeso"
+        },
+        "sleep": {
+            "good": "Bueno",
+            "average": "Promedio",
+            "poor": "Malo",
+            "insomnia": "Insomnio"
+        },
+        "stress": {
+            "low": "Bajo",
+            "moderate": "Moderado",
+            "high": "Alto",
+            "extreme": "Extremo"
+        },
+        "smoke": {
+            "no": "No",
+            "yes": "Sí"
+        },
+        "alcohol": {
+            "no": "No",
+            "occasional": "Ocasional",
+            "frequent": "Frecuente"
+        },
+        "coffee": {
+            "no": "No",
+            "1-2": "1-2",
+            "3+": "3+"
+        }
+    },
+    "tabs": {
+        "dashboard": "Inicio",
+        "analysis": "Análisis",
+        "nutrition": "Nutrición",
+        "profile": "Perfil"
+    },
+    "dashboard": {
+        "greeting": "Hola, %{name}",
+        "uploadCard": {
+            "title": "Nuevo Análisis",
+            "subtitle": "Sube o toma una foto de tus exámenes"
+        },
+        "historyTitle": "Historial de Análisis",
+        "noHistory": "Sin análisis recientes",
+        "vitalScoreTitle": "Wellness Score (by AI)",
+        "vitalScoreInfo": "El Wellness Score es un índice sintético de tu estado de salud (0-100), calculado analizando biomarcadores, factores de riesgo y perfil lipídico. Un puntaje alto indica un excelente estado de salud general.",
+        "healthMapTitle": "Wellness Map",
+        "nutritionStrategyTitle": "Estrategia Nutricional",
+        "nutritionStrategyInfo": "Estos son tus objetivos diarios calculados en base a tu perfil (TDEE, objetivo de peso, etc.).",
+        "dailyGoals": "Objetivos Diarios",
+        "dailyShopping": "Compras del día",
+        "nextMeal": "Próxima Comida",
+        "goalsCompleted": "¡Objetivos completados! 🎉",
+        "allMealsEaten": "Has consumido todas las comidas de hoy. ¡Buen trabajo!",
+        "markAsEaten": "Marcar como comido",
+        "noPlan": "Ningún plan nutricional activo.",
+        "noPlanAlertTitle": "Ningún Plan",
+        "noPlanAlertMessage": "No hay un plan nutricional para hoy.",
+        "dailyTip": "Beber agua antes de las comidas ayuda a la hidratación y digestión."
+    },
+    "analysis": {
+        "title": "Análisis de Biomarcadores",
+        "subtitle": "Guía de Interpretación",
+        "uploadTitle": "Sube tu análisis",
+        "uploadSubtitle": "Soporta JPG, PNG, PDF",
+        "uploadDesc": "Puedes subir resultados de análisis de sangre y cualquier otro informe (ej. marcadores tumorales, ecografías, TAC, radiografías, resonancia magnética, etc.)",
+        "camera": "Cámara",
+        "file": "Archivo",
+        "archive": "Archivo",
+        "security": "Tus datos se transmiten de forma segura y encriptada a los servidores de Google.",
+        "loadingTitle": "Carga de documentos en curso",
+        "loadingDesc": "El análisis detallado de tus documentos está en curso. Esta operación puede tardar unos minutos: es completamente normal, estamos procesando cada detalle para ofrecerte un informe completo.",
+        "errorProfile": "No se puede recuperar el perfil de usuario.",
+        "errorPdf": "No se puede generar el PDF. Inténtalo de nuevo.",
+        "errorCameraPermission": "Se requiere acceso a la cámara para tomar fotos.",
+        "errorCamera": "No se puede tomar la foto. Inténtalo de nuevo.",
+        "errorAnalysis": "No se puede analizar el documento: %{error}",
+        "generatedOn": "Generado el %{date} para %{name}",
+        "vitalScore": "Wellness Score",
+        "vitalScoreDesc": "Tu puntuación general de salud basada en todos los parámetros analizados.",
+        "vitalScoreInfo": "ℹ️ El Wellness Score es un índice sintético de tu estado de salud (0-100), calculado analizando biomarcadores, factores de riesgo y perfil lipídico. Una puntuación alta indica un excelente estado de salud general.",
+        "lipidProfile": "Perfil Lipídico",
+        "lipidProfileDesc": "Comparación visual de los valores de colesterol frente a los límites.",
+        "lipidProfileInfo": "ℹ️ El gráfico muestra tus valores de colesterol (Total, LDL, HDL) y triglicéridos en comparación con los rangos óptimos. El área verde indica los valores ideales para la salud cardiovascular.",
+        "globalRisk": "Riesgo Global",
+        "globalRiskDesc": "Promedio ponderado de los factores de riesgo identificados.",
+        "globalRiskInfo": "ℹ️ Indica la presencia y gravedad de los factores de riesgo identificados en tu análisis. Incluye parámetros como inflamación, salud metabólica y salud cardiovascular.",
+        "quantitativeAnalysis": "Análisis Cuantitativo",
+        "qualitativeAnalysis": "Análisis Cualitativo Avanzado",
+        "generalEvaluation": "Evaluación General",
+        "riskFactors": "Factores de Riesgo",
+        "biomarkers": "Biomarcadores",
+        "disclaimer": "Nota: Este análisis es generado por IA y no sustituye el consejo médico.",
+        "entryDisclaimer": "My Proactive Lab AI proporciona información nutricional y apoyo para la interpretación de biomarcadores con fines de bienestar. No es un dispositivo médico y no debe utilizarse para diagnosticar, tratar o prevenir enfermedades. Consulte siempre a un profesional de la salud antes de tomar decisiones sobre su salud.",
+        "charts": {
+            "vitalScoreDesc": "Tu puntuación general de salud basada en todos los biomarcadores analizados.",
+            "lipidDesc": "Resumen de tu perfil lipídico comparado con valores óptimos.",
+            "noData": "Sin Datos",
+            "dataUnavailable": "Datos insuficientes para generar el gráfico.",
+            "riskDesc": "Evaluación de los principales factores de riesgo cardiovascular y metabólico.",
+            "total": "Total",
+            "ldl": "LDL",
+            "hdl": "HDL",
+            "triglycerides": "Triglicéridos",
+            "idealZone": "Zona Ideal / Valores OK",
+            "outOfRange": "Fuera de Rango",
+            "globalRisk": "Riesgo Global"
+        },
+        "riskLevels": {
+            "low": "Bajo",
+            "medium": "Medio",
+            "high": "Alto"
+        },
+        "cholesterol": {
+            "quantitativeAnalysis": "Análisis Cuantitativo",
+            "qualitativeAnalysis": "Análisis Cualitativo Avanzado",
+            "total": "Colesterol Total",
+            "ldl": "Colesterol LDL (Malo)",
+            "hdl": "Colesterol HDL (Bueno)",
+            "triglycerides": "Triglicéridos",
+            "target": "Objetivo"
+        },
+        "risk": {
+            "riskLabel": "RIESGO",
+            "probability": "Probabilidad de Riesgo"
+        },
+        "carousel": {
+            "tapDetails": "Toca para detalles",
+            "fullReport": "Tu Informe Completo",
+            "exportAnalysis": "Exportar análisis completo",
+            "generalEval": "Evaluación General",
+            "overview": "Resumen Completo",
+            "mainResults": "Resultados Principales",
+            "trends": "Tendencias y Patrones",
+            "correlations": "Correlaciones",
+            "riskFactors": "Factores de Riesgo",
+            "recommendations": "Consideraciones",
+            "considerations": "Consideraciones",
+            "lifestyle": "Estilo de Vida y Dieta",
+            "followUp": "Seguimiento Recomendado",
+            "specialists": "Especialistas",
+            "lipidProfile": "Perfil Lipídico",
+            "biomarkersDetail": "Detalle de Biomarcadores",
+            "supplements": "Suplementos",
+            "currentSupplements": "Suplementos Actuales",
+            "recommendedSupplements": "Suplementos Recomendados",
+            "conclusion": "Conclusión"
+        },
+        "history": {
+            "title": "Historial de Análisis",
+            "unknownDate": "Fecha desconocida",
+            "biomarkers": "Biomarcadores",
+            "risks": "Riesgos",
+            "errorDelete": "No se puede eliminar el análisis.",
+            "noAnalysis": "Sin análisis guardados",
+            "deleteTitle": "Eliminar Análisis",
+            "deleteConfirmCurrent": "ADVERTENCIA: Este es el análisis activo. Al eliminarlo se restablecerán todos los datos (gráficos, mapa, etc.). ¿Estás seguro?",
+            "deleteConfirm": "¿Estás seguro de que deseas eliminar este análisis? Esta acción es irreversible.",
+            "cancel": "Cancelar",
+            "delete": "Eliminar",
+            "current": "(Actual)"
+        },
+        "success": {
+            "title": "¡Éxito!",
+            "button": "Genial"
+        }
+    },
+    "nutrition": {
+        "title": "Plan Nutricional",
+        "generateButton": "Generar Plan",
+        "regenerateButton": "Regenerar Plan",
+        "generatePlanPrompt": "Genera un plan nutricional completo de 7 días basado en tus análisis y objetivos.",
+        "didYouKnow": "¿Sabías que?",
+        "preparing": "Estamos preparando tu plan...",
+        "tips": {
+            "hydration": {
+                "title": "Hidratación",
+                "text": "Beber agua antes de las comidas puede ayudarte a sentirte lleno más rápido."
+            },
+            "movement": {
+                "title": "Movimiento",
+                "text": "Una caminata de 10 minutos después de comer ayuda a regular el azúcar en la sangre."
+            },
+            "sleep": {
+                "title": "Sueño",
+                "text": "Dormir 7-8 horas por noche es esencial para la recuperación muscular y mental."
+            },
+            "fiber": {
+                "title": "Fibra",
+                "text": "La fibra ayuda a la digestión y mantiene estables los niveles de energía."
+            },
+            "stress": {
+                "title": "Estrés",
+                "text": "El estrés crónico puede afectar negativamente el metabolismo."
+            },
+            "chewing": {
+                "title": "Masticación",
+                "text": "Masticar lentamente mejora la digestión y la absorción de nutrientes."
+            }
+        },
+        "quotes": [
+            "La salud es el primer deber de la vida.",
+            "Cuida tu cuerpo, es el único lugar que tienes para vivir.",
+            "La felicidad es la forma más alta de salud.",
+            "Cada día es una nueva oportunidad para mejorar.",
+            "El bienestar no es un destino, sino una forma de viajar.",
+            "Escucha a tu cuerpo, te habla continuamente.",
+            "Que la comida sea tu medicina y la medicina sea tu comida.",
+            "La calma es la cuna de la fuerza.",
+            "Un cuerpo sano es una cámara de invitados para el alma.",
+            "Invertir en salud produce los mejores intereses."
+        ],
+        "breakfast": "Desayuno",
+        "lunch": "Almuerzo",
+        "dinner": "Cena",
+        "snacks": "Meriendas",
+        "shoppingList": "Lista de Compras",
+        "strategyTitle": "Estrategia Nutricional",
+        "strategySubtitle": "Tu plan alimenticio personalizado",
+        "dietPlanTitle": "Plan Nutricional",
+        "dietPlanSubtitle": "Tu plan semanal",
+        "shoppingListWeek": "Compra Semanal",
+        "reanalyzing": "Reanalizando...",
+        "ingredients": "Ingredientes",
+        "preparation": "Preparación",
+        "swapMeal": "Cambiar Comida",
+        "confirmSwap": "Confirmar Cambio",
+        "noMealsFound": "No se encontraron comidas.",
+        "calories": "Calorías",
+        "protein": "Proteínas",
+        "carbs": "Carbohidratos",
+        "fats": "Grasas",
+        "mealTypes": {
+            "breakfast": "Desayuno",
+            "lunch": "Almuerzo",
+            "dinner": "Cena",
+            "snack": "Merienda"
+        },
+        "newAnalysisTitle": "Nuevo Análisis Detectado",
+        "newAnalysisMessage": "Detectamos un nuevo análisis o actualización de perfil. ¿Quieres regenerar el plan nutricional para adaptarlo a los nuevos datos?",
+        "regenerate": "Regenerar",
+        "cancel": "Cancelar",
+        "newAnalysis": {
+            "title": "Nuevo Análisis Detectado",
+            "message": "Tus datos clínicos han cambiado. Los cálculos calóricos se han actualizado automáticamente.\n\n¿Quieres regenerar también el plan de comidas semanal para adaptarlo a los nuevos resultados?",
+            "keep": "No, mantener",
+            "regenerate": "Sí, regenerar"
+        },
+        "mealSwap": {
+            "title": "Cambiar Comida",
+            "subtitle": "Elige una alternativa para:",
+            "loading": "La IA está buscando alternativas...",
+            "timeout": "Tiempo agotado. La conexión es lenta, inténtalo de nuevo.",
+            "error": "No se pueden generar alternativas en este momento. Inténtalo de nuevo.",
+            "retry": "Reintentar",
+            "confirmTitle": "Confirmar Cambio",
+            "confirmMessage": "¿Quieres cambiar \"%{old}\" por \"%{new}\"?",
+            "cancel": "Cancelar",
+            "confirm": "Cambiar"
+        },
+        "target": "Objetivo",
+        "tdee": "TDEE",
+        "surplus": "Excedente",
+        "deficit": "Déficit",
+        "day": "Día",
+        "strategies": {
+            "whyTitle": "¿Por qué esta dieta?",
+            "allowedTitle": "Alimentos Recomendados",
+            "avoidedTitle": "Alimentos a Evitar",
+            "customStrategy": "Estrategia Personalizada",
+            "strategyDisclaimer": "My Proactive Lab AI es una aplicación de Bienestar/Estilo de Vida y no está destinada a uso médico. Las sugerencias dietéticas se basan en correlaciones nutricionales publicadas, no en diagnósticos clínicos.",
+            "mediterranean": {
+                "description": "La dieta Mediterránea es considerada una de las más saludables del mundo. Se basa en alimentos vegetales, grasas saludables (aceite de oliva) y consumo moderado de proteínas animales.",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nElegimos la Dieta Mediterránea porque es rica en antioxidantes y grasas monoinsaturadas, ideal para mejorar la salud cardiovascular y reducir la inflamación sistémica.",
+                "allowed": [
+                    "Verduras",
+                    "Fruta",
+                    "Granos Enteros",
+                    "Legumbres",
+                    "Nueces",
+                    "Aceite de Oliva",
+                    "Pescado"
+                ],
+                "avoided": [
+                    "Azúcares",
+                    "Carnes Procesadas",
+                    "Alimentos Ultraprocesados",
+                    "Bebidas Azucaradas"
+                ]
+            },
+            "keto": {
+                "description": "La dieta Cetogénica reduce drásticamente los carbohidratos para empujar al cuerpo a quemar grasa como fuente principal de energía (cetosis).",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nLa Dieta Cetogénica fue seleccionada para mejorar tu sensibilidad a la insulina y promover la oxidación rápida de grasas, en línea con tus objetivos de composición corporal.",
+                "allowed": [
+                    "Carne",
+                    "Pescado",
+                    "Huevos",
+                    "Quesos",
+                    "Verduras de Hoja",
+                    "Aceites",
+                    "Mantequilla",
+                    "Aguacate"
+                ],
+                "avoided": [
+                    "Pan",
+                    "Pasta",
+                    "Fruta Azucarada",
+                    "Legumbres",
+                    "Papas",
+                    "Dulces",
+                    "Alcohol"
+                ]
+            },
+            "vegetarian": {
+                "description": "La dieta Vegetariana excluye carne y pescado, centrándose en alimentos vegetales, huevos y lácteos para una ingesta equilibrada.",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nOptamos por un enfoque Vegetariano para reducir la carga de grasas saturadas y aumentar la ingesta de fibra y fitonutrientes, esenciales para regular la función intestinal y el bienestar general.",
+                "allowed": [
+                    "Verduras",
+                    "Legumbres",
+                    "Soja",
+                    "Granos",
+                    "Huevos",
+                    "Lácteos",
+                    "Frutos Secos"
+                ],
+                "avoided": [
+                    "Carne",
+                    "Pescado",
+                    "Embutidos",
+                    "Gelatina",
+                    "Manteca"
+                ]
+            },
+            "vegan": {
+                "description": "La dieta Vegana excluye todos los productos de origen animal. Es rica en fibra y antioxidantes, excelente para la salud del corazón.",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nLa elección Vegana maximiza la ingesta de nutrientes vegetales protectores. Está particularmente indicada para reducir el estrés oxidativo y mejorar la salud cardiovascular.",
+                "allowed": [
+                    "Legumbres",
+                    "Tofu",
+                    "Tempeh",
+                    "Granos",
+                    "Semillas",
+                    "Fruta",
+                    "Verduras",
+                    "Leche Vegetal"
+                ],
+                "avoided": [
+                    "Carne",
+                    "Pescado",
+                    "Huevos",
+                    "Lácteos",
+                    "Miel",
+                    "Derivados Animales"
+                ]
+            },
+            "paleo": {
+                "description": "La dieta Paleo se inspira en la alimentación de nuestros antepasados cazadores-recolectores, excluyendo alimentos procesados y granos.",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nEl protocolo Paleo fue elegido para eliminar posibles alérgenos e irritantes intestinales (como gluten y lácteos), favoreciendo un reinicio metabólico y una reducción de la inflamación crónica.",
+                "allowed": [
+                    "Carne",
+                    "Pescado",
+                    "Fruta",
+                    "Verduras",
+                    "Nueces",
+                    "Semillas",
+                    "Aceites Saludables"
+                ],
+                "avoided": [
+                    "Granos",
+                    "Legumbres",
+                    "Lácteos",
+                    "Azúcares",
+                    "Alimentos Procesados"
+                ]
+            },
+            "balanced": {
+                "description": "Una alimentación equilibrada personalizada para apoyar tu bienestar general y mantener niveles de energía constantes.",
+                "reasoning": "Esta estrategia nutricional fue desarrollada para optimizar tus niveles de energía y apoyar tu bienestar a largo plazo, respetando tus preferencias dietéticas.\n\nEstructuramos un plan Equilibrado para garantizarte una ingesta completa de macro y micronutrientes, asegurando una ingesta óptima y apoyando tu estilo de vida activo.",
+                "allowed": [
+                    "Verduras",
+                    "Proteínas Magras",
+                    "Carbohidratos",
+                    "Grasas Saludables",
+                    "Fruta"
+                ],
+                "avoided": [
+                    "Azúcares",
+                    "Fritos",
+                    "Sal Excesiva",
+                    "Alcohol",
+                    "Comida Chatarra"
+                ]
+            }
+        },
+        "noAnalysisError": "Por favor, sube un análisis primero para generar un plan nutricional personalizado.",
+        "daysReady": "Días listos",
+        "caloriesTitle": "Necesidades Calóricas",
+        "caloriesInfo": "El TDEE es tu gasto energético diario total.",
+        "macrosTitle": "Desglose de Macronutrientes",
+        "macrosInfo": "Indica el porcentaje ideal de Proteínas, Carbohidratos y Grasas.",
+        "bmiTitle": "Índice de Masa Corporal (IMC)",
+        "bmiInfo": "El IMC es un indicador que relaciona el peso y la altura. Aunque no distingue entre masa grasa y magra, es un punto de partida útil para evaluar el peso saludable.",
+        "bmi": {
+            "underweight": "Bajo peso",
+            "normal": "Normal",
+            "overweight": "Sobrepeso",
+            "obese": "Obeso"
+        },
+        "planTitle": "Plan Nutricional"
+    },
+    "chat": {
+        "title": "my Proactive Lab AI",
+        "online": "En línea",
+        "welcome": "¡Hola! 👋 Soy tu Asistente Proactive Lab AI.\n\nHe analizado tu perfil y estoy aquí para ayudarte a optimizar tu bienestar y alcanzar tus objetivos.\n\n¿Cómo puedo ayudarte hoy?",
+        "error": "¡Ups! Algo salió mal. Por favor, inténtalo de nuevo. 🙏",
+        "placeholder": "Pregúntame cualquier cosa sobre tu salud...",
+        "suggestions": {
+            "food": "🥗 ¿Qué como hoy?",
+            "summary": "📊 Resumen de datos",
+            "routine": "💊 Mi rutina",
+            "advice": "💡 Dame un consejo"
+        }
+    },
+    "map": {
+        "title": "Mapa de Biomarcadores",
+        "noAnalysis": "Sube tu análisis en la pestaña \"Análisis\" para activar el mapa.",
+        "subtitle": "Distribución de tus biomarcadores en los órganos correspondientes.",
+        "toAnalyze": "POR ANALIZAR",
+        "noDataOrgan": "Sin datos relevantes para este órgano.",
+        "noData": "Sin datos disponibles, sube tus datos."
+    },
+    "userProfile": {
+        "title": "Tu Perfil",
+        "success": "¡Perfil actualizado con éxito!",
+        "subtitle": "Completa tus datos para un análisis preciso.",
+        "changePhoto": "Cambiar Foto",
+        "personalInfo": "Información Personal",
+        "name": "Nombre o Apodo",
+        "namePlaceholder": "Tu nombre",
+        "age": "Edad",
+        "agePlaceholder": "Años",
+        "gender": "Género *",
+        "height": "Altura (cm)",
+        "heightPlaceholder": "cm",
+        "weight": "Peso (kg)",
+        "weightPlaceholder": "kg",
+        "waist": "Cintura (cm)",
+        "waistPlaceholder": "cm",
+        "physicalDescription": "Descripción Física",
+        "lifestyle": "Estilo de Vida",
+        "smoke": "Fumar",
+        "alcohol": "Alcohol",
+        "coffee": "Café",
+        "activityLevel": "Nivel de Actividad",
+        "sleepQuality": "Calidad del Sueño",
+        "stressLevel": "Nivel de Estrés",
+        "habits": "Hábitos",
+        "dietNutrition": "Dieta y Nutrición",
+        "mealsPerDay": "Comidas al día",
+        "snacksPerDay": "Snacks al día",
+        "dietType": "Tipo de Dieta Actual",
+        "dietaryRestrictionsQuestion": "¿Tienes restricciones dietéticas, alergias o alimentos que no te gustan?",
+        "other": "Especificar Otro",
+        "describe": "Describir...",
+        "typicalDay": "Día Típico (Desayuno/Almuerzo/Cena)",
+        "typicalDayPlaceholder": "Desayuno: leche, café...\nAlmuerzo: pasta...\nCena: carne...",
+        "supplements": "Suplementos que tomo",
+        "conditions": "Condiciones Conocidas",
+        "symptoms": "Síntomas Recientes",
+        "medications": "Medicamentos",
+        "medicationsQuestion": "¿Tomas medicamentos?",
+        "medicationsList": "¿Qué medicamentos tomas?",
+        "medicationsPlaceholder": "Listar medicamentos...",
+        "saveButton": "CONFIRMAR PERFIL",
+        "saveSuccess": "¡Perfil guardado con éxito!",
+        "warning": "Advertencia",
+        "fillRequired": "Rellena todos los campos obligatorios marcados con *",
+        "errorSave": "No se pudo guardar el perfil.",
+        "errorImage": "No se pudo seleccionar la imagen.",
+        "incompleteProfile": "Por favor completa tu perfil para acceder a todas las funciones.",
+        "uploadAnalysisPrompt": "¡Perfil completado! Ahora sube tu primer análisis para generar tu plan personalizado."
+    },
+    "settings": {
+        "title": "Configuración",
+        "language": "Idioma",
+        "privacy": "Política de Privacidad",
+        "terms": "Términos de Servicio",
+        "disclaimer": "Descargo Médico",
+        "deleteData": "Eliminar todos los datos",
+        "deleteDataConfirm": "¿Estás seguro? Esta acción es irreversible. Todos tus datos serán eliminados del dispositivo.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "profileData": "Mi Perfil de Usuario",
+        "exportPdf": "Exportar Informe PDF",
+        "clearChat": "Borrar Memoria del Chat",
+        "clearChatConfirm": "¿Quieres borrar el historial de conversación con el Asistente?",
+        "info": "Info de la App",
+        "sections": {
+            "profile": "PERFIL Y DATOS",
+            "preferences": "PREFERENCIAS",
+            "ai": "INTELIGENCIA ARTIFICIAL",
+            "legal": "CUMPLIMIENTO LEGAL",
+            "danger": "ZONA DE PELIGRO"
+        },
+        "version": "Versión",
+        "dataDeleted": "Datos Eliminados",
+        "restartMessage": "La aplicación se reiniciará.",
+        "chatDeleted": "Chat Borrado",
+        "chatDeletedMessage": "La memoria del asistente ha sido borrada.",
+        "exporting": "Generando informe...",
+        "comingSoon": "Próximamente",
+        "exportSuccess": "¡Informe exportado con éxito!",
+        "exportError": "Error al exportar el informe."
+    },
+    "shoppingList": {
+        "title": "Lista de Compras",
+        "subtitleDaily": "Ingredientes de tu plan diario.",
+        "subtitleWeekly": "Ingredientes de tu plan semanal.",
+        "loading": "Organizando lista...",
+        "empty": "No se encontraron ingredientes.",
+        "copyAll": "Copiar Todo",
+        "copied": "¡Copiado al portapapeles!"
+    },
+    "common": {
+        "loading": "Cargando...",
+        "error": "Ocurrió un error",
+        "successMessage": "¡Análisis completado con éxito!",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "close": "Cerrar",
+        "view": "Ver",
+        "gotIt": "Entendido",
+        "days": {
+            "short": [
+                "LUN",
+                "MAR",
+                "MIÉ",
+                "JUE",
+                "VIE",
+                "SÁB",
+                "DOM"
+            ],
+            "long": [
+                "Lunes",
+                "Martes",
+                "Miércoles",
+                "Jueves",
+                "Viernes",
+                "Sábado",
+                "Domingo"
+            ]
+        }
+    },
+    "disclaimer": {
+        "title": "Descargo de Responsabilidad Importante",
+        "text1": "Esta aplicación utiliza Inteligencia Artificial para proporcionar análisis y sugerencias basados en datos proporcionados por el usuario.",
+        "highlight": "NO ES UN DISPOSITIVO MÉDICO.",
+        "text2": "La información proporcionada es solo para fines informativos y de bienestar general. No constituye un diagnóstico médico, tratamiento o prescripción de ninguna manera.",
+        "text3": "Nunca reemplace el consejo de su médico con información obtenida de esta aplicación. Si tiene preocupaciones de salud, consulte siempre a un profesional de la salud.",
+        "text4": "Al continuar, declara que ha leído y comprendido que el uso de esta aplicación es bajo su exclusiva responsabilidad.",
+        "accept": "Entiendo y Acepto",
+        "fullText": "# DESCARGO DE RESPONSABILIDAD MÉDICO\n\n## ⚠️ ADVERTENCIA DE SALUD IMPORTANTE\n\n**PROACTIVE LAB NO ES UN MÉDICO Y NO ES UN DISPOSITIVO MÉDICO.**\n\n*   **Solo con Fines Informativos:** El contenido, los análisis y las sugerencias generados por esta aplicación (incluidos los proporcionados por Inteligencia Artificial) son solo con fines informativos y educativos.\n*   **Riesgo de Error:** La Inteligencia Artificial puede cometer errores (\"alucinaciones\"). Nunca considere los datos proporcionados como una verdad absoluta. Verifique siempre los valores originales en sus informes.\n*   **Consulte Siempre a un Profesional:** No tome decisiones de salud, cambie terapias o ignore síntomas basándose en esta aplicación. Consulte siempre a su médico o a un especialista.\n*   **Emergencias:** Si cree que tiene una emergencia médica, llame inmediatamente a su médico o al número de emergencia (112/911).\n\nAl utilizar esta aplicación, declara que comprende que no reemplaza el juicio médico profesional."
+    },
+    "legal": {
+        "privacyPolicy": "# POLÍTICA DE PRIVACIDAD\n\n**Última actualización:** 10/12/2025\n\n## 1. Responsable del Tratamiento\n\n**EARTH'S DREAMS S.R.L.**\nStradela Carabus Nr. 15, Iasi, 700275, Rumanía\nCUI: 38752272 (J22/39/07.01.2019) | NIF: RO38752272\nContacto de protección de datos: info@earthsdreams.ro\n\n## 2. Introducción y Principios\n\nBienvenido a Proactive Lab (\"la Aplicación\"). Tu privacidad es nuestra máxima prioridad. Reconocemos la naturaleza sensible de los datos de salud y nos comprometemos a protegerlos en pleno cumplimiento del Reglamento General de Protección de Datos (RGPD - UE 2016/679).\n\nEsta política describe cómo tratamos tus datos, basándonos en los principios de Privacidad por Diseño y Minimización de Datos.\n\n## 3. Tipos de Datos Tratados\n\n### A. Datos introducidos por el usuario (Categorías Especiales de Datos - Art. 9 RGPD):\nPara proporcionar el servicio, la aplicación procesa datos que proporcionas voluntariamente, tales como:\n*   **Datos personales y biométricos** (edad, género, altura, peso).\n*   **Datos relacionados con la salud** (biomarcadores, síntomas, notas médicas, historial clínico).\n*   **Documentos visuales** (fotos de informes médicos subidas para análisis OCR/IA).\n\n### B. Datos técnicos (Recopilados automáticamente):\n*   Registros del sistema anonimizados y datos técnicos estrictamente necesarios para la seguridad, depuración y funcionamiento de la aplicación.\n*   No utilizamos rastreadores publicitarios ni cookies de perfil de terceros con fines de marketing.\n\n### C. Datos de Pago y Suscripción:\nLa Aplicación ofrece compras dentro de la aplicación o suscripciones. EARTH'S DREAMS S.R.L. **NO** recopila, procesa ni almacena tus datos financieros (números de tarjetas de crédito, cuentas bancarias).\n\nTodas las transacciones financieras son gestionadas íntegramente por terceros: Apple (App Store) para iOS y Google (Play Store) para Android. Solo recibimos un \"token\" anónimo de estos proveedores confirmando el pago o el estado de la suscripción (activa/caducada), sin ninguna referencia a tu identidad financiera.\n\n## 4. Arquitectura \"Zero-Knowledge\" y Lugar del Tratamiento\n\nLa Aplicación opera con un modelo \"Local-First\":\n\n*   **Almacenamiento Local:** Tus datos de salud y personales se guardan cifrados exclusivamente en la memoria de tu dispositivo.\n*   **Ausencia de Nube Propietaria:** Earth's Dreams S.R.L. **NO** posee, gestiona ni tiene acceso a una base de datos central que contenga tus datos de salud. Nosotros, los desarrolladores, no podemos ver, leer ni recuperar tus datos.\n*   **Soberanía:** En caso de eliminación de la aplicación o pérdida del dispositivo sin copia de seguridad (que es responsabilidad del usuario), los datos son irrecuperables por nuestra parte.\n\n## 5. Uso de Inteligencia Artificial y Transferencia de Datos\n\nPara proporcionar funciones de análisis avanzado, la Aplicación utiliza las API de Google Gemini (proporcionadas por Google Cloud Platform).\n\n*   **Modo de Transmisión:** Cuando solicitas un análisis, solo los datos textuales o numéricos estrictamente necesarios (sin tu nombre y apellido, si es posible) se envían cifrados (HTTPS/TLS) a los servidores de Google.\n*   **Términos de Uso de Datos:** Utilizamos los servicios de Google en modo \"Enterprise\". Según los términos actuales de Google Cloud, tus datos **NO** se utilizan para entrenar los modelos de Inteligencia Artificial de Google y no se almacenan de forma persistente en sus sistemas.\n*   **Rol de Google:** Google actúa como Encargado o Subencargado del tratamiento para el mero procesamiento técnico.\n\n## 6. Base Jurídica del Tratamiento\n\nEl tratamiento de tus datos de salud se realiza exclusivamente sobre la base de tu **Consentimiento Explícito** (Art. 9.2.a RGPD), que prestas al iniciar la aplicación por primera vez y que es necesario para la prestación del servicio. Puedes revocar el consentimiento en cualquier momento eliminando los datos o desinstalando la aplicación.\n\n## 7. Derechos del Interesado\n\nDe conformidad con el RGPD, tienes derecho a:\n*   Acceder a tus datos (todos ya visibles en tu dispositivo).\n*   Rectificar datos inexactos.\n*   Eliminar datos (\"Derecho al olvido\"): Puedes eliminar completamente tus datos utilizando la función \"Eliminar todos los datos\" en la configuración de la aplicación o desinstalando la aplicación. Dado que no guardamos copias en nuestros servidores, esta acción es definitiva.\n*   Limitar el tratamiento u oponerse al mismo.\n\n## 8. Menores\n\nLa Aplicación está destinada exclusivamente a usuarios de 18 años o más. No recopilamos conscientemente datos de menores. Si tenemos conocimiento de datos de menores introducidos en la aplicación, invitamos a los padres a eliminar la aplicación del dispositivo del menor.\n\n## 9. Cambios\n\nNos reservamos el derecho de actualizar esta política. Los cambios sustanciales se notificarán a través de la aplicación.",
+        "termsOfService": "# TÉRMINOS DE SERVICIO (TOS)\n\n**Última actualización:** 10/12/2025\n\n## 1. Aceptación de los Términos\n\nAl descargar, instalar o utilizar Proactive Lab (\"la Aplicación\"), proporcionada por EARTH'S DREAMS S.R.L. (\"la Compañía\"), el usuario acepta estar sujeto a estos Términos de Servicio. Si no acepta estos términos, no utilice la Aplicación.\n\n## 2. Licencia de Uso\n\nLa Compañía otorga al usuario una licencia limitada, no exclusiva, intransferible y revocable para utilizar la Aplicación exclusivamente para fines personales y no comerciales, de acuerdo con estos Términos. Está prohibido descompilar, desensamblar, realizar ingeniería inversa o intentar derivar el código fuente de la Aplicación.\n\n## 3. Modelos de Acceso, Suscripciones y Pagos\n\nLa Aplicación adopta un modelo \"Freemium\". Algunas funciones básicas son gratuitas y están siempre activas. Las funciones avanzadas (\"Premium\") son visibles dentro de la aplicación pero aparecen bloqueadas o borrosas hasta que el usuario completa la compra.\n\n### A. Métodos de Desbloqueo:\nEl usuario puede desbloquear las funciones Premium a través de uno de los siguientes métodos (dependiendo de la oferta activa en el momento de la compra):\n*   **Suscripción:** Pago recurrente (por ejemplo, mensual o anual) con renovación automática.\n*   **Compra Única (Lifetime):** Si está disponible, un pago único que otorga acceso de por vida a las funciones Premium, sin caducidad y sin tarifas recurrentes.\n\n### B. Gestión de Pagos:\nTodas las compras se gestionan a través de tu cuenta de Apple ID (iOS) o Google Play (Android). El pago se cargará al método de pago asociado a tu cuenta de la Tienda tras la confirmación.\n\n### C. Desbloqueo Inmediato (Sin Período de Prueba):\nA menos que se indique específicamente lo contrario como promoción en la Tienda, la Aplicación **NO** ofrece períodos de prueba gratuitos. Las funciones Premium se desbloquean inmediatamente después de la confirmación del pago. El usuario puede evaluar la utilidad de las funciones Premium consultando las descripciones y vistas previas en la aplicación antes de la compra.\n\n### D. Renovación Automática (Solo Suscripciones):\nEn el caso de una suscripción recurrente, esta se renueva automáticamente al final de cada período de facturación, a menos que la renovación automática se desactive en la configuración de la cuenta de la Tienda al menos 24 horas antes de la expiración.\n\n### E. Cancelación y Terminación:\n*   **Para Suscripciones:** Puedes cancelar la renovación automática en cualquier momento desde la configuración de tu cuenta de Apple o Google. La terminación tendrá efecto al final del período de facturación actual.\n*   **Para Compra Única:** Esta compra es definitiva y no requiere terminación ya que no genera cargos futuros.\n\n**Nota:** Desinstalar la aplicación **NO** cancela automáticamente una suscripción activa.\n\n### F. Reembolsos:\nDado que los pagos son gestionados por las tiendas, EARTH'S DREAMS S.R.L. no tiene la capacidad técnica para emitir reembolsos directos. Las solicitudes de reembolso deben enviarse directamente a Apple o Google de acuerdo con sus políticas vigentes.\n\n## 4. Descargo de Responsabilidad Médica (Medical Disclaimer)\n\n**LA APLICACIÓN NO ES UN DISPOSITIVO MÉDICO.**\nLa Aplicación y los servicios de Inteligencia Artificial integrados proporcionan información solo con fines educativos e informativos.\n\n*   **Sin Diagnóstico:** La aplicación no realiza diagnósticos, no prescribe tratamientos y no reemplaza la relación médico-paciente.\n*   **Verificación:** El usuario reconoce que la Inteligencia Artificial está sujeta a errores, inexactitudes o \"alucinaciones\". Es responsabilidad exclusiva del usuario verificar cualquier información generada por la aplicación con un médico cualificado.\n*   **Emergencias:** No utilice esta aplicación en situaciones de emergencia médica. En caso de emergencia, contacte inmediatamente al 112, 911 o a su número de emergencia local.\n\n## 5. Responsabilidad del Usuario y Seguridad\n\nDado que los datos residen localmente en el dispositivo (\"Offline-First\"), el usuario es el único responsable de:\n*   La custodia física de su dispositivo.\n*   Configurar códigos de bloqueo, contraseñas o datos biométricos para evitar el acceso no autorizado a la Aplicación.\n*   Realizar copias de seguridad de sus datos (si la función es compatible con el sistema operativo). La Compañía no puede recuperar datos perdidos debido a robo, pérdida o daño del dispositivo.\n\n## 6. Limitación de Responsabilidad\n\nEn la medida máxima permitida por la ley aplicable, EARTH'S DREAMS S.R.L. no será responsable de daños indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de la Aplicación, incluidos, entre otros, daños por pérdida de datos o errores en los análisis proporcionados por la IA.\nLa responsabilidad total de la Compañía hacia el usuario no excederá la cantidad posiblemente pagada por el usuario por la Aplicación en los últimos 12 meses.\n\n## 7. Ley Aplicable y Jurisdicción\n\nEstos Términos se rigen por las leyes de Rumanía, sin perjuicio de las normas obligatorias de protección al consumidor del país de residencia del usuario. Para cualquier disputa, será competente el tribunal del domicilio social de la Compañía, salvo los foros obligatorios previstos por la ley de protección al consumidor."
+    },
+    "pdf": {
+        "dietTitle": "Plan Nutricional Semanal",
+        "generatedFor": "Generado para %{name} el %{date}",
+        "vitalScore": "Wellness Score",
+        "vitalScoreDesc": "Tu puntuación general de salud basada en todos los parámetros analizados.",
+        "vitalScoreInfo": "ℹ️ El Wellness Score es un índice sintético de tu estado de salud (0-100), calculado analizando biomarcadores, factores de riesgo y perfil lipídico. Una puntuación alta indica un excelente estado de salud general.",
+        "lipidProfile": "Perfil Lipídico",
+        "lipidProfileDesc": "Comparación visual de los valores de colesterol frente a los límites.",
+        "lipidProfileInfo": "ℹ️ El gráfico muestra tus valores de colesterol (Total, LDL, HDL) y triglicéridos en comparación con los rangos óptimos. El área verde indica los valores ideales para la salud cardiovascular.",
+        "globalRisk": "Riesgo Global",
+        "globalRiskDesc": "Promedio ponderado de los factores de riesgo identificados.",
+        "globalRiskInfo": "ℹ️ Indica la presencia y gravedad de los factores de riesgo identificados en tu análisis. Incluye parámetros como inflamación, salud metabólica y salud cardiovascular.",
+        "quantitativeAnalysis": "Análisis Cuantitativo",
+        "qualitativeAnalysis": "Análisis Cualitativo Avanzado",
+        "generalEvaluation": "Evaluación General",
+        "analysisTitle": "my Proactive Lab AI",
+        "analysisSubtitle": "Informe sobre mi estado de bienestar.",
+        "goalCalories": "Calorías Objetivo",
+        "goal": "Objetivo",
+        "macros": "Macros",
+        "day": "Día",
+        "ingredients": "Ingredientes",
+        "totalCalories": "Calorías Totales",
+        "shoppingList": "Lista de Compras",
+        "footer": "Generado por my Proactive Lab AI - Tu asistente nutricional personal",
+        "target": "Objetivo",
+        "biomarkersTitle": "Informe de Biomarcadores",
+        "name": "Nombre",
+        "value": "Valor",
+        "unit": "Unidad",
+        "status": "Estado",
+        "attention": "ATENCIÓN",
+        "disclaimerTitle": "DESCARGO DE RESPONSABILIDAD IMPORTANTE",
+        "disclaimerText": "Este informe es generado por un sistema de Inteligencia Artificial con fines puramente informativos y de apoyo al bienestar general.<br>NO es un dispositivo médico, NO proporciona diagnósticos médicos y NO sustituye de ninguna manera la opinión, el diagnóstico o el tratamiento de un médico profesional.<br>Cualquier decisión relacionada con su salud, incluida la toma o suspensión de suplementos, medicamentos o cambios en la dieta, debe ser siempre discutida y confirmada por su médico o especialista.<br>El usuario utiliza esta información bajo su propio riesgo.",
+        "disclaimerTextShort": "Informe generado por IA para fines de bienestar. No es un dispositivo médico. Consulte siempre a un médico.",
+        "overview": "Visión General",
+        "keyResults": "Resultados Clave e Implicaciones",
+        "mainResults": "Resultados Principales",
+        "trends": "Tendencias",
+        "correlations": "Correlaciones",
+        "riskFactors": "Factores de Riesgo",
+        "noRiskFactors": "No se identificaron factores de riesgo significativos.",
+        "recommendations": "Consideraciones",
+        "medicalConsiderations": "Consideraciones Médicas",
+        "considerations": "Consideraciones",
+        "lifestyle": "Estilo de Vida",
+        "followUp": "Seguimiento",
+        "specialists": "Especialistas",
+        "supplements": "Suplementos",
+        "currentSupplements": "Suplementos Actuales",
+        "confirm": "CONFIRMAR",
+        "suspend": "SUSPENDER",
+        "currentlyTaken": "Tomado actualmente",
+        "recommendedSupplements": "Suplementos Recomendados",
+        "noSupplements": "No se recomiendan ni reportan suplementos.",
+        "conclusion": "Conclusión",
+        "noConclusion": "No hay conclusión disponible.",
+        "dataNotAvailable": "Datos no disponibles"
+    }
+}

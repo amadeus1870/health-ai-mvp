@@ -1,0 +1,764 @@
+{
+    "welcomeScreen": {
+        "welcomeTitle": "Ciao! Sono my Proactive Lab AI",
+        "welcomeBackTitle": "Che piacere rivederti!",
+        "welcomeSubtitle": "Sono qui per aiutarti a capire meglio il tuo corpo e a raggiungere i tuoi obiettivi di benessere.",
+        "welcomeBackSubtitle": "Pronto per nuovi insight sul tuo benessere? Riprendiamo da dove eravamo rimasti.",
+        "continue": "Continua",
+        "completeProfile": "Completa Profilo",
+        "acceptPrivacy": "Accetto la",
+        "accept": "Accetto",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Termini di Servizio",
+        "medicalDisclaimer": "Disclaimer Medico"
+    },
+    "tabs": {
+        "dashboard": "Home",
+        "analysis": "Analisi",
+        "nutrition": "Nutrizione",
+        "profile": "Profilo",
+        "map": "Mappa",
+        "chat": "Chat AI"
+    },
+    "dashboard": {
+        "greeting": "Ciao, %{name}",
+        "uploadCard": {
+            "title": "Nuova Analisi",
+            "subtitle": "Carica o scatta una foto dei tuoi esami"
+        },
+        "historyTitle": "Storico Analisi",
+        "noHistory": "Nessuna analisi recente",
+        "vitalScoreTitle": "Wellness Score (by AI)",
+        "vitalScoreInfo": "Il Wellness Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale.",
+        "healthMapTitle": "Wellness Map",
+        "nutritionStrategyTitle": "Strategia Nutrizionale",
+        "nutritionStrategyInfo": "Questi sono i tuoi obiettivi giornalieri calcolati in base al tuo profilo (TDEE, obiettivo peso, ecc.).",
+        "dailyGoals": "Obiettivi Giornalieri",
+        "dailyShopping": "Spesa giorno",
+        "nextMeal": "Prossimo Pasto",
+        "goalsCompleted": "Obiettivi completati! 🎉",
+        "allMealsEaten": "Hai consumato tutti i pasti di oggi. Ottimo lavoro!",
+        "markAsEaten": "Segna come mangiato",
+        "noPlan": "Nessun piano nutrizionale attivo.",
+        "noPlanAlertTitle": "Nessun Piano",
+        "noPlanAlertMessage": "Non c'è un piano nutrizionale per oggi.",
+        "dailyTip": "Bere acqua prima dei pasti aiuta idratazione e digestione."
+    },
+    "nutrition": {
+        "title": "Piano Nutrizionale",
+        "generateButton": "Genera Piano",
+        "regenerateButton": "Rigenera Piano",
+        "generating": "Generazione piano in corso...",
+        "breakfast": "Colazione",
+        "lunch": "Pranzo",
+        "dinner": "Cena",
+        "snacks": "Spuntini",
+        "shoppingList": "Lista della Spesa",
+        "strategyTitle": "Strategia Nutrizionale",
+        "strategySubtitle": "Il tuo piano alimentare personalizzato",
+        "caloriesTitle": "Fabbisogno Calorico",
+        "caloriesInfo": "Il TDEE è il tuo dispendio energetico giornaliero totale. Le calorie obiettivo sono calcolate per raggiungere il tuo scopo (es. deficit per dimagrire).",
+        "macrosTitle": "Ripartizione Macronutrienti",
+        "macrosInfo": "Indica la percentuale ideale di Proteine, Carboidrati e Grassi nella tua dieta. Questa ripartizione è ottimizzata in base ai tuoi obiettivi e alle tue condizioni fisiche.",
+        "bmiTitle": "Indice di Massa Corporea (BMI)",
+        "bmiInfo": "Il BMI è un indicatore che mette in relazione peso e altezza. Sebbene non distingua tra massa grassa e magra, è un utile punto di partenza per valutare il peso forma.",
+        "bmi": {
+            "underweight": "Sottopeso",
+            "normal": "Normopeso",
+            "overweight": "Sovrappeso",
+            "obese": "Obeso"
+        },
+        "planTitle": "Piano Nutrizionale",
+        "daysReady": "Giorni pronti",
+        "aiGenerated": "Generato dall'AI su misura per te",
+        "week": "Settimana",
+        "export": "Esporta",
+        "regenerateAlertTitle": "Rigenera Piano",
+        "regenerateAlertMessage": "Il piano settimanale sarà aggiornato completamente. L'operazione richiederà del tempo (anche minuti). Sei sicuro di voler continuare?",
+        "generatingDay": "Sto generando il giorno %{day}...",
+        "generatePrompt": "Genera un piano nutrizionale completo di 7 giorni basato sulle tue analisi e obiettivi.",
+        "generatePlanPrompt": "Genera un piano nutrizionale completo di 7 giorni basato sulle tue analisi e obiettivi.",
+        "generateAi": "Genera con AI",
+        "updateTitle": "Aggiornamento in Corso",
+        "updateMessage": "Stiamo analizzando il tuo nuovo profilo e rigenerando il piano nutrizionale su misura per te.\n\nQuesta operazione richiede molta potenza di calcolo e può durare fino a 2 minuti.\n\nPuoi chiudere questa finestra e continuare a usare l'app: la pagina si aggiornerà automaticamente appena finito.",
+        "updateBanner": "Aggiornamento in corso... (Tocca per info)",
+        "errorTitle": "Errore",
+        "errorGenerate": "Impossibile generare il piano nutrizionale al momento. Riprova più tardi.",
+        "noPlanTitle": "Nessun Piano",
+        "noPlanExport": "Genera prima un piano nutrizionale per poterlo stampare.",
+        "noPlanShopping": "Genera prima un piano nutrizionale per vedere la lista della spesa.",
+        "noAnalysisError": "Carica prima un'analisi per generare un piano nutrizionale personalizzato.",
+        "dietPlanTitle": "Piano Nutrizionale",
+        "dietPlanSubtitle": "Il tuo piano settimanale",
+        "shoppingListWeek": "Spesa Settimana",
+        "reanalyzing": "Rianalisi in corso...",
+        "ingredients": "Ingredienti",
+        "preparation": "Preparazione",
+        "swapMeal": "Sostituisci Pasto",
+        "confirmSwap": "Conferma Sostituzione",
+        "searchPlaceholder": "Cerca alimento...",
+        "noMealsFound": "Nessun pasto trovato.",
+        "calories": "Calorie",
+        "protein": "Proteine",
+        "carbs": "Carboidrati",
+        "fats": "Grassi",
+        "mealTypes": {
+            "breakfast": "Colazione",
+            "lunch": "Pranzo",
+            "dinner": "Cena",
+            "snack": "Spuntino"
+        },
+        "newAnalysisTitle": "Nuova Analisi Rilevata",
+        "newAnalysisMessage": "Abbiamo rilevato una nuova analisi o un aggiornamento del profilo. Vuoi rigenerare il piano nutrizionale per adattarlo ai nuovi dati?",
+        "newAnalysis": {
+            "title": "Nuova Analisi Rilevata",
+            "message": "I tuoi dati clinici sono cambiati. I calcoli calorici sono stati aggiornati automaticamente.\n\nVuoi rigenerare anche il piano pasti settimanale per adattarlo ai nuovi risultati?",
+            "keep": "No, mantieni",
+            "regenerate": "Sì, rigenera"
+        },
+        "mealSwap": {
+            "title": "Sostituisci Pasto",
+            "subtitle": "Scegli un'alternativa per:",
+            "loading": "L'AI sta cercando alternative...",
+            "timeout": "Tempo scaduto. La connessione è lenta, riprova.",
+            "error": "Impossibile generare alternative al momento. Riprova.",
+            "retry": "Riprova",
+            "confirmTitle": "Conferma Sostituzione",
+            "confirmMessage": "Vuoi sostituire \"%{old}\" con \"%{new}\"?",
+            "cancel": "Annulla",
+            "confirm": "Sostituisci"
+        },
+        "target": "Obiettivo",
+        "tdee": "Fabbisogno",
+        "surplus": "Surplus",
+        "deficit": "Deficit",
+        "day": "Giorno",
+        "regenerate": "Rigenera",
+        "cancel": "Annulla",
+        "strategies": {
+            "whyTitle": "Perché questa dieta?",
+            "allowedTitle": "Cibi Consigliati",
+            "avoidedTitle": "Cibi da Evitare",
+            "customStrategy": "Strategia Personalizzata",
+            "strategyDisclaimer": "My Proactive Lab AI è una Wellness/Lifestyle App e non è destinata all'uso medico. I suggerimenti dietetici sono basati su correlazioni nutrizionali pubblicate, non su diagnostica clinica.",
+            "mediterranean": {
+                "description": "La dieta Mediterranea è considerata una delle più sane al mondo. Si basa su alimenti vegetali, grassi sani (olio d'oliva) e consumo moderato di proteine animali.",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nAbbiamo scelto la Dieta Mediterranea perché è ricca di antiossidanti e grassi monoinsaturi, ideali per migliorare la salute cardiovascolare e ridurre l'infiammazione sistemica.",
+                "allowed": [
+                    "Verdura",
+                    "Frutta",
+                    "Cereali Integrali",
+                    "Legumi",
+                    "Noci",
+                    "Olio d'Oliva",
+                    "Pesce"
+                ],
+                "avoided": [
+                    "Zuccheri",
+                    "Carni lavorate",
+                    "Cibi ultra-processati",
+                    "Bevande dolci"
+                ]
+            },
+            "keto": {
+                "description": "La dieta Chetogenica riduce drasticamente i carboidrati per spingere il corpo a bruciare grassi come fonte primaria di energia (chetosi).",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nLa Dieta Chetogenica è stata selezionata per migliorare la tua sensibilità insulinica e favorire una rapida ossidazione dei grassi, in linea con i tuoi obiettivi di composizione corporea.",
+                "allowed": [
+                    "Carne",
+                    "Pesce",
+                    "Uova",
+                    "Formaggi",
+                    "Verdure foglia",
+                    "Oli",
+                    "Burro",
+                    "Avocado"
+                ],
+                "avoided": [
+                    "Pane",
+                    "Pasta",
+                    "Frutta zuccherina",
+                    "Legumi",
+                    "Patate",
+                    "Dolci",
+                    "Alcol"
+                ]
+            },
+            "vegetarian": {
+                "description": "La dieta Vegetariana esclude carne e pesce, concentrandosi su alimenti vegetali, uova e latticini per un apporto bilanciato.",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nAbbiamo optato per un approccio Vegetariano per ridurre il carico di grassi saturi e aumentare l'apporto di fibre e fitonutrienti, essenziali per regolarizzare la funzionalità intestinale e il benessere generale.",
+                "allowed": [
+                    "Verdura",
+                    "Legumi",
+                    "Soia",
+                    "Cereali",
+                    "Uova",
+                    "Latticini",
+                    "Frutta secca"
+                ],
+                "avoided": [
+                    "Carne",
+                    "Pesce",
+                    "Salumi",
+                    "Gelatina",
+                    "Strutto"
+                ]
+            },
+            "vegan": {
+                "description": "La dieta Vegana esclude tutti i prodotti di origine animale. È ricca di fibre e antiossidanti, ottima per la salute del cuore.",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nLa scelta Vegana massimizza l'apporto di nutrienti vegetali protettivi. È particolarmente indicata per ridurre lo stress ossidativo e migliorare la salute cardiovascolare.",
+                "allowed": [
+                    "Legumi",
+                    "Tofu",
+                    "Tempeh",
+                    "Cereali",
+                    "Semi",
+                    "Frutta",
+                    "Verdura",
+                    "Latte veg"
+                ],
+                "avoided": [
+                    "Carne",
+                    "Pesce",
+                    "Uova",
+                    "Latticini",
+                    "Miele",
+                    "Derivati animali"
+                ]
+            },
+            "paleo": {
+                "description": "La dieta Paleo si ispira all'alimentazione dei nostri antenati cacciatori-raccoglitori, escludendo cibi processati e cereali.",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nIl protocollo Paleo è stato scelto per eliminare potenziali allergeni e irritanti intestinali (come glutine e latticini), favorendo un reset metabolico e una riduzione dell'infiammazione cronica.",
+                "allowed": [
+                    "Carne",
+                    "Pesce",
+                    "Frutta",
+                    "Verdura",
+                    "Noci",
+                    "Semi",
+                    "Oli sani"
+                ],
+                "avoided": [
+                    "Cereali",
+                    "Legumi",
+                    "Latticini",
+                    "Zuccheri",
+                    "Cibi processati"
+                ]
+            },
+            "balanced": {
+                "description": "Un'alimentazione bilanciata personalizzata per supportare il tuo benessere generale e mantenere livelli di energia costanti.",
+                "reasoning": "Questa strategia nutrizionale è stata elaborata per ottimizzare i tuoi livelli di energia e supportare il tuo benessere a lungo termine, rispettando le tue preferenze alimentari.\n\nAbbiamo strutturato un piano Bilanciato per garantirti un apporto completo di macro e micronutrienti, garantendo un apporto ottimale e sostenendo il tuo stile di vita attivo.",
+                "allowed": [
+                    "Verdure",
+                    "Proteine magre",
+                    "Carboidrati",
+                    "Grassi sani",
+                    "Frutta"
+                ],
+                "avoided": [
+                    "Zuccheri",
+                    "Fritti",
+                    "Sale eccessivo",
+                    "Alcolici",
+                    "Junk food"
+                ]
+            }
+        }
+    },
+    "loading": {
+        "didYouKnow": "Lo sapevi che?",
+        "preparing": "Stiamo preparando il tuo piano...",
+        "tips": {
+            "hydration": {
+                "title": "Idratazione",
+                "text": "Bere acqua prima dei pasti può aiutarti a sentirti sazio più velocemente."
+            },
+            "movement": {
+                "title": "Movimento",
+                "text": "Una passeggiata di 10 minuti dopo mangiato aiuta a regolare la glicemia."
+            },
+            "sleep": {
+                "title": "Sonno",
+                "text": "Dormire 7-8 ore a notte è fondamentale per il recupero muscolare e mentale."
+            },
+            "fiber": {
+                "title": "Fibre",
+                "text": "Le fibre aiutano la digestione e mantengono stabile il livello di energia."
+            },
+            "stress": {
+                "title": "Stress",
+                "text": "Lo stress cronico può influenzare negativamente il metabolismo."
+            },
+            "chewing": {
+                "title": "Masticazione",
+                "text": "Masticare lentamente migliora la digestione e l'assorbimento dei nutrienti."
+            }
+        },
+        "quotes": [
+            "La salute è il primo dovere della vita.",
+            "Abbi cura del tuo corpo, è l'unico posto in cui devi vivere.",
+            "La felicità è la forma più alta di salute.",
+            "Ogni giorno è una nuova opportunità per stare meglio.",
+            "Il benessere non è una destinazione, ma un modo di viaggiare.",
+            "Ascolta il tuo corpo, ti parla continuamente.",
+            "Fa che il cibo sia la tua medicina e non la medicina sia il tuo cibo.",
+            "La calma è la culla della forza.",
+            "Un corpo sano è una camera per l'anima.",
+            "Investire nella salute produce i migliori interessi."
+        ]
+    },
+    "analysis": {
+        "title": "Analisi Sangue e Referti",
+        "subtitle": "Guida all'interpretazione",
+        "uploadTitle": "Carica le tue analisi",
+        "uploadSubtitle": "Supporta JPG, PNG, PDF",
+        "uploadDesc": "Puoi caricare risultati di analisi del sangue, e qualunque altro referto (per esempio marker tumorali, ecografie, TAC, radiografie, risonanza magnetica, ecc..)",
+        "camera": "Camera",
+        "file": "File",
+        "archive": "Archivio",
+        "security": "I tuoi dati vengono trasmessi in modo sicuro e crittografato ai server di Google.",
+        "loadingTitle": "Caricamento dei documenti in corso",
+        "loadingDesc": "L'analisi approfondita dei tuoi documenti è in corso. Questa operazione può richiedere anche qualche minuto: è del tutto normale, stiamo elaborando ogni dettaglio per offrirti un report completo.",
+        "successMessage": "Analisi completata con successo!",
+        "errorProfile": "Impossibile recuperare il profilo utente.",
+        "errorPdf": "Impossibile generare il PDF. Riprova.",
+        "errorCameraPermission": "È necessario concedere l'accesso alla fotocamera per scattare foto.",
+        "errorCamera": "Impossibile scattare la foto. Riprova.",
+        "errorAnalysis": "Impossibile analizzare il documento: %{error}",
+        "vitalScoreTitle": "Wellness Score",
+        "vitalScoreInfo": "Il Wellness Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale.",
+        "lipidTitle": "Profilo Lipidico",
+        "lipidInfo": "Il grafico mostra i tuoi valori di colesterolo (Totale, LDL, HDL) e trigliceridi rispetto ai range ottimali. L'area verde indica i valori ideali per la salute cardiovascolare.",
+        "riskTitle": "Rischio Globale",
+        "riskInfo": "Indica la presenza e la gravità dei fattori di rischio identificati nelle tue analisi. Include parametri come infiammazione, salute metabolica e cardiovascolare.",
+        "uploadButton": "Carica Referto",
+        "analyzing": "Analisi in corso...",
+        "resultsTitle": "Risultati",
+        "riskFactors": "Fattori di Rischio",
+        "biomarkers": "Biomarcatori",
+        "disclaimer": "Nota: Questa analisi è generata dall'IA e non sostituisce il parere medico.",
+        "entryDisclaimer": "My Proactive Lab AI fornisce informazioni nutrizionali e supporto all'interpretazione dei biomarcatori per finalità di benessere. Non è un dispositivo medico e non deve essere utilizzato per diagnosticare, curare o prevenire malattie. Consultare sempre un professionista sanitario prima di prendere decisioni sulla salute.",
+        "charts": {
+            "total": "Totale",
+            "ldl": "LDL",
+            "hdl": "HDL",
+            "triglycerides": "Trigliceridi",
+            "vitalScoreDesc": "Il tuo punteggio di salute generale basato su tutti i biomarcatori analizzati.",
+            "lipidDesc": "Panoramica del tuo profilo lipidico rispetto ai valori ottimali.",
+            "riskDesc": "Valutazione dei principali fattori di rischio cardiovascolare e metabolico.",
+            "noData": "Dati non disponibili",
+            "dataUnavailable": "Dati insufficienti per generare il grafico.",
+            "idealZone": "Zona Ideale / Valori OK",
+            "outOfRange": "Fuori Range",
+            "globalRisk": "Rischio Globale"
+        },
+        "riskLevels": {
+            "low": "Basso",
+            "medium": "Medio",
+            "high": "Alto"
+        },
+        "cholesterol": {
+            "quantitativeAnalysis": "Analisi Quantitativa",
+            "qualitativeAnalysis": "Analisi Qualitativa Avanzata",
+            "total": "Colesterolo Totale",
+            "ldl": "Colesterolo LDL (Cattivo)",
+            "hdl": "Colesterolo HDL (Buono)",
+            "triglycerides": "Trigliceridi",
+            "target": "Obiettivo"
+        },
+        "risk": {
+            "riskLabel": "RISCHIO",
+            "probability": "Probabilità Rischio"
+        },
+        "carousel": {
+            "tapDetails": "Tocca per dettagli",
+            "fullReport": "Il tuo Report Completo",
+            "exportAnalysis": "Esporta l'intera analisi",
+            "generalEval": "Valutazione Generale",
+            "overview": "Panoramica Completa",
+            "mainResults": "Principali Risultati",
+            "trends": "Tendenze e Pattern",
+            "correlations": "Correlazioni",
+            "riskFactors": "Fattori di Rischio",
+            "recommendations": "Considerazioni",
+            "considerations": "Considerazioni",
+            "lifestyle": "Stile di Vita e Dieta",
+            "followUp": "Follow-up Consigliati",
+            "specialists": "Specialisti",
+            "lipidProfile": "Profilo Lipidico",
+            "biomarkersDetail": "Dettaglio Biomarcatori",
+            "supplements": "Integratori",
+            "currentSupplements": "Integratori Attuali",
+            "recommendedSupplements": "Integratori Consigliati",
+            "conclusion": "Conclusione"
+        },
+        "history": {
+            "title": "Storico Analisi",
+            "unknownDate": "Data sconosciuta",
+            "biomarkers": "Biomarcatori",
+            "risks": "Rischi",
+            "errorDelete": "Impossibile eliminare l'analisi.",
+            "noAnalysis": "Nessuna analisi salvata",
+            "deleteTitle": "Elimina Analisi",
+            "deleteConfirmCurrent": "ATTENZIONE: Questa è l'analisi attualmente in uso. Eliminandola, tutti i dati (grafici, mappa, ecc.) verranno azzerati. Sei sicuro?",
+            "deleteConfirm": "Sei sicuro di voler eliminare questa analisi? L'azione è irreversibile.",
+            "cancel": "Annulla",
+            "delete": "Elimina",
+            "current": "(Attuale)"
+        },
+        "success": {
+            "title": "Successo!",
+            "button": "Ottimo"
+        }
+    },
+    "userProfile": {
+        "title": "Il Tuo Profilo",
+        "success": "Profilo aggiornato con successo!",
+        "subtitle": "Completa i dati per un'analisi precisa.",
+        "changePhoto": "Modifica Foto",
+        "personalInfo": "Dati Personali",
+        "name": "Nome o Nickname",
+        "namePlaceholder": "Il tuo nome",
+        "age": "Età",
+        "agePlaceholder": "Anni",
+        "gender": "Sesso *",
+        "height": "Altezza (cm)",
+        "heightPlaceholder": "cm",
+        "weight": "Peso (kg)",
+        "weightPlaceholder": "kg",
+        "waist": "Girovita (cm)",
+        "waistPlaceholder": "cm",
+        "physicalDescription": "Descrizione Fisica",
+        "lifestyle": "Stile di Vita",
+        "smoke": "Fumo",
+        "alcohol": "Alcol",
+        "coffee": "Caffè",
+        "activityLevel": "Livello di Attività",
+        "sleepQuality": "Qualità del Sonno",
+        "stressLevel": "Livello di Stress",
+        "habits": "Abitudini",
+        "dietNutrition": "Dieta e Nutrizione",
+        "mealsPerDay": "Pasti al Giorno",
+        "snacksPerDay": "Numero Spuntini",
+        "dietType": "Tipo di Dieta Attuale",
+        "dietaryRestrictionsQuestion": "Hai restrizioni dietetiche, allergie o cibi che non ti piacciono?",
+        "other": "Specifica Altro",
+        "describe": "Descrivi...",
+        "typicalDay": "Giornata Tipo (Colazione/Pranzo/Cena)",
+        "typicalDayPlaceholder": "Colazione: latte, caffe...\nPranzo: pasta...\nCena: carne...",
+        "supplements": "Integratori che prendo",
+        "conditions": "Condizioni Note",
+        "symptoms": "Sintomi Recenti",
+        "medications": "Farmaci",
+        "medicationsQuestion": "Assumi Farmaci?",
+        "medicationsList": "Quali farmaci assumi?",
+        "medicationsPlaceholder": "Elenca i farmaci...",
+        "saveButton": "CONFERMA PROFILO",
+        "saveSuccess": "Profilo salvato con successo!",
+        "warning": "Attenzione",
+        "fillRequired": "Compila tutti i campi obbligatori contrassegnati con *",
+        "errorSave": "Impossibile salvare il profilo.",
+        "errorImage": "Impossibile selezionare l'immagine.",
+        "incompleteProfile": "Per continuare, completa il tuo profilo o carica un'analisi.",
+        "uploadAnalysisPrompt": "Profilo completato! Ora carica la tua prima analisi per generare il piano personalizzato."
+    },
+    "profileOptions": {
+        "gender": {
+            "M": "M",
+            "F": "F"
+        },
+        "activity": {
+            "sedentary": "Sedentario",
+            "lightly_active": "Leggermente attivo",
+            "moderately_active": "Moderatamente attivo",
+            "very_active": "Molto attivo",
+            "extreme": "Estremo"
+        },
+        "diet": {
+            "omnivore": "Onnivora",
+            "vegetarian": "Vegetariana",
+            "vegan": "Vegana",
+            "pescatarian": "Pescatariana",
+            "keto": "Chetogenica",
+            "paleo": "Paleo",
+            "gluten_free": "Senza Glutine",
+            "lactose_free": "Senza Lattosio",
+            "other": "Altro"
+        },
+        "restrictions": {
+            "none": "Nessuno",
+            "vegetarian": "Vegetariano",
+            "vegan": "Vegano",
+            "gluten_free": "Senza glutine",
+            "dairy_free": "Senza latticini",
+            "no_red_meat": "Non mi piace la carne rossa",
+            "nut_allergy": "Allergia alle noci",
+            "religious": "Restrizione religiosa",
+            "other": "Altro"
+        },
+        "conditions": {
+            "fatty_liver": "Fegato Grasso",
+            "hypertension": "Ipertensione",
+            "pre_hypertension": "Predisposizione Ipertensione",
+            "diabetes": "Diabete",
+            "heart_disease": "Cardiopatia",
+            "kidney_issues": "Reni",
+            "ibs": "Colon Irritabile (IBS)",
+            "hypothyroidism": "Ipotiroidismo",
+            "hyperthyroidism": "Ipertiroidismo",
+            "high_cholesterol": "Colesterolo alto (LDL)",
+            "other": "Altro"
+        },
+        "symptoms": {
+            "fatigue": "Affaticamento",
+            "abdominal_pain": "Dolori Addominali",
+            "migraine": "Emicrania",
+            "muscle_pain": "Dolori Muscolari",
+            "back_pain": "Mal di Schiena",
+            "pelvic_pain": "Dolore Pelvico",
+            "jaundice": "Ittero",
+            "tiredness": "Stanchezza",
+            "insomnia": "Insonnia",
+            "weight_loss": "Perdita di Peso",
+            "physical_change": "Cambiamento Fisico",
+            "nausea": "Nausea",
+            "dizziness": "Vertigini"
+        },
+        "habits": {
+            "cold_showers": "Docce Fredde",
+            "meditation": "Meditazione",
+            "walking": "Passeggiate",
+            "gym": "Palestra",
+            "sauna": "Sauna",
+            "fasting": "Digiuno"
+        },
+        "supplements": {
+            "multivitamin": "Multivitaminico",
+            "multimineral": "Multi-integratore in polvere",
+            "vitamin_d": "Vitamina D",
+            "vitamin_c": "Vitamina C",
+            "vitamin_e": "Vitamina E",
+            "omega_3": "Omega-3",
+            "magnesium": "Magnesio",
+            "potassium": "Potassio",
+            "mineral_salts": "Sali Minerali",
+            "probiotics": "Probiotici",
+            "zinc": "Zinco",
+            "iron": "Ferro",
+            "b_complex": "Complesso B",
+            "protein_powder": "Proteine in polvere",
+            "creatine": "Creatina",
+            "melatonin": "Melatonina"
+        },
+        "physical": {
+            "very_defined": "Molto Definito/Vene visibili",
+            "athletic": "Atletico/Tonico",
+            "average": "Forma Media",
+            "soft": "Morbido/Qualche chilo in più",
+            "overweight": "Sovrappeso/Robusto"
+        },
+        "sleep": {
+            "good": "Buono",
+            "average": "Medio",
+            "poor": "Scarso",
+            "insomnia": "Insonnia"
+        },
+        "stress": {
+            "low": "Basso",
+            "moderate": "Moderato",
+            "high": "Alto",
+            "extreme": "Estremo"
+        },
+        "smoke": {
+            "no": "No",
+            "yes": "Sì"
+        },
+        "alcohol": {
+            "no": "No",
+            "occasional": "Occasionale",
+            "frequent": "Frequente"
+        },
+        "coffee": {
+            "no": "No",
+            "1-2": "1-2",
+            "3+": "3+"
+        }
+    },
+    "map": {
+        "title": "Mappa Biomarcatori",
+        "noAnalysis": "Carica le tue analisi nella scheda \"Analisi\" per attivare la mappa.",
+        "subtitle": "Distribuzione dei tuoi biomarcatori sui relativi organi.",
+        "toAnalyze": "DA ANALIZZARE",
+        "noDataOrgan": "Nessun dato rilevante per questo organo.",
+        "noData": "Nessun dato disponibile, carica i tuoi dati."
+    },
+    "chat": {
+        "title": "my Proactive Lab AI",
+        "online": "Online",
+        "welcome": "Ciao! 👋 Sono il tuo Assistente Proactive Lab AI.\n\nHo analizzato il tuo profilo e sono qui per aiutarti a ottimizzare il tuo benessere e raggiungere i tuoi obiettivi.\n\nCome posso esserti utile oggi?",
+        "error": "Ops! Qualcosa è andato storto. Riprova per favore. 🙏",
+        "placeholder": "Chiedimi qualcosa sulla tua salute...",
+        "suggestions": {
+            "food": "🥗 Cosa mangio oggi?",
+            "summary": "📊 Riepilogo dati",
+            "routine": "💊 La mia routine",
+            "advice": "💡 Dammi un consiglio"
+        }
+    },
+    "settings": {
+        "title": "Impostazioni",
+        "language": "Lingua",
+        "privacy": "Privacy Policy",
+        "terms": "Termini di Servizio",
+        "disclaimer": "Disclaimer Medico",
+        "deleteData": "Elimina tutti i dati",
+        "deleteDataConfirm": "Sei sicuro? Questa azione è irreversibile. Tutti i tuoi dati verranno cancellati dal dispositivo.",
+        "cancel": "Annulla",
+        "confirm": "Elimina",
+        "profileData": "Il mio profilo utente",
+        "exportPdf": "Esporta Report PDF",
+        "clearChat": "Cancella memoria chat",
+        "clearChatConfirm": "Vuoi cancellare la cronologia della conversazione con l'Assistente?",
+        "info": "Info App",
+        "sections": {
+            "profile": "PROFILO & DATI",
+            "preferences": "PREFERENZE",
+            "ai": "INTELLIGENZA ARTIFICIALE",
+            "legal": "LEGAL COMPLIANCE",
+            "danger": "ZONA PERICOLOSA"
+        },
+        "version": "Versione",
+        "dataDeleted": "Dati Eliminati",
+        "restartMessage": "L'app verrà riavviata.",
+        "chatDeleted": "Chat Cancellata",
+        "chatDeletedMessage": "La memoria dell'assistente è stata ripulita.",
+        "exporting": "Generazione report in corso...",
+        "comingSoon": "Funzionalità in arrivo",
+        "exportSuccess": "Report esportato con successo!",
+        "exportError": "Errore durante l'esportazione del report."
+    },
+    "shoppingList": {
+        "title": "Lista della Spesa",
+        "subtitleDaily": "Ingredienti estratti dal tuo piano giornaliero.",
+        "subtitleWeekly": "Ingredienti estratti dal tuo piano settimanale.",
+        "loading": "Organizzo la lista...",
+        "empty": "Nessun ingrediente trovato.",
+        "copyAll": "Copia Tutto",
+        "copied": "Copiato negli appunti!"
+    },
+    "common": {
+        "loading": "Caricamento...",
+        "error": "Si è verificato un errore",
+        "success": "Operazione completata",
+        "back": "Indietro",
+        "save": "Salva",
+        "close": "Chiudi",
+        "view": "Visualizza",
+        "gotIt": "Ho capito",
+        "cancel": "Annulla",
+        "next": "Avanti",
+        "days": {
+            "short": [
+                "LUN",
+                "MAR",
+                "MER",
+                "GIO",
+                "VEN",
+                "SAB",
+                "DOM"
+            ],
+            "long": [
+                "Lunedì",
+                "Martedì",
+                "Mercoledì",
+                "Giovedì",
+                "Venerdì",
+                "Sabato",
+                "Domenica"
+            ]
+        }
+    },
+    "disclaimer": {
+        "title": "Disclaimer Importante",
+        "text1": "Questa applicazione utilizza l'Intelligenza Artificiale per fornire analisi e suggerimenti basati sui dati forniti dall'utente.",
+        "highlight": "NON È UN DISPOSITIVO MEDICO.",
+        "text2": "Le informazioni fornite sono a scopo puramente informativo e di benessere generale. Non costituiscono in alcun modo una diagnosi medica, un trattamento o una prescrizione.",
+        "text3": "Non sostituire mai il parere del tuo medico curante con le informazioni ottenute da questa app. In caso di dubbi sulla tua salute, consulta sempre un professionista sanitario.",
+        "text4": "Continuando, dichiari di aver letto e compreso che l'uso di questa applicazione è sotto la tua esclusiva responsabilità.",
+        "accept": "Ho capito e Accetto",
+        "fullText": "# DISCLAIMER MEDICO\n\n## ⚠️ AVVERTENZA IMPORTANTE SULLA SALUTE\n\n**PROACTIVE LAB NON È UN MEDICO E NON È UN DISPOSITIVO MEDICO.**\n\n*   **Solo scopo informativo:** I contenuti, le analisi e i suggerimenti generati da questa applicazione (inclusi quelli forniti dall'Intelligenza Artificiale) hanno scopo puramente informativo ed educativo.\n*   **Rischio di Errore:** L'Intelligenza Artificiale può commettere errori (\"allucinazioni\"). Non considerare mai i dati forniti come verità assolute. Controlla sempre i valori originali sui tuoi referti.\n*   **Consulta sempre un professionista:** Non prendere decisioni sulla tua salute, non cambiare terapie e non ignorare sintomi basandoti su questa app. Rivolgiti sempre al tuo medico curante o a uno specialista.\n*   **Emergenze:** Se pensi di avere un'emergenza medica, chiama immediatamente il tuo medico o il numero di emergenza (112/118).\n\nUtilizzando questa app, dichiari di aver compreso che essa non sostituisce il giudizio professionale medico."
+    },
+    "legal": {
+        "privacyPolicy": "# PRIVACY POLICY (Informativa sulla Privacy)\n\n**Ultimo aggiornamento:** 10/12/2025\n\n## 1. Titolare del Trattamento\n\n**EARTH'S DREAMS S.R.L.**\nStradela Carabus Nr. 15, Iasi, 700275, Romania\nCUI: 38752272 (J22/39/07.01.2019) | Partita IVA: RO38752272\nContatto per la protezione dei dati: info@earthsdreams.ro\n\n## 2. Introduzione e Principi\n\nBenvenuto in Proactive Lab (\"l'Applicazione\"). La tua privacy è la nostra priorità assoluta. Riconosciamo la natura sensibile dei dati sanitari e ci impegniamo a proteggerli in piena conformità con il Regolamento Generale sulla Protezione dei Dati (GDPR - UE 2016/679).\n\nQuesta informativa descrive come trattiamo i tuoi dati, basandoci sui principi di Privacy by Design e Minimizzazione dei Dati.\n\n## 3. Tipologia di Dati Trattati\n\n### A. Dati inseriti dall'utente (Categorie Particolari di Dati - Art. 9 GDPR):\nPer fornire il servizio, l'app elabora dati che tu fornisci volontariamente, quali:\n*   **Dati anagrafici e biometrici** (età, genere, altezza, peso).\n*   **Dati relativi alla salute** (biomarcatori, sintomi, note mediche, storico clinico).\n*   **Documenti visivi** (foto di referti medici caricate per l'analisi OCR/AI).\n\n### B. Dati tecnici (Raccolti automaticamente):\n*   Log di sistema anonimizzati e dati tecnici strettamente necessari per la sicurezza, il debug e il funzionamento dell'app.\n*   Non utilizziamo tracker pubblicitari o cookie di profilazione di terze parti per scopi di marketing.\n\n### C. Dati di Pagamento e Abbonamento:\nL'Applicazione offre acquisti in-app o abbonamenti. EARTH'S DREAMS S.R.L. **NON** raccoglie, non elabora e non archivia i tuoi dati finanziari (numeri di carta di credito, conti bancari).\n\nTutte le transazioni finanziarie sono gestite interamente da terze parti: Apple (App Store) per iOS e Google (Play Store) per Android. Noi riceviamo da questi fornitori solo un \"token\" anonimo che conferma l'avvenuto pagamento o lo stato dell'abbonamento (attivo/scaduto), senza alcun riferimento alla tua identità finanziaria.\n\n## 4. Architettura \"Zero-Knowledge\" e Luogo del Trattamento\n\nL'Applicazione opera con un modello \"Local-First\":\n\n*   **Archiviazione Locale:** I tuoi dati sanitari e personali sono salvati crittografati esclusivamente nella memoria del tuo dispositivo.\n*   **Assenza di Cloud Proprietario:** Earth's Dreams S.R.L. **NON** possiede, non gestisce e non ha accesso a un database centrale contenente i tuoi dati sanitari. Noi sviluppatori non possiamo vedere, leggere o recuperare i tuoi dati.\n*   **Sovranità:** In caso di cancellazione dell'app o smarrimento del dispositivo senza backup (che è a carico dell'utente), i dati sono irrecuperabili da parte nostra.\n\n## 5. Utilizzo dell'Intelligenza Artificiale e Trasferimento Dati\n\nPer fornire le funzionalità di analisi avanzata, l'Applicazione utilizza le API di Google Gemini (fornite da Google Cloud Platform).\n\n*   **Modalità di Trasmissione:** Quando richiedi un'analisi, i soli dati testuali o numerici strettamente necessari (privati del tuo nome e cognome, se possibile) vengono inviati in modo crittografato (HTTPS/TLS) ai server di Google.\n*   **Termini di Utilizzo Dati:** Utilizziamo i servizi Google in modalità \"Enterprise\". In base ai termini vigenti di Google Cloud, i tuoi dati **NON** vengono utilizzati per addestrare i modelli di Intelligenza Artificiale di Google e non vengono memorizzati in modo persistente dai loro sistemi.\n*   **Ruolo di Google:** Google agisce in qualità di Responsabile o Sub-responsabile del trattamento per la mera elaborazione tecnica.\n\n## 6. Base Giuridica del Trattamento\n\nIl trattamento dei tuoi dati sanitari avviene esclusivamente sulla base del tuo **Consenso Esplicito** (Art. 9.2.a GDPR), che presti al primo avvio dell'app e che è necessario per l'erogazione del servizio. Puoi revocare il consenso in qualsiasi momento cancellando i dati o disinstallando l'app.\n\n## 7. Diritti dell'Interessato\n\nIn conformità al GDPR, hai il diritto di:\n*   Accedere ai tuoi dati (sono già tutti visibili sul tuo dispositivo).\n*   Rettificare i dati inesatti.\n*   Cancellare i dati (\"Diritto all'oblio\"): Puoi eliminare integralmente i tuoi dati utilizzando la funzione \"Elimina tutti i dati\" nelle impostazioni dell'app o disinstallando l'applicazione. Poiché non conserviamo copie sui nostri server, questa azione è definitiva.\n*   Limitare il trattamento o opporsi ad esso.\n\n## 8. Minori\n\nL'Applicazione è destinata esclusivamente a utenti di età pari o superiore a 18 anni. Non raccogliamo consapevolmente dati di minori. Se venissimo a conoscenza di dati di minori inseriti nell'app, invitiamo i genitori a cancellare l'app dal dispositivo del minore.\n\n## 9. Modifiche\n\nCi riserviamo il diritto di aggiornare questa policy. Le modifiche sostanziali verranno notificate tramite l'app.",
+        "termsOfService": "# TERMINI DI SERVIZIO (TOS)\n\n**Ultimo aggiornamento:** 10/12/2025\n\n## 1. Accettazione dei Termini\n\nScaricando, installando o utilizzando Proactive Lab (\"l'Applicazione\"), fornita da EARTH'S DREAMS S.R.L. (\"la Società\"), l'utente accetta di essere vincolato dai presenti Termini di Servizio. Se non si accettano questi termini, non utilizzare l'Applicazione.\n\n## 2. Licenza d'Uso\n\nLa Società concede all'utente una licenza limitata, non esclusiva, non trasferibile e revocabile per utilizzare l'Applicazione esclusivamente per scopi personali e non commerciali, in conformità con questi Termini. È vietato decompilare, disassemblare, effettuare reverse engineering o tentare di derivare il codice sorgente dell'Applicazione.\n\n## 3. Modelli di Accesso, Abbonamenti e Pagamenti\n\nL'Applicazione adotta un modello \"Freemium\". Alcune funzionalità base sono gratuite e sempre attive. Le funzionalità avanzate (\"Premium\") sono visibili all'interno dell'app ma appaiono bloccate o offuscate finché l'utente non completa l'acquisto.\n\n### A. Modalità di Sblocco:\nL'utente può sbloccare le funzionalità Premium tramite una delle seguenti modalità (a seconda dell'offerta attiva al momento dell'acquisto):\n*   **Abbonamento:** Pagamento ricorrente (es. mensile o annuale) con rinnovo automatico.\n*   **Acquisto Una Tantum (Lifetime):** Se disponibile, un pagamento unico che garantisce l'accesso alle funzionalità Premium a vita, senza scadenza e senza canoni ricorrenti.\n\n### B. Gestione dei Pagamenti:\nTutti gli acquisti sono gestiti tramite il tuo account Apple ID (iOS) o Google Play (Android). Il pagamento sarà addebitato sul metodo di pagamento associato al tuo account Store al momento della conferma.\n\n### C. Sblocco Immediato (Nessun Periodo di Prova):\nSalvo diversa indicazione specifica promozionale sullo Store, l'Applicazione **NON** prevede periodi di prova gratuiti a tempo. Le funzionalità Premium si sbloccano immediatamente dopo la conferma del pagamento. L'utente ha modo di valutare l'utilità delle funzioni Premium consultando le descrizioni e le anteprime nell'app prima dell'acquisto.\n\n### D. Rinnovo Automatico (Solo per Abbonamenti):\nNel caso di sottoscrizione di un abbonamento ricorrente, questo si rinnova automaticamente alla fine di ogni periodo di fatturazione, a meno che il rinnovo automatico non venga disattivato nelle impostazioni dell'account Store almeno 24 ore prima della scadenza.\n\n### E. Cancellazione e Disdetta:\n*   **Per gli Abbonamenti:** Puoi annullare il rinnovo automatico in qualsiasi momento dalle impostazioni del tuo account Apple o Google. La disdetta avrà effetto alla fine del periodo di fatturazione corrente.\n*   **Per l'Acquisto Una Tantum:** Questo acquisto è definitivo e non richiede disdetta in quanto non genera addebiti futuri.\n\n**Nota:** La disinstallazione dell'app **NON** annulla automaticamente un abbonamento attivo.\n\n### F. Rimborsi:\nPoiché i pagamenti sono gestiti dagli store, EARTH'S DREAMS S.R.L. non ha la possibilità tecnica di emettere rimborsi diretti. Le richieste di rimborso devono essere inoltrate direttamente ad Apple o Google secondo le loro politiche vigenti.\n\n## 4. Esclusione di Responsabilità Medica (Medical Disclaimer)\n\n**L'APPLICAZIONE NON È UN DISPOSITIVO MEDICO.**\nL'Applicazione e i servizi di Intelligenza Artificiale integrati forniscono informazioni a solo scopo educativo e informativo.\n\n*   **Nessuna Diagnosi:** L'app non effettua diagnosi, non prescrive trattamenti e non sostituisce il rapporto medico-paziente.\n*   **Verifica:** L'utente riconosce che l'Intelligenza Artificiale è soggetta a errori, imprecisioni o \"allucinazioni\". È responsabilità esclusiva dell'utente verificare qualsiasi informazione generata dall'app con un medico qualificato.\n*   **Emergenze:** Non utilizzare questa app in situazioni di emergenza medica. In caso di emergenza, contattare immediatamente il 112, il 118 o il numero di emergenza locale.\n\n## 5. Responsabilità dell'Utente e Sicurezza\n\nPoiché i dati risiedono localmente sul dispositivo (\"Offline-First\"), l'utente è l'unico responsabile:\n*   Della custodia fisica del proprio dispositivo.\n*   Dell'impostazione di codici di blocco, password o dati biometrici per impedire accessi non autorizzati all'App.\n*   Dell'esecuzione di backup dei propri dati (se la funzionalità è supportata dal sistema operativo). La Società non può recuperare dati persi a causa di furto, smarrimento o danneggiamento del dispositivo.\n\n## 6. Limitazione di Responsabilità\n\nNella misura massima consentita dalla legge applicabile, EARTH'S DREAMS S.R.L. non sarà responsabile per danni indiretti, incidentali, speciali o consequenziali derivanti dall'uso o dall'impossibilità di usare l'Applicazione, inclusi, a titolo esemplificativo, danni per perdita di dati o errori nelle analisi fornite dall'AI.\nLa responsabilità totale della Società verso l'utente non supererà l'importo eventualmente pagato dall'utente per l'Applicazione negli ultimi 12 mesi.\n\n## 7. Legge Applicabile e Foro Competente\n\nI presenti Termini sono regolati dalle leggi della Romania, fatto salvo il rispetto delle norme imperative a tutela dei consumatori del paese di residenza dell'utente (es. Italia). Per qualsiasi controversia sarà competente il foro della sede legale della Società, salvo i fori inderogabili previsti dalla legge a tutela del consumatore."
+    },
+    "organs": {
+        "cervello": "Cervello",
+        "tiroide": "Tiroide",
+        "polmoni": "Polmoni",
+        "cuore": "Cuore",
+        "fegato": "Fegato",
+        "stomaco": "Stomaco",
+        "pancreas": "Pancreas",
+        "colecisti": "Colecisti",
+        "reni": "Reni",
+        "intestino": "Intestino",
+        "colon": "Colon",
+        "prostata": "Prostata"
+    },
+    "pdf": {
+        "dietTitle": "Piano Nutrizionale Settimanale",
+        "generatedFor": "Generato per %{name} il %{date}",
+        "goalCalories": "Obiettivo Calorico",
+        "goal": "Obiettivo",
+        "macros": "Ripartizione Macro",
+        "day": "Giorno",
+        "ingredients": "Ingredienti",
+        "totalCalories": "Totale Calorie",
+        "shoppingList": "Lista della Spesa Settimanale",
+        "footer": "Generato da my Proactive Lab AI - Il tuo assistente nutrizionale personale",
+        "analysisTitle": "my Proactive Lab AI",
+        "analysisSubtitle": "Report sul mio stato di benessere.",
+        "generatedOn": "Generato il %{date} per %{name}",
+        "vitalScore": "Wellness Score",
+        "vitalScoreDesc": "Il tuo punteggio generale di salute basato su tutti i parametri analizzati.",
+        "vitalScoreInfo": "ℹ️ Il Wellness Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale.",
+        "lipidProfile": "Profilo Lipidico",
+        "lipidProfileDesc": "Confronto visivo dei valori di colesterolo rispetto ai limiti.",
+        "lipidProfileInfo": "ℹ️ Il grafico mostra i tuoi valori di colesterolo (Totale, LDL, HDL) e trigliceridi rispetto ai range ottimali. L'area verde indica i valori ideali per la salute cardiovascolare.",
+        "globalRisk": "Rischio Globale",
+        "globalRiskDesc": "Media ponderata dei fattori di rischio identificati.",
+        "globalRiskInfo": "ℹ️ Indica la presenza e la gravità dei fattori di rischio identificati nelle tue analisi. Include parametri come infiammazione, salute metabolica e cardiovascolare.",
+        "quantitativeAnalysis": "Analisi Quantitativa",
+        "qualitativeAnalysis": "Analisi Qualitativa Avanzata",
+        "generalEvaluation": "Valutazione Generale",
+        "overview": "Panoramica",
+        "keyResults": "Principali Risultati e Implicazioni",
+        "mainResults": "Risultati Principali",
+        "trends": "Tendenze",
+        "correlations": "Correlazioni",
+        "riskFactors": "Fattori di Rischio",
+        "noRisk": "Nessun fattore di rischio rilevato.",
+        "recommendations": "Considerazioni",
+        "medicalConsiderations": "Considerazioni Mediche",
+        "considerations": "Considerazioni",
+        "lifestyle": "Stile di Vita",
+        "followUp": "Follow Up",
+        "specialists": "Specialisti",
+        "supplements": "Integrazione",
+        "currentSupplements": "Integratori Attuali",
+        "recommendedSupplements": "Integratori Consigliati",
+        "noSupplements": "Nessuna integrazione specifica rilevata o consigliata.",
+        "conclusion": "Conclusione",
+        "disclaimerTitle": "DISCLAIMER IMPORTANTE:",
+        "disclaimerText": "Questo report è generato da un sistema di Intelligenza Artificiale a scopo puramente informativo e di supporto al benessere generale.<br>NON è un dispositivo medico, NON fornisce diagnosi mediche e NON sostituisce in alcun modo il parere, la diagnosi o il trattamento di un medico professionista.<br>Qualsiasi decisione riguardante la propria salute, inclusa l'assunzione o la sospensione di integratori, farmaci o cambiamenti nella dieta, deve essere sempre discussa e confermata dal proprio medico curante o specialista.<br>L'utente utilizza queste informazioni a proprio rischio e pericolo.",
+        "biomarkersTitle": "Dettaglio Biomarcatori",
+        "user": "Utente",
+        "name": "Nome",
+        "value": "Valore",
+        "unit": "Unità",
+        "target": "Target",
+        "status": "Stato",
+        "attention": "ATTENZIONE"
+    }
+}

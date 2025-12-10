@@ -13,6 +13,7 @@ import * as Haptics from 'expo-haptics';
 import Reanimated, { FadeInDown, Layout } from 'react-native-reanimated';
 import TypingIndicator from '../../components/ui/TypingIndicator';
 import QuickReplyChips from '../../components/ui/QuickReplyChips';
+import i18n from '../../config/i18n';
 
 const markdownStyles = {
     body: {
@@ -75,7 +76,12 @@ const AnimatedMessage = ({ item }: { item: ChatMessage }) => {
     );
 };
 
+import { useLanguage } from '../../context/LanguageContext';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function ChatScreen() {
+    const { language } = useLanguage();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -124,19 +130,51 @@ export default function ChatScreen() {
         };
     }, [tabBarHeight]);
 
-    // Initial Greeting
+    // Load Chat History
     useEffect(() => {
-        if (messages.length === 0) {
+        const loadHistory = async () => {
+            try {
+                const stored = await AsyncStorage.getItem('chat_history_v1');
+                if (stored) {
+                    setMessages(JSON.parse(stored));
+                } else {
+                    // Initial Greeting if no history
+                    setMessages([
+                        {
+                            id: 'welcome',
+                            role: 'assistant',
+                            content: i18n.t('chat.welcome'),
+                            timestamp: new Date()
+                        }
+                    ]);
+                }
+            } catch (e) {
+                console.error("Failed to load chat history", e);
+            }
+        };
+        loadHistory();
+    }, []);
+
+    // Save Chat History whenever messages change
+    useEffect(() => {
+        if (messages.length > 0) {
+            AsyncStorage.setItem('chat_history_v1', JSON.stringify(messages)).catch(e => console.error("Failed to save chat", e));
+        }
+    }, [messages]);
+
+    // Update Welcome Message Language if it's the only message
+    useEffect(() => {
+        if (messages.length === 1 && messages[0].id === 'welcome') {
             setMessages([
                 {
                     id: 'welcome',
                     role: 'assistant',
-                    content: "Ciao! 👋 Sono il tuo Assistente Proactive Lab AI.\n\nHo analizzato il tuo profilo e sono qui per aiutarti a ottimizzare il tuo benessere e raggiungere i tuoi obiettivi.\n\nCome posso esserti utile oggi?",
+                    content: i18n.t('chat.welcome'),
                     timestamp: new Date()
                 }
             ]);
         }
-    }, []);
+    }, [language]);
 
     const handleSend = async () => {
         if (!inputText.trim()) return;
@@ -159,7 +197,7 @@ export default function ChatScreen() {
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
-            const responseText = await ChatService.generateResponse(userMsg.content, messages);
+            const responseText = await ChatService.generateResponse(userMsg.content, messages, language);
 
             // Haptic Feedback on Receive
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -177,7 +215,7 @@ export default function ChatScreen() {
             const errorMsg: ChatMessage = {
                 id: Date.now().toString(),
                 role: 'assistant',
-                content: "Ops! Qualcosa è andato storto. Riprova per favore. 🙏",
+                content: i18n.t('chat.error'),
                 timestamp: new Date(),
             };
             setMessages(prev => [...prev, errorMsg]);
@@ -195,6 +233,7 @@ export default function ChatScreen() {
 
     return (
         <ImageBackground
+            key={language}
             source={require('../../assets/images/custom_bg.jpg')}
             style={styles.container}
             resizeMode="cover"
@@ -203,10 +242,10 @@ export default function ChatScreen() {
                 <Animated.View style={{ flex: 1, paddingBottom: paddingBottomAnim }}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Proactive Lab AI</Text>
+                        <Text style={styles.headerTitle}>{i18n.t('chat.title')}</Text>
                         <View style={styles.onlineBadge}>
                             <View style={styles.dot} />
-                            <Text style={styles.onlineText}>Online</Text>
+                            <Text style={styles.onlineText}>{i18n.t('chat.online')}</Text>
                         </View>
                     </View>
 
@@ -244,7 +283,7 @@ export default function ChatScreen() {
                     <BlurView intensity={80} tint="dark" style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Chiedimi qualcosa sulla tua salute..."
+                            placeholder={i18n.t('chat.placeholder')}
                             placeholderTextColor="rgba(255,255,255,0.5)"
                             value={inputText}
                             onChangeText={setInputText}

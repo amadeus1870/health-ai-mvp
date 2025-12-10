@@ -7,8 +7,9 @@ import { SoftCard } from './SoftCard';
 import { VitalScoreChart } from './VitalScoreChart';
 import { RadarChart } from '../charts/RadarChart';
 import { GlobalRiskChart } from '../charts/GlobalRiskChart';
-import { BlurView } from 'expo-blur';
+
 import { LinearGradient } from 'expo-linear-gradient';
+import i18n from '../../config/i18n';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
@@ -16,7 +17,9 @@ const SPACING = 12;
 const SNAP_INTERVAL = CARD_WIDTH + SPACING;
 const INSET = (width - CARD_WIDTH) / 2;
 
-// ... existing imports
+
+
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ChartsCardProps {
     results: any;
@@ -26,15 +29,16 @@ interface ChartsCardProps {
     onRiskInfo: () => void;
 }
 export const ChartsCard: React.FC<ChartsCardProps> = ({ results, vitalScore, onVitalInfo, onLipidInfo, onRiskInfo }) => {
+    const { language } = useLanguage(); // Trigger re-render on language change
     // Prepare Cholesterol Data
     const q = results?.cholesterolAnalysis?.quantitative;
     const parse = (v: string) => parseFloat(v?.replace(/[^0-9.]/g, '') || '0');
 
     const radarData = q ? [
-        { label: 'Totale', value: parse(q.total), fullMark: 300, target: 200, isOk: parse(q.total) <= 200 },
-        { label: 'LDL', value: parse(q.ldl), fullMark: 200, target: 100, isOk: parse(q.ldl) <= 100 },
-        { label: 'HDL', value: parse(q.hdl), fullMark: 100, target: 60, isOk: parse(q.hdl) >= 60 },
-        { label: 'Trigliceridi', value: parse(q.triglycerides), fullMark: 300, target: 150, isOk: parse(q.triglycerides) <= 150 },
+        { label: i18n.t('analysis.charts.total'), value: parse(q.total), fullMark: 300, target: 200, isOk: parse(q.total) <= 200 },
+        { label: i18n.t('analysis.charts.ldl'), value: parse(q.ldl), fullMark: 200, target: 100, isOk: parse(q.ldl) <= 100 },
+        { label: i18n.t('analysis.charts.hdl'), value: parse(q.hdl), fullMark: 100, target: 60, isOk: parse(q.hdl) >= 60 },
+        { label: i18n.t('analysis.charts.triglycerides'), value: parse(q.triglycerides), fullMark: 300, target: 150, isOk: parse(q.triglycerides) <= 150 },
     ] : [];
 
     const renderGradientCard = (title: string, children: React.ReactNode, gradientColors: readonly [string, string, ...string[]], onInfoPress: () => void) => (
@@ -73,13 +77,13 @@ export const ChartsCard: React.FC<ChartsCardProps> = ({ results, vitalScore, onV
             >
                 {/* 1. Vital Score -> BMI Style */}
                 {renderGradientCard(
-                    "Vital Score",
+                    i18n.t('analysis.vitalScoreTitle'),
                     <>
                         <View style={styles.chartContainer}>
                             <VitalScoreChart score={vitalScore} size={200} />
                         </View>
                         <Text style={styles.chartDescription}>
-                            Il tuo punteggio generale di salute basato su tutti i parametri analizzati.
+                            {i18n.t('analysis.charts.vitalScoreDesc')}
                         </Text>
                     </>,
                     ['#1a2a6c', '#b21f1f', '#fdbb2d'], // BMI Gradient
@@ -88,7 +92,7 @@ export const ChartsCard: React.FC<ChartsCardProps> = ({ results, vitalScore, onV
 
                 {/* 2. Cholesterol Radar -> Calories Style */}
                 {renderGradientCard(
-                    "Profilo Lipidico",
+                    i18n.t('analysis.lipidTitle'),
                     <>
                         <View style={styles.chartContainer}>
                             {hasRadarData ? (
@@ -96,15 +100,15 @@ export const ChartsCard: React.FC<ChartsCardProps> = ({ results, vitalScore, onV
                             ) : (
                                 <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 0.5, flex: 1 }}>
                                     <Text style={{ color: '#FFF', fontSize: 16, fontFamily: Typography.fontFamily.medium }}>
-                                        Nessun dato
+                                        {i18n.t('analysis.charts.noData')}
                                     </Text>
                                 </View>
                             )}
                         </View>
                         <Text style={styles.chartDescription}>
                             {hasRadarData
-                                ? "Confronto visivo dei tuoi valori di colesterolo rispetto ai limiti ideali."
-                                : "Dati non disponibili"}
+                                ? i18n.t('analysis.charts.lipidDesc')
+                                : i18n.t('analysis.charts.dataUnavailable')}
                         </Text>
                     </>,
                     ['#8E0E00', '#EA384D', '#fdbb2d'], // Calories Gradient
@@ -113,13 +117,13 @@ export const ChartsCard: React.FC<ChartsCardProps> = ({ results, vitalScore, onV
 
                 {/* 3. Global Risk -> Macros Style */}
                 {results?.fattoriDiRischio && renderGradientCard(
-                    "Rischio Globale",
+                    i18n.t('analysis.riskTitle'),
                     <>
                         <View style={styles.chartContainer}>
                             <GlobalRiskChart risks={results.fattoriDiRischio} size={200} />
                         </View>
                         <Text style={styles.chartDescription}>
-                            Media ponderata dei fattori di rischio identificati nelle tue analisi.
+                            {i18n.t('analysis.charts.riskDesc')}
                         </Text>
                     </>,
                     ['#002b19', '#2e7d32', '#aeea00'], // Macros Gradient (High Contrast Green)

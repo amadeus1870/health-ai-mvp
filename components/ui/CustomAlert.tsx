@@ -54,7 +54,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
         switch (type) {
             case 'success': return { icon: 'checkmark', color: Colors.success };
             case 'error': return { icon: 'close', color: Colors.error };
-            case 'warning': return { icon: 'alert', color: Colors.warning };
+            case 'warning': return { icon: 'alert', color: Colors.primary };
             case 'info': default: return { icon: 'information', color: '#FFB142' }; // Orange
         }
     };

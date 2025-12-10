@@ -4,6 +4,7 @@ import Svg, { Circle, G, Path } from 'react-native-svg';
 import Animated, { useSharedValue, withTiming, Easing, useAnimatedProps } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -35,9 +36,9 @@ export const GlobalRiskChart: React.FC<GlobalRiskChartProps> = ({ risks = [], si
 
     // Determine Color based on percentage
     let color = Colors.success; // Soft Green
-    let label = 'Basso';
-    if (riskPercentage > 0.66) { color = '#b61b1b'; label = 'Alto'; } // Custom Red
-    else if (riskPercentage > 0.33) { color = Colors.warning; label = 'Medio'; } // Soft Amber
+    let label = 'low';
+    if (riskPercentage > 0.66) { color = '#b61b1b'; label = 'high'; } // Custom Red
+    else if (riskPercentage > 0.33) { color = Colors.warning; label = 'medium'; } // Soft Amber
 
     useEffect(() => {
         progress.value = withTiming(riskPercentage, { duration: 1500, easing: Easing.out(Easing.exp) });
@@ -80,8 +81,8 @@ export const GlobalRiskChart: React.FC<GlobalRiskChartProps> = ({ risks = [], si
             </Svg>
             <View style={styles.textContainer}>
                 <Text style={[styles.scoreText, { color: '#FFFFFF' }]}>{Math.round(riskPercentage * 100)}%</Text>
-                <Text style={styles.label}>Rischio Globale</Text>
-                <Text style={[styles.subLabel, { color: '#FFFFFF' }]}>{label}</Text>
+                <Text style={styles.label}>{i18n.t('analysis.charts.globalRisk')}</Text>
+                <Text style={[styles.subLabel, { color: '#FFFFFF' }]}>{i18n.t(`analysis.riskLevels.${label.toLowerCase()}`)}</Text>
             </View>
         </View>
     );

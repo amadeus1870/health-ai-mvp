@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Line, G } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedProps, withTiming, Easing } from 'react-native-reanimated';
-import { Colors } from '../../constants/Colors';
+import Svg, { Line } from 'react-native-svg';
+import { useSharedValue, withTiming, Easing } from 'react-native-reanimated';
+
 import { Typography } from '../../constants/Typography';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line);
+
 
 interface VitalScoreChartProps {
     score: number;
@@ -18,14 +18,14 @@ export const VitalScoreChart: React.FC<VitalScoreChartProps> = ({ score, size = 
     const strokeWidth = 3;
     const numSegments = 60; // Number of ticks
     const segmentLength = 15;
-    const innerRadius = radius - segmentLength - 10; // Space for text
+
 
     useEffect(() => {
         animatedScore.value = withTiming(score, {
             duration: 1500,
             easing: Easing.out(Easing.exp),
         });
-    }, [score]);
+    }, [score, animatedScore]);
 
     const getSegmentColor = (index: number) => {
         const ratio = index / numSegments;

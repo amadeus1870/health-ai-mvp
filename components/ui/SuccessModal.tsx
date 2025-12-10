@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withDelay, withSequence } from 'react-native-reanimated';
-import { Colors } from '../../constants/Colors';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence } from 'react-native-reanimated';
+
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -29,7 +30,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ visible, onClose, me
             scale.value = 0;
             opacity.value = 0;
         }
-    }, [visible]);
+    }, [visible, scale, opacity]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -60,11 +61,11 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ visible, onClose, me
                             <Ionicons name="checkmark" size={50} color="#FFF" />
                         </View>
 
-                        <Text style={styles.title}>Successo!</Text>
+                        <Text style={styles.title}>{i18n.t('analysis.success.title')}</Text>
                         <Text style={styles.message}>{message}</Text>
 
                         <TouchableOpacity style={styles.button} onPress={onClose}>
-                            <Text style={styles.buttonText}>Ottimo</Text>
+                            <Text style={styles.buttonText}>{i18n.t('analysis.success.button')}</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>

@@ -4,7 +4,6 @@ import { Colors } from './Colors';
 
 export const GlobalStyles = StyleSheet.create({
     headerContainer: {
-        marginTop: 50,
         marginBottom: 10,
         paddingHorizontal: 20,
         zIndex: 10,

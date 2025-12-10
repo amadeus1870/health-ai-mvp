@@ -40,7 +40,9 @@ export const CurrentSupplementCard: React.FC<{ supplement: CurrentSupplement, te
                 <Text style={[styles.name, { color: nameColor }]}>{supplement.name}</Text>
                 <View style={[styles.badge, { backgroundColor: statusColor + '20' }]}>
                     <Ionicons name={iconName} size={16} color={statusColor} style={{ marginRight: 4 }} />
-                    <Text style={[styles.badgeText, { color: statusColor }]}>{supplement.action}</Text>
+                    <Text style={[styles.badgeText, { color: statusColor }]} numberOfLines={1} ellipsizeMode="tail">
+                        {supplement.action}
+                    </Text>
                 </View>
             </View>
             <MarkdownText style={[styles.reason, { color: reasonColor }]}>{supplement.reason}</MarkdownText>
@@ -71,6 +73,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 12,
+        maxWidth: '45%', // Limit badge width
     },
     badgeText: {
         fontSize: 12,

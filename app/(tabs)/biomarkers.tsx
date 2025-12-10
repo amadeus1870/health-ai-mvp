@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GlobalStyles } from '../../constants/GlobalStyles';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator, Platform, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform, Image, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,12 +24,16 @@ import { DetailedAnalysisCarousel } from '../../components/ui/DetailedAnalysisCa
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { SuccessModal } from '../../components/ui/SuccessModal';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { PdfService } from '../../services/PdfService';
 import { ProfileService } from '../../services/ProfileService';
+import i18n from '../../config/i18n';
+
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function BiomarkersScreen() {
   const router = useRouter();
+  const { language } = useLanguage(); // Trigger re-render on language change
   const { results, setResults, isAnalyzing, setIsAnalyzing } = useAnalysis();
   const params = useLocalSearchParams();
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
@@ -51,9 +56,39 @@ export default function BiomarkersScreen() {
   React.useEffect(() => {
     if (params.upload === 'true') {
       setIsUploadMode(true);
-      router.setParams({ upload: undefined });
     }
-  }, [params.upload]);
+
+    if (params.profileSaved === 'true') {
+      // Show the success alert from profile creation
+      setTimeout(() => {
+        showAlert(
+          i18n.t('userProfile.saveSuccess'),
+          i18n.t('userProfile.uploadAnalysisPrompt'),
+          'success'
+        );
+      }, 500); // Small delay to ensure transition is done
+    }
+
+    // Clear params to avoid showing it again if we navigate back/forth (optional but good practice)
+    if (params.upload || params.profileSaved) {
+      router.setParams({ upload: undefined, profileSaved: undefined });
+    }
+  }, [params.upload, params.profileSaved]);
+
+  // Show Disclaimer on Entry
+  useFocusEffect(
+    React.useCallback(() => {
+      // Small delay to ensure UI is ready
+      const timer = setTimeout(() => {
+        showAlert(
+          i18n.t('settings.disclaimer'), // Title: "Disclaimer Medico"
+          i18n.t('analysis.entryDisclaimer'), // Message
+          'warning'
+        );
+      }, 500);
+      return () => clearTimeout(timer);
+    }, [])
+  );
 
   // Custom Alert State
   const [alertVisible, setAlertVisible] = useState(false);
@@ -116,12 +151,12 @@ export default function BiomarkersScreen() {
       const profile = await ProfileService.getProfile();
       if (profile) {
         const score = AnalysisService.calculateVitalScore(results);
-        await PdfService.generateAndShareAnalysisPdf(results, profile, score);
+        await PdfService.generateAndShareAnalysisPdf(results, profile, score, language);
       } else {
-        showAlert("Errore", "Impossibile recuperare il profilo utente.", "error");
+        showAlert(i18n.t('common.error'), i18n.t('analysis.errorProfile'), "error");
       }
     } catch (error) {
-      showAlert("Errore", "Impossibile generare il PDF. Riprova.", "error");
+      showAlert(i18n.t('common.error'), i18n.t('analysis.errorPdf'), "error");
       console.error(error);
     } finally {
       setIsGeneratingPdf(false);
@@ -132,7 +167,7 @@ export default function BiomarkersScreen() {
     try {
       const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
       if (permissionResult.granted === false) {
-        showAlert("Permesso Negato", "È necessario concedere l'accesso alla fotocamera per scattare foto.", "error");
+        showAlert(i18n.t('common.error'), i18n.t('analysis.errorCameraPermission'), "error");
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
@@ -148,14 +183,14 @@ export default function BiomarkersScreen() {
           mimeType: asset.mimeType || 'image/jpeg'
         }];
         // @ts-ignore
-        const analysis = await analyzeBiomarkers(fileData);
+        const analysis = await analyzeBiomarkers(fileData, i18n.locale);
         await AnalysisService.saveAnalysis(analysis);
         setSuccessModalVisible(true);
         setResults(analysis);
         setIsUploadMode(false);
       }
     } catch (error) {
-      showAlert("Errore", "Impossibile scattare la foto. Riprova.", "error");
+      showAlert(i18n.t('common.error'), i18n.t('analysis.errorCamera'), "error");
       console.error(error);
     } finally {
       setIsAnalyzing(false);
@@ -184,7 +219,7 @@ export default function BiomarkersScreen() {
               { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
             );
             uri = manipulated.uri;
-            console.log(`Image compressed: ${uri}`);
+
           } catch (err) {
             console.warn("Image compression failed, using original:", err);
           }
@@ -205,7 +240,7 @@ export default function BiomarkersScreen() {
         } else {
           try {
             const base64 = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
-            console.log(`File read: ${uri}, Size: ${(base64.length * 0.75 / 1024 / 1024).toFixed(2)} MB`);
+
             return { base64, mimeType };
           } catch (e: any) {
             console.warn("FileSystem Error:", e);
@@ -216,14 +251,15 @@ export default function BiomarkersScreen() {
       const filePromises = result.assets.map(asset => readFileAsBase64(asset));
       const fileData = await Promise.all(filePromises);
       // @ts-ignore
-      const analysis = await analyzeBiomarkers(fileData);
+      const analysis = await analyzeBiomarkers(fileData, i18n.locale);
       await AnalysisService.saveAnalysis(analysis);
       setSuccessModalVisible(true);
       // Inject timestamp so Nutrition screen can detect it's new
       setResults({ ...analysis, timestamp: new Date().toISOString() });
+      setResults({ ...analysis, timestamp: new Date().toISOString() });
       setIsUploadMode(false);
     } catch (error) {
-      showAlert("Errore", `Impossibile analizzare il documento: ${error instanceof Error ? error.message : String(error)}`, "error");
+      showAlert(i18n.t('common.error'), i18n.t('analysis.errorAnalysis', { error: error instanceof Error ? error.message : String(error) }), "error");
       console.warn("Upload error:", error);
     } finally {
       setIsAnalyzing(false);
@@ -240,8 +276,8 @@ export default function BiomarkersScreen() {
         <FallingParticles isActive={isAnalyzing} touchX={touchX} isTouching={isTouching} />
         <View style={styles.headerSection}>
           <View style={[GlobalStyles.headerContainer, { marginBottom: 30 }]}>
-            <Text style={GlobalStyles.headerTitle}>Analisi Sangue e Referti</Text>
-            <Text style={GlobalStyles.headerSubtitle}>Guida all'interpretazione</Text>
+            <Text style={GlobalStyles.headerTitle}>{i18n.t('analysis.title')}</Text>
+            <Text style={GlobalStyles.headerSubtitle}>{i18n.t('analysis.subtitle')}</Text>
           </View>
           {isAnalyzing ? (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', zIndex: 10 }}>
@@ -269,10 +305,10 @@ export default function BiomarkersScreen() {
               <View style={{ width: '100%', flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingTop: 20 }}>
                 <ActivityIndicator size="large" color="#FFB142" style={{ marginBottom: 16 }} />
                 <Text style={[styles.actionTitle, { color: '#FFB142', textAlign: 'center', marginBottom: 8 }]}>
-                  Caricamento dei documenti in corso
+                  {i18n.t('analysis.loadingTitle')}
                 </Text>
                 <Text style={[styles.descriptionText, { textAlign: 'center', color: 'rgba(255, 255, 255, 0.8)' }]}>
-                  L'analisi approfondita dei tuoi documenti è in corso. Questa operazione può richiedere anche qualche minuto: è del tutto normale, stiamo elaborando ogni dettaglio per offrirti un report completo.
+                  {i18n.t('analysis.loadingDesc')}
                 </Text>
               </View>
             ) : (
@@ -292,34 +328,34 @@ export default function BiomarkersScreen() {
                       <Ionicons name="cloud-upload-outline" size={32} color="#FFF" />
                     </View>
                     <View style={styles.actionTextContainer}>
-                      <Text style={styles.actionTitle}>Carica le tue analisi</Text>
-                      <Text style={styles.actionSubtitle}>Supporta JPG, PNG, PDF</Text>
+                      <Text style={styles.actionTitle}>{i18n.t('analysis.uploadTitle')}</Text>
+                      <Text style={styles.actionSubtitle}>{i18n.t('analysis.uploadSubtitle')}</Text>
                     </View>
                   </View>
                   <Text style={styles.descriptionText}>
-                    Puoi caricare risultati di analisi del sangue, e qualunque altro referto (per esempio marker tumorali, ecografie, TAC, radiografie, risonanza magnetica, ecc..)
+                    {i18n.t('analysis.uploadDesc')}
                   </Text>
                 </View>
                 <View style={styles.actionButtonsRow}>
                   <TouchableOpacity style={styles.actionButton} onPress={handleCameraUpload}>
                     <Ionicons name="camera-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.actionButtonText}>Camera</Text>
+                    <Text style={styles.actionButtonText}>{i18n.t('analysis.camera')}</Text>
                   </TouchableOpacity>
                   <View style={styles.verticalDivider} />
                   <TouchableOpacity style={styles.actionButton} onPress={handleUpload}>
                     <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.actionButtonText}>File</Text>
+                    <Text style={styles.actionButtonText}>{i18n.t('analysis.file')}</Text>
                   </TouchableOpacity>
                   <View style={styles.verticalDivider} />
                   <TouchableOpacity style={styles.actionButton} onPress={() => setHistoryModalVisible(true)}>
                     <Ionicons name="archive-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.actionButtonText}>Archivio</Text>
+                    <Text style={styles.actionButtonText}>{i18n.t('analysis.archive')}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.securityContainer}>
                   <Ionicons name="lock-closed-outline" size={14} color="#FFFFFF" style={{ marginRight: 4 }} />
                   <Text style={[styles.securityText, { color: '#FFFFFF' }]}>
-                    I tuoi dati vengono trasmessi in modo sicuro e crittografato ai server di Google.
+                    {i18n.t('analysis.security')}
                   </Text>
                 </View>
               </>
@@ -353,25 +389,27 @@ export default function BiomarkersScreen() {
               <SafeAreaView style={styles.container}>
                 <FallingParticles isActive={isAnalyzing} touchX={touchX} isTouching={isTouching} />
                 <View style={styles.fixedContent}>
-                  <View style={[GlobalStyles.headerContainer, { marginBottom: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                  <View style={[GlobalStyles.headerContainer, { marginBottom: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
                     <View>
-                      <Text style={GlobalStyles.headerTitle}>Analisi Sangue e Referti</Text>
-                      <Text style={GlobalStyles.headerSubtitle}>Guida all'interpretazione</Text>
+                      <Text style={GlobalStyles.headerTitle}>{i18n.t('analysis.title')}</Text>
+                      <Text style={GlobalStyles.headerSubtitle}>{i18n.t('analysis.subtitle')}</Text>
                     </View>
                   </View>
                   {results && (
                     <View style={styles.resultsContainer}>
                       <View style={{ flex: 1, justifyContent: 'center' }}>
                         <ChartsCard
+                          key={`charts-${language}`}
                           results={results}
                           vitalScore={vitalScore}
-                          onVitalInfo={() => showInfo("Vital Score", "Il Vital Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale.")}
-                          onLipidInfo={() => showInfo("Profilo Lipidico", "Il grafico mostra i tuoi valori di colesterolo (Totale, LDL, HDL) e trigliceridi rispetto ai range ottimali. L'area verde indica i valori ideali per la salute cardiovascolare.")}
-                          onRiskInfo={() => showInfo("Rischio Globale", "Indica la presenza e la gravità dei fattori di rischio identificati nelle tue analisi. Include parametri come infiammazione, salute metabolica e cardiovascolare.")}
+                          onVitalInfo={() => showInfo(i18n.t('analysis.vitalScoreTitle'), i18n.t('analysis.vitalScoreInfo'))}
+                          onLipidInfo={() => showInfo(i18n.t('analysis.lipidTitle'), i18n.t('analysis.lipidInfo'))}
+                          onRiskInfo={() => showInfo(i18n.t('analysis.riskTitle'), i18n.t('analysis.riskInfo'))}
                         />
                       </View>
                       <View style={{ height: 220, marginBottom: 70 }}>
                         <DetailedAnalysisCarousel
+                          key={`carousel-${language}`}
                           results={results}
                           onExport={handleExportPdf}
                           isExporting={isGeneratingPdf}
@@ -399,7 +437,7 @@ export default function BiomarkersScreen() {
       <SuccessModal
         visible={successModalVisible}
         onClose={() => setSuccessModalVisible(false)}
-        message="Analisi completata con successo!"
+        message={i18n.t('analysis.successMessage')}
       />
       <CustomAlert
         visible={alertVisible}
@@ -527,7 +565,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
   },
   actionButtonText: {
     fontSize: 14,

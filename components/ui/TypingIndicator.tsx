@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withDelay, withSequence } from 'react-native-reanimated';
-import { Colors } from '../../constants/Colors';
+
 
 const Dot = ({ delay }: { delay: number }) => {
     const opacity = useSharedValue(0.3);
@@ -24,7 +24,7 @@ const Dot = ({ delay }: { delay: number }) => {
             -1,
             true
         );
-    }, []);
+    }, [delay, opacity, scale]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,

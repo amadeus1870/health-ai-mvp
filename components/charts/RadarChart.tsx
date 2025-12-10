@@ -4,6 +4,7 @@ import Svg, { Polygon, Line, Text as SvgText, Circle, G } from 'react-native-svg
 import Animated, { useSharedValue, withTiming, useAnimatedProps, Easing } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
 
@@ -178,11 +179,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({ data, size = 300 }) => {
             <View style={styles.legend}>
                 <View style={styles.legendItem}>
                     <View style={[styles.dot, { backgroundColor: '#32D74B' }]} />
-                    <Text style={styles.legendText}>Zona Ideale / Valori OK</Text>
+                    <Text style={styles.legendText}>{i18n.t('analysis.charts.idealZone')}</Text>
                 </View>
                 <View style={styles.legendItem}>
                     <View style={[styles.dot, { backgroundColor: '#FF453A' }]} />
-                    <Text style={styles.legendText}>Fuori Range</Text>
+                    <Text style={styles.legendText}>{i18n.t('analysis.charts.outOfRange')}</Text>
                 </View>
             </View>
         </View>

@@ -1,6 +1,5 @@
-import { db } from '../config/firebaseConfig';
-import { doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, getDocs, deleteDoc } from 'firebase/firestore';
 import { UserProfile } from '../types/Profile';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AnalysisService = {
     calculateNutritionalStrategy: (user: UserProfile) => {
@@ -139,72 +138,66 @@ export const AnalysisService = {
 
     saveAnalysis: async (analysisData: any) => {
         try {
-            const userId = 'current_user'; // TODO: Replace with actual auth ID
+            const historyKey = 'analysis_history_v1';
+            const existingHistoryJson = await AsyncStorage.getItem(historyKey);
+            let history = existingHistoryJson ? JSON.parse(existingHistoryJson) : [];
 
-            // Save as a new document in the history
-            const docRef = await addDoc(collection(db, 'users', userId, 'analyses'), {
+            const newEntry = {
+                id: Date.now().toString(), // Simple ID generation
                 ...analysisData,
                 timestamp: new Date().toISOString(),
-            });
+            };
 
-            console.log('Analysis saved to history successfully');
-            return docRef.id;
+            // Add to beginning of array
+            history.unshift(newEntry);
+
+            await AsyncStorage.setItem(historyKey, JSON.stringify(history));
+            console.log('Analysis saved locally successfully');
+            return newEntry.id;
         } catch (error) {
-            console.error('Error saving analysis:', error);
+            console.error('Error saving analysis locally:', error);
             throw error;
         }
     },
 
     getLastAnalysis: async () => {
         try {
-            const userId = 'current_user';
-            const q = query(
-                collection(db, 'users', userId, 'analyses'),
-                orderBy('timestamp', 'desc'),
-                limit(1)
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                const doc = querySnapshot.docs[0];
-                return { id: doc.id, ...doc.data() };
-            } else {
-                return null;
+            const historyKey = 'analysis_history_v1';
+            const existingHistoryJson = await AsyncStorage.getItem(historyKey);
+            if (existingHistoryJson) {
+                const history = JSON.parse(existingHistoryJson);
+                return history.length > 0 ? history[0] : null;
             }
+            return null;
         } catch (error) {
-            console.error('Error getting last analysis:', error);
+            console.error('Error getting last analysis locally:', error);
             return null;
         }
     },
 
     getHistory: async () => {
         try {
-            const userId = 'current_user';
-            const q = query(
-                collection(db, 'users', userId, 'analyses'),
-                orderBy('timestamp', 'desc')
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const historyKey = 'analysis_history_v1';
+            const existingHistoryJson = await AsyncStorage.getItem(historyKey);
+            return existingHistoryJson ? JSON.parse(existingHistoryJson) : [];
         } catch (error) {
-            console.error('Error getting analysis history:', error);
+            console.error('Error getting analysis history locally:', error);
             return [];
         }
     },
 
     deleteAnalysis: async (analysisId: string) => {
         try {
-            const userId = 'current_user';
-            await deleteDoc(doc(db, 'users', userId, 'analyses', analysisId));
-            console.log('Analysis deleted successfully');
+            const historyKey = 'analysis_history_v1';
+            const existingHistoryJson = await AsyncStorage.getItem(historyKey);
+            if (existingHistoryJson) {
+                let history = JSON.parse(existingHistoryJson);
+                history = history.filter((item: any) => item.id !== analysisId);
+                await AsyncStorage.setItem(historyKey, JSON.stringify(history));
+                console.log('Analysis deleted locally successfully');
+            }
         } catch (error) {
-            console.error('Error deleting analysis:', error);
+            console.error('Error deleting analysis locally:', error);
             throw error;
         }
     }
