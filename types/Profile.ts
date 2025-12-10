@@ -12,16 +12,16 @@ export interface UserProfile {
     medications: boolean;
     medicationsList: string;
     habits: string[];
-    smoke: 'No' | 'Sì';
-    alcohol: 'No' | 'Occasionale' | 'Frequente';
-    coffee: 'No' | '1-2' | '3+';
-    sleep: 'Buono' | 'Medio' | 'Scarso' | 'Insonnia';
-    stress: 'Basso' | 'Moderato' | 'Alto' | 'Estremo';
+    smoke: 'no' | 'yes';
+    alcohol: 'no' | 'occasional' | 'frequent';
+    coffee: 'no' | '1-2' | '3+';
+    sleep: 'good' | 'average' | 'poor' | 'insomnia';
+    stress: 'low' | 'moderate' | 'high' | 'extreme';
     dailyDiet: string;
     supplements: string[];
     otherSupplement: string;
     profilePicture?: string;
-    activityLevel: 'Sedentario' | 'Leggermente attivo' | 'Moderatamente attivo' | 'Molto attivo' | 'Estremo';
+    activityLevel: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extreme';
     mealsPerDay: string;
     snacksPerDay: string;
     dietType: string;
@@ -38,24 +38,24 @@ export const initialUserProfile: UserProfile = {
     waistCircumference: '',
     conditions: [],
     otherCondition: '',
-    physicalDescription: 'Forma Media (Pancia piatta o quasi, aspetto sano)',
+    physicalDescription: 'average',
     symptoms: [],
     medications: false,
     medicationsList: '',
     habits: [],
-    smoke: 'No',
-    alcohol: 'No',
-    coffee: 'No',
-    sleep: 'Buono',
-    stress: 'Basso',
+    smoke: 'no',
+    alcohol: 'no',
+    coffee: 'no',
+    sleep: 'good',
+    stress: 'low',
     dailyDiet: '',
     supplements: [],
     otherSupplement: '',
     profilePicture: '',
-    activityLevel: 'Sedentario',
+    activityLevel: 'sedentary',
     mealsPerDay: '3',
     snacksPerDay: '1',
-    dietType: 'Onnivora',
+    dietType: 'omnivore',
     dietaryRestrictions: [],
     otherDietaryRestriction: '',
 };

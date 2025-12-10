@@ -4,6 +4,7 @@ import { DietPlan } from '../types/Diet';
 import { UserProfile } from '../types/Profile';
 import { ShoppingListService } from './ShoppingListService';
 import { AnalysisService } from './AnalysisService';
+import i18n from '../config/i18n';
 
 export const PdfService = {
     // Helper to convert basic Markdown to HTML
@@ -36,20 +37,21 @@ export const PdfService = {
         return html;
     },
 
-    generateAndShareDietPdf: async (dietPlan: DietPlan, userProfile: UserProfile) => {
+    generateAndShareDietPdf: async (dietPlan: DietPlan, userProfile: UserProfile, language: string) => {
         try {
             const strategy = AnalysisService.calculateNutritionalStrategy(userProfile);
             const shoppingList = await ShoppingListService.generateList(dietPlan);
 
             const formatMarkdown = PdfService.formatMarkdown;
+            const t = (key: string, options?: any) => i18n.t(key, { locale: language, ...options });
 
             const html = `
         <!DOCTYPE html>
-        <html lang="it">
+        <html lang="${language}">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Piano Nutrizionale - ${userProfile.name}</title>
+            <title>${t('pdf.dietTitle')} - ${userProfile.name}</title>
             <style>
                 body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.5; padding: 20px; }
                 h1 { color: #FF9F43; text-align: center; margin-bottom: 10px; }
@@ -74,29 +76,29 @@ export const PdfService = {
             </style>
         </head>
         <body>
-            <h1>Piano Nutrizionale Settimanale</h1>
+            <h1>${t('pdf.dietTitle')}</h1>
             <div class="header-info">
-                Generato per <strong>${userProfile.name}</strong> il ${new Date().toLocaleDateString('it-IT')}
+                ${t('pdf.generatedFor', { name: `<strong>${userProfile.name}</strong>`, date: new Date().toLocaleDateString(language) })}
             </div>
 
             <div class="strategy-box">
                 <div class="strategy-row">
-                    <strong>Obiettivo Calorico:</strong>
-                    <span>${strategy.goalCalories} kcal / giorno</span>
+                    <strong>${t('pdf.goalCalories')}:</strong>
+                    <span>${strategy.goalCalories} kcal / ${t('pdf.day').toLowerCase()}</span>
                 </div>
                 <div class="strategy-row">
-                    <strong>Obiettivo:</strong>
+                    <strong>${t('pdf.goal')}:</strong>
                     <span>${strategy.goalType}</span>
                 </div>
                 <div class="strategy-row">
-                    <strong>Ripartizione Macro:</strong>
-                    <span>Proteine ${strategy.macros.protein}% - Carboidrati ${strategy.macros.carbs}% - Grassi ${strategy.macros.fats}%</span>
+                    <strong>${t('pdf.macros')}:</strong>
+                    <span>${t('nutrition.protein')} ${strategy.macros.protein}% - ${t('nutrition.carbs')} ${strategy.macros.carbs}% - ${t('nutrition.fats')} ${strategy.macros.fats}%</span>
                 </div>
             </div>
 
             ${dietPlan.days.map(day => `
                 <div class="day-container">
-                    <h2>Giorno ${day.day}</h2>
+                    <h2>${t('pdf.day')} ${day.day}</h2>
                     ${day.meals.map(meal => `
                         <div class="meal-row">
                             <div class="meal-info">
@@ -104,7 +106,7 @@ export const PdfService = {
                                 <div class="meal-name">${meal.name}</div>
                                 ${meal.description ? `<div class="meal-desc">${formatMarkdown(meal.description)}</div>` : ''}
                                 <div class="meal-ingredients">
-                                    <strong>Ingredienti:</strong> ${meal.ingredients.join(', ')}
+                                    <strong>${t('pdf.ingredients')}:</strong> ${meal.ingredients.join(', ')}
                                 </div>
                             </div>
                             <div class="meal-macros">
@@ -116,14 +118,14 @@ export const PdfService = {
                         </div>
                     `).join('')}
                     <div style="text-align: right; margin-top: 10px; font-weight: bold; font-size: 14px;">
-                        Totale Calorie: ${day.meals.reduce((sum, m) => sum + m.calories, 0)} kcal
+                        ${t('pdf.totalCalories')}: ${day.meals.reduce((sum, m) => sum + m.calories, 0)} kcal
                     </div>
                 </div>
             `).join('')}
 
             <div style="page-break-before: always;"></div>
 
-            <h2>Lista della Spesa Settimanale</h2>
+            <h2>${t('pdf.shoppingList')}</h2>
             <div style="column-count: 2; column-gap: 40px;">
                 ${shoppingList.map(cat => `
                     <div class="shopping-list-category">
@@ -139,7 +141,7 @@ export const PdfService = {
             </div>
 
             <div class="footer">
-                Generato da my Procative Lab AI - Il tuo assistente nutrizionale personale
+                ${t('pdf.footer')}
             </div>
         </body>
         </html>
@@ -154,7 +156,7 @@ export const PdfService = {
         }
     },
 
-    generateAndShareAnalysisPdf: async (analysis: any, userProfile: UserProfile, vitalScore: number) => {
+    generateAndShareAnalysisPdf: async (analysis: any, userProfile: UserProfile, vitalScore: number, language: string) => {
         try {
             // --- Ensure Data Safety (Prevent Crashes) ---
             // Map cholesterolAnalysis to profiloLipidico if needed
@@ -176,6 +178,7 @@ export const PdfService = {
 
             // --- Helper Functions for Chart Logic ---
             const formatMarkdown = PdfService.formatMarkdown;
+            const t = (key: string, options?: any) => i18n.t(key, { locale: language, ...options });
 
             // 1. Vital Score SVG Generator (Ticks)
             const generateVitalScoreSvg = (score: number, size: number) => {
@@ -234,9 +237,9 @@ export const PdfService = {
 
                 // Color & Label
                 let color = '#2ecc71'; // Green
-                let label = 'Basso';
-                if (percentage > 0.66) { color = '#b61b1b'; label = 'Alto'; }
-                else if (percentage > 0.33) { color = '#FFB142'; label = 'Medio'; }
+                let label = t('analysis.riskLevels.low');
+                if (percentage > 0.66) { color = '#b61b1b'; label = t('analysis.riskLevels.high'); }
+                else if (percentage > 0.33) { color = '#FFB142'; label = t('analysis.riskLevels.medium'); }
 
                 const radius = (size - 15) / 2;
                 const circumference = 2 * Math.PI * radius;
@@ -255,8 +258,8 @@ export const PdfService = {
             };
 
             // 3. Comparison Bar HTML Generator (Lipid Profile)
-            const generateComparisonRow = (label: string, valueStr: string, target: number, unit: string, isLowerBetter: boolean = true, isWarning: boolean = false) => {
-                const value = parseFloat(valueStr?.replace(/[^0-9.]/g, '') || '0');
+            const generateComparisonRow = (label: string, valueStr: string | number, target: number, unit: string, isLowerBetter: boolean = true, isWarning: boolean = false) => {
+                const value = parseFloat(String(valueStr || '0').replace(/[^0-9.]/g, '') || '0');
                 const maxScale = Math.max(value, target) * 1.3;
                 const userPercent = Math.min((value / maxScale) * 100, 100);
                 const targetPercent = Math.min((target / maxScale) * 100, 100);
@@ -288,41 +291,41 @@ export const PdfService = {
                         <!-- Target Marker -->
                         <div style="position: absolute; left: ${targetPercent}%; top: 0; bottom: 0; width: 2px; background-color: #2D3436; z-index: 10;"></div>
                     </div>
-                    <div style="text-align: right; font-size: 10px; color: #666; margin-top: 4px;">Obiettivo: ${isLowerBetter ? '<' : '>'} ${target} ${unit}</div>
+                    <div style="text-align: right; font-size: 10px; color: #666; margin-top: 4px;">${t('pdf.target')}: ${isLowerBetter ? '<' : '>'} ${target} ${unit}</div>
                 </div>
                `;
             };
 
             // 4. Radar Chart SVG Generator
             const generateRadarChartSvg = (lipidProfile: any, size: number) => {
-                const parseVal = (v: string) => parseFloat(v?.replace(/[^0-9.]/g, '') || '0');
+                const parseVal = (v: string | number) => parseFloat(String(v || '0').replace(/[^0-9.]/g, '') || '0');
 
                 // DATA PREPARATION (Matching RadarChart.tsx logic)
                 // We define max 'fullMark' for axis scaling and 'target' for the safe zone.
                 const dataPoints = [
                     {
-                        label: 'Totale',
+                        label: t('analysis.charts.total'),
                         value: parseVal(lipidProfile.colesteroloTotale || lipidProfile.quantitative?.total),
                         fullMark: 300,
                         target: 200,
                         isOk: (parseVal(lipidProfile.colesteroloTotale || lipidProfile.quantitative?.total) < 200)
                     },
                     {
-                        label: 'LDL',
+                        label: t('analysis.charts.ldl'),
                         value: parseVal(lipidProfile.colesteroloLDL || lipidProfile.quantitative?.ldl),
                         fullMark: 200,
                         target: 100,
                         isOk: (parseVal(lipidProfile.colesteroloLDL || lipidProfile.quantitative?.ldl) < 100)
                     },
                     {
-                        label: 'Triglic.',
+                        label: t('analysis.charts.triglycerides'),
                         value: parseVal(lipidProfile.trigliceridi || lipidProfile.quantitative?.triglycerides),
                         fullMark: 300,
                         target: 150,
                         isOk: (parseVal(lipidProfile.trigliceridi || lipidProfile.quantitative?.triglycerides) < 150)
                     },
                     {
-                        label: 'HDL',
+                        label: t('analysis.charts.hdl'),
                         value: parseVal(lipidProfile.colesteroloHDL || lipidProfile.quantitative?.hdl),
                         fullMark: 100,
                         target: 50, // HDL target > 50, so for plot we can stick to this. Visual logic usually implies outer = better for radar? 
@@ -420,13 +423,13 @@ export const PdfService = {
 
             const html = `
                 <!DOCTYPE html>
-                <html lang="it">
+                <html lang="${language}">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Report Analisi - ${userProfile.name}</title>
+                    <title>${t('pdf.analysisTitle')} - ${userProfile.name}</title>
                     <style>
-                        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.6; padding: 0; margin: 0; background-color: #fff; }
+                        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.6; padding: 0; margin: 0; background-color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                         .container { max-width: 800px; margin: 0 auto; padding: 40px; }
                         .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
                         .logo { font-size: 24px; font-weight: bold; color: #E65100; margin-bottom: 5px; }
@@ -466,59 +469,59 @@ export const PdfService = {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <div class="logo">Health AI</div>
-                            <h1>Report Analisi Salute</h1>
-                            <div class="date">Generato il ${new Date().toLocaleDateString('it-IT')} per <strong>${userProfile.name}</strong></div>
+                            <h1>${t('pdf.analysisTitle')}</h1>
+                            <h3 style="text-align: center; color: #666; margin-top: -10px; margin-bottom: 20px;">${t('pdf.analysisSubtitle')}</h3>
+                            <div class="date">${t('pdf.generatedFor', { name: `<strong>${userProfile.name}</strong>`, date: new Date().toLocaleDateString(language) })}</div>
                         </div>
 
                         <!-- TOP 3 SUMMARY CARDS -->
                         <div class="top-cards-container">
                             <!-- 1. Vital Score -->
                             <div class="summary-card">
-                                <div class="summary-card-title">Vital Score</div>
+                                <div class="summary-card-title">${t('pdf.vitalScore')}</div>
                                 ${generateVitalScoreSvg(vitalScore, 140)}
-                                <div class="summary-card-desc">Il tuo punteggio generale di salute basato su tutti i parametri analizzati.</div>
-                                <div class="summary-card-info">ℹ️ Il Vital Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale.</div>
+                                <div class="summary-card-desc">${t('pdf.vitalScoreDesc')}</div>
+                                <div class="summary-card-info">${t('pdf.vitalScoreInfo')}</div>
                             </div>
                             
                             <!-- 2. Profilo Lipidico (Radar) -->
                             <div class="summary-card">
-                                <div class="summary-card-title">Profilo Lipidico</div>
+                                <div class="summary-card-title">${t('analysis.carousel.lipidProfile')}</div>
                                 ${generateRadarChartSvg(analysis.profiloLipidico, 140)}
-                                <div class="summary-card-desc">Confronto visivo dei valori di colesterolo rispetto ai limiti.</div>
-                                <div class="summary-card-info">ℹ️ Il grafico mostra i tuoi valori di colesterolo (Totale, LDL, HDL) e trigliceridi rispetto ai range ottimali. L'area verde indica i valori ideali per la salute cardiovascolare.</div>
+                                <div class="summary-card-desc">${t('pdf.lipidProfileDesc')}</div>
+                                <div class="summary-card-info">${t('pdf.lipidProfileInfo')}</div>
                             </div>
 
                             <!-- 3. Rischio Globale -->
                             <div class="summary-card">
-                                <div class="summary-card-title">Rischio Globale</div>
+                                <div class="summary-card-title">${t('pdf.globalRisk')}</div>
                                 <div style="position: relative; width: 140px; height: 140px; margin: 0 auto;">
                                     ${generateGlobalRiskSvg(analysis.fattoriDiRischio, 140)}
                                 </div>
-                                <div class="summary-card-desc">Media ponderata dei fattori di rischio identificati.</div>
-                                <div class="summary-card-info">ℹ️ Indica la presenza e la gravità dei fattori di rischio identificati nelle tue analisi. Include parametri come infiammazione, salute metabolica e cardiovascolare.</div>
+                                <div class="summary-card-desc">${t('pdf.globalRiskDesc')}</div>
+                                <div class="summary-card-info">${t('pdf.globalRiskInfo')}</div>
                             </div>
                         </div>
 
                         <!-- DETAILED SECTIONS -->
 
                         <!-- 1. Profilo Lipidico -->
-                        <h2>Profilo Lipidico</h2>
+                        <h2>${t('analysis.carousel.lipidProfile')}</h2>
                         <div class="card-section">
                             
                             <!-- QUANTITATIVE ANALYSIS -->
                             <div style="margin-bottom: 30px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 10px; color: #E65100;">
                                     <span style="font-size: 18px; margin-right: 8px;">📊</span>
-                                    <h3 style="margin: 0; color: #E65100;">Analisi Quantitativa</h3>
+                                    <h3 style="margin: 0; color: #E65100;">${t('pdf.quantitativeAnalysis')}</h3>
                                 </div>
-                                <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${formatMarkdown(analysis.profiloLipidico.quantitative?.description || analysis.profiloLipidico.analisi || 'Dati non disponibili.')}</p>
+                                <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${formatMarkdown(analysis.profiloLipidico.quantitative?.description || analysis.profiloLipidico.analisi || t('pdf.dataNotAvailable'))}</p>
 
                                 <div style="margin-bottom: 20px;">
-                                    ${generateComparisonRow('Colesterolo Totale', analysis.profiloLipidico.colesteroloTotale || analysis.profiloLipidico.quantitative?.total, 200, 'mg/dL')}
-                                    ${generateComparisonRow('Colesterolo LDL (Cattivo)', analysis.profiloLipidico.colesteroloLDL || analysis.profiloLipidico.quantitative?.ldl, 100, 'mg/dL')}
-                                    ${generateComparisonRow('Colesterolo HDL (Buono)', analysis.profiloLipidico.colesteroloHDL || analysis.profiloLipidico.quantitative?.hdl, 50, 'mg/dL', false)}
-                                    ${generateComparisonRow('Trigliceridi', analysis.profiloLipidico.trigliceridi || analysis.profiloLipidico.quantitative?.triglycerides, 150, 'mg/dL')}
+                                    ${generateComparisonRow(t('analysis.charts.total'), analysis.profiloLipidico.colesteroloTotale || analysis.profiloLipidico.quantitative?.total, 200, 'mg/dL')}
+                                    ${generateComparisonRow(t('analysis.charts.ldl'), analysis.profiloLipidico.colesteroloLDL || analysis.profiloLipidico.quantitative?.ldl, 100, 'mg/dL')}
+                                    ${generateComparisonRow(t('analysis.charts.hdl'), analysis.profiloLipidico.colesteroloHDL || analysis.profiloLipidico.quantitative?.hdl, 50, 'mg/dL', false)}
+                                    ${generateComparisonRow(t('analysis.charts.triglycerides'), analysis.profiloLipidico.trigliceridi || analysis.profiloLipidico.quantitative?.triglycerides, 150, 'mg/dL')}
                                 </div>
                             </div>
 
@@ -527,7 +530,7 @@ export const PdfService = {
                                 <div>
                                     <div style="display: flex; align-items: center; margin-bottom: 10px; color: #E65100;">
                                         <span style="font-size: 18px; margin-right: 8px;">🧪</span>
-                                        <h3 style="margin: 0; color: #E65100;">Analisi Qualitativa Avanzata</h3>
+                                        <h3 style="margin: 0; color: #E65100;">${t('pdf.qualitativeAnalysis')}</h3>
                                     </div>
                                     <p style="font-size: 13px; color: #666; margin-bottom: 20px;">${formatMarkdown(analysis.profiloLipidico.qualitative.description || '')}</p>
 
@@ -564,52 +567,52 @@ export const PdfService = {
                         </div>
 
                         <!-- 2. Valutazione Generale -->
-                        <h2>Valutazione Generale</h2>
+                        <h2>${t('analysis.carousel.generalEval')}</h2>
                         <div class="card-section">
                             <div class="card-content">
-                                <p><strong>Panoramica: </strong> ${formatMarkdown(analysis.valutazioneGenerale.panoramica || 'N/A')}</p>
-                                <p><strong>Risultati Principali: </strong> ${formatMarkdown(analysis.valutazioneGenerale.risultati || 'N/A')}</p>
-                                <p><strong>Tendenze: </strong> ${formatMarkdown(analysis.valutazioneGenerale.tendenze || 'N/A')}</p>
-                                <p><strong>Correlazioni: </strong> ${formatMarkdown(analysis.valutazioneGenerale.correlazioni || 'N/A')}</p>
+                                <p><strong>${t('analysis.carousel.overview')}: </strong> ${formatMarkdown(analysis.valutazioneGenerale.panoramica || 'N/A')}</p>
+                                <p><strong>${t('analysis.carousel.mainResults')}: </strong> ${formatMarkdown((analysis.valutazioneGenerale.risultati || 'N/A').replace(new RegExp(`^${t('pdf.keyResults')}:?\\s*`, 'i'), ''))}</p>
+                                <p><strong>${t('analysis.carousel.trends')}: </strong> ${formatMarkdown(analysis.valutazioneGenerale.tendenze || 'N/A')}</p>
+                                <p><strong>${t('analysis.carousel.correlations')}: </strong> ${formatMarkdown(analysis.valutazioneGenerale.correlazioni || 'N/A')}</p>
                             </div>
                         </div>
 
                         <!-- 3. Fattori di Rischio -->
-                        <h2>Fattori di Rischio</h2>
+                        <h2>${t('analysis.carousel.riskFactors')}</h2>
                         <div class="card-section">
                             ${analysis.fattoriDiRischio.length > 0 ? analysis.fattoriDiRischio.map((risk: any) => `
-                                <div class="risk-item ${risk.gravita.toLowerCase().includes('alto') ? 'risk-high' : risk.gravita.toLowerCase().includes('medio') ? 'risk-med' : 'risk-low'}">
-                                    <div style="font-weight: bold; text-transform: uppercase; font-size: 12px; margin-bottom: 2px;">${risk.gravita}</div>
+                                <div class="risk-item ${risk.gravita.toLowerCase().includes('high') || risk.gravita.toLowerCase().includes('alto') ? 'risk-high' : risk.gravita.toLowerCase().includes('medium') || risk.gravita.toLowerCase().includes('medio') ? 'risk-med' : 'risk-low'}">
+                                    <div style="font-weight: bold; text-transform: uppercase; font-size: 12px; margin-bottom: 2px;">${t(`analysis.riskLevels.${risk.gravita.toLowerCase()}`, { defaultValue: risk.gravita })}</div>
                                     <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">${formatMarkdown(risk.identificazione)}</div>
                                     <div style="font-size: 14px; color: #555;">${formatMarkdown(risk.spiegazione)}</div>
                                 </div>
-                            `).join('') : '<div style="padding: 10px; font-style: italic; color: #666;">Nessun fattore di rischio rilevato.</div>'}
+                            `).join('') : `<div style="padding: 10px; font-style: italic; color: #666;">${t('pdf.noRiskFactors')}</div>`}
                         </div>
 
                         <!-- 4. Raccomandazioni -->
-                        <h2>Raccomandazioni</h2>
+                        <h2>${t('analysis.carousel.recommendations')}</h2>
                         <div class="card-section">
                             <div class="card-content">
-                                <h3>Considerazioni</h3>
+                                <h3>${t('analysis.carousel.considerations')}</h3>
                                 <p>${formatMarkdown(analysis.raccomandazioni.mediche || 'N/A')}</p>
-                                <h3>Stile di Vita</h3>
+                                <h3>${t('analysis.carousel.lifestyle')}</h3>
                                 <p>${formatMarkdown(analysis.raccomandazioni.stileDiVita || 'N/A')}</p>
-                                <h3>Follow Up</h3>
+                                <h3>${t('analysis.carousel.followUp')}</h3>
                                 <p>${formatMarkdown(analysis.raccomandazioni.followUp || 'N/A')}</p>
-                                <h3>Specialisti</h3>
+                                <h3>${t('analysis.carousel.specialists')}</h3>
                                 <p>${formatMarkdown(analysis.raccomandazioni.specialisti || 'N/A')}</p>
                             </div>
                         </div>
 
                         <!-- 5. Integrazione -->
-                        <h2>Integrazione</h2>
+                        <h2>${t('analysis.carousel.supplements')}</h2>
                         ${analysis.supplements.current.length > 0 ? `
-                            <h3>Integratori Attuali</h3>
+                            <h3>${t('analysis.carousel.currentSupplements')}</h3>
                             <div class="supp-grid" style="margin-bottom: 20px;">
                                 ${analysis.supplements.current.map((s: any) => {
                 const isConfirm = s.action?.toLowerCase() === 'conferma';
                 const badgeClass = isConfirm ? 'status-confirm' : 'status-suspend';
-                const badgeText = isConfirm ? 'CONFERMA' : 'SOSPENDI';
+                const badgeText = isConfirm ? t('pdf.confirm') : t('pdf.suspend');
                 return `
                                     <div class="supp-card">
                                         <div class="supp-name">
@@ -617,7 +620,7 @@ export const PdfService = {
                                             <span class="status-badge ${badgeClass}">${badgeText}</span>
                                         </div>
                                         ${s.dosage ? `<div class="supp-dose">${s.dosage}</div>` : ''}
-                                        <div class="supp-reason">${formatMarkdown(s.reason || 'Attualmente assunto')}</div>
+                                        <div class="supp-reason">${formatMarkdown(s.reason || t('pdf.currentlyTaken'))}</div>
                                     </div>
                                     `;
             }).join('')}
@@ -625,7 +628,7 @@ export const PdfService = {
                         ` : ''}
 
                         ${analysis.supplements.recommended.length > 0 ? `
-                            <h3>Integratori Consigliati</h3>
+                            <h3>${t('analysis.carousel.recommendedSupplements')}</h3>
                             <div class="supp-grid">
                                 ${analysis.supplements.recommended.map((s: any) => `
                                     <div class="supp-card" style="border-left: 3px solid #E65100;">
@@ -636,26 +639,23 @@ export const PdfService = {
                                 `).join('')}
                             </div>
                         ` : ''}
-                        ${analysis.supplements.current.length === 0 && analysis.supplements.recommended.length === 0 ? '<p style="font-style:italic; color:#666;">Nessuna integrazione specifica rilevata o consigliata.</p>' : ''}
+                        ${analysis.supplements.current.length === 0 && analysis.supplements.recommended.length === 0 ? `<p style="font-style:italic; color:#666;">${t('pdf.noSupplements')}</p>` : ''}
 
                         <!-- 6. Conclusione -->
-                        <h2>Conclusione</h2>
+                        <h2>${t('analysis.carousel.conclusion')}</h2>
                         <div class="card-section">
                             <div class="card-content" style="background-color: #f0f8ff; border: 1px solid #bcdff1;">
-                                ${formatMarkdown(analysis.conclusione || 'Nessuna conclusione disponibile.')}
+                                ${formatMarkdown(analysis.conclusione || t('pdf.noConclusion'))}
                             </div>
                         </div>
 
                         <div class="footer">
-                            Generato da my Procative Lab AI - Il tuo assistente nutrizionale personale
+                            ${t('pdf.footer')}
                         </div>
 
                         <div class="disclaimer">
-                            <strong>DISCLAIMER IMPORTANTE:</strong><br>
-                            Questo report è generato da un sistema di Intelligenza Artificiale a scopo puramente informativo e di supporto al benessere generale.<br>
-                            NON è un dispositivo medico, NON fornisce diagnosi mediche e NON sostituisce in alcun modo il parere, la diagnosi o il trattamento di un medico professionista.<br>
-                            Qualsiasi decisione riguardante la propria salute, inclusa l'assunzione o la sospensione di integratori, farmaci o cambiamenti nella dieta, deve essere sempre discussa e confermata dal proprio medico curante o specialista.<br>
-                            L'utente utilizza queste informazioni a proprio rischio e pericolo.
+                            <strong>${t('pdf.disclaimerTitle')}</strong><br>
+                            ${t('pdf.disclaimerText')}
                         </div>
                     </div>
                 </body>
@@ -673,54 +673,55 @@ export const PdfService = {
         }
     },
 
-    generateBiomarkersPdf: async (biomarkers: any[], userProfile: UserProfile) => {
+    generateBiomarkersPdf: async (biomarkers: any[], userProfile: UserProfile, language: string) => {
         try {
-            const html = `
-                < !DOCTYPE html >
-                    <html lang="it" >
-                        <head>
-                        <meta charset="UTF-8" >
-                            <meta name="viewport" content = "width=device-width, initial-scale=1.0" >
-                                <title>Dettaglio Biomarcatori - ${userProfile.name} </title>
-                                    <style>
-                        body { font - family: 'Helvetica', sans - serif; color: #333; line - height: 1.6; padding: 40px; }
-                        h1 { color: #E65100; text - align: center; margin - bottom: 30px; }
-                        .header - info { text-align: center; margin - bottom: 40px; font - size: 14px; color: #666; }
-                        table { width: 100 %; border - collapse: collapse; margin - top: 20px; }
-th, td { padding: 12px; text - align: left; border - bottom: 1px solid #eee; }
-                        th { background - color: #f9f9f9; color: #666; font - weight: bold; font - size: 14px; }
-                        td { font - size: 14px; color: #333; }
-                        .status - badge { padding: 4px 8px; border - radius: 4px; font - size: 12px; font - weight: bold; }
-                        .status - ok { background - color: rgba(46, 204, 113, 0.2); color: #2ecc71; }
-                        .status - warning { background - color: rgba(255, 177, 66, 0.2); color: #FFB142; }
-                        .status - danger { background - color: rgba(255, 82, 82, 0.2); color: #FF5252; }
-                        .footer { text - align: center; margin - top: 50px; font - size: 12px; color: #999; border - top: 1px solid #eee; padding - top: 20px; }
-</style>
-    </head>
-    < body >
-    <h1>Dettaglio Biomarcatori </h1>
-        < div class="header-info" >
-            Utente: <strong>${userProfile.name} </strong><br>
-                        Generato il ${new Date().toLocaleDateString('it-IT')}
-</div>
+            const t = (key: string, options?: any) => i18n.t(key, { locale: language, ...options });
 
-    < table >
-    <thead>
-    <tr>
-    <th>Nome </th>
-    < th > Valore </th>
-    < th > Unità </th>
-    < th > Target </th>
-    < th > Stato </th>
-    </tr>
-    </thead>
-    <tbody>
+            const html = `
+                <!DOCTYPE html>
+                <html lang="${language}">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${t('pdf.biomarkersTitle')} - ${userProfile.name}</title>
+                    <style>
+                        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.6; padding: 40px; }
+                        h1 { color: #E65100; text-align: center; margin-bottom: 30px; }
+                        .header-info { text-align: center; margin-bottom: 40px; font-size: 14px; color: #666; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+                        th { background-color: #f9f9f9; color: #666; font-weight: bold; font-size: 14px; }
+                        td { font-size: 14px; color: #333; }
+                        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+                        .status-ok { background-color: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+                        .status-warning { background-color: rgba(255, 177, 66, 0.2); color: #FFB142; }
+                        .status-danger { background-color: rgba(255, 82, 82, 0.2); color: #FF5252; }
+                        .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${t('pdf.biomarkersTitle')}</h1>
+                    <div class="header-info">
+                        ${t('pdf.generatedFor', { name: `<strong>${userProfile.name}</strong>`, date: new Date().toLocaleDateString(language) })}
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>${t('pdf.name')}</th>
+                                <th>${t('pdf.value')}</th>
+                                <th>${t('pdf.unit')}</th>
+                                <th>${t('pdf.target')}</th>
+                                <th>${t('pdf.status')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             ${biomarkers.map(b => {
                 let statusClass = 'status-ok';
                 let statusText = 'OK';
-                if (b.status?.toLowerCase().includes('fuori') || b.status?.toLowerCase().includes('alto') || b.status?.toLowerCase().includes('basso')) {
+                if (b.status?.toLowerCase().includes('fuori') || b.status?.toLowerCase().includes('alto') || b.status?.toLowerCase().includes('basso') || b.status?.toLowerCase().includes('warning') || b.status?.toLowerCase().includes('critical')) {
                     statusClass = 'status-danger';
-                    statusText = 'ATTENZIONE';
+                    statusText = t('pdf.attention');
                 }
 
                 return `
@@ -734,19 +735,19 @@ th, td { padding: 12px; text - align: left; border - bottom: 1px solid #eee; }
                                 `;
             }).join('')
                 }
-</tbody>
-    </table>
+                        </tbody>
+                    </table>
 
-    < div class="footer" >
-        Generato da my Procative Lab AI - Il tuo assistente nutrizionale personale
-            </div>
-            < div style = "font-size: 10px; color: #999; text-align: center; margin-top: 30px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 15px;" >
-                <strong>DISCLAIMER IMPORTANTE: </strong><br>
-                        Questo documento è generato da un sistema di IA.Non sostituisce il parere medico professionale.
+                    <div class="footer">
+                        ${t('pdf.footer')}
                     </div>
-    </body>
-    </html>
-        `;
+                    <div style="font-size: 10px; color: #999; text-align: center; margin-top: 30px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 15px;">
+                        <strong>${t('pdf.disclaimerTitle')}:</strong><br>
+                        ${t('pdf.disclaimerTextShort')}
+                    </div>
+                </body>
+                </html>
+            `;
 
             const { uri } = await Print.printToFileAsync({ html });
             await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });

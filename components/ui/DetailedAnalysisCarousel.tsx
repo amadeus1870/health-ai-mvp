@@ -12,6 +12,7 @@ import { SupplementCard } from './SupplementCard';
 import { CholesterolCard } from './CholesterolCard';
 import { CurrentSupplementCard } from './CurrentSupplementCard';
 import { MarkdownText } from './MarkdownText';
+import i18n from '../../config/i18n';
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.65; // Increased width
@@ -26,7 +27,10 @@ interface DetailedAnalysisCarouselProps {
     isExporting?: boolean;
 }
 
+import { useLanguage } from '../../context/LanguageContext';
+
 export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> = ({ results, onExport, isExporting }) => {
+    const { language } = useLanguage(); // Trigger re-render on language change
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedCard, setSelectedCard] = useState<{ title: string, content: React.ReactNode } | null>(null);
 
@@ -77,7 +81,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                         <Text style={[styles.cardTitle, { color: '#FFF' }]}>{title}</Text>
 
                         <View style={{ flex: 1 }} />
-                        <Text style={styles.tapToViewText}>Tocca per dettagli</Text>
+                        <Text style={styles.tapToViewText}>{i18n.t('analysis.carousel.tapDetails')}</Text>
                     </View>
                 </View>
             </SoftCard>
@@ -149,9 +153,9 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                                         </View>
                                     </View>
 
-                                    <Text style={[styles.cardTitle, { color: '#FFF', fontSize: 22, marginTop: -5 }]}>Il tuo Report Completo</Text>
+                                    <Text style={[styles.cardTitle, { color: '#FFF', fontSize: 22, marginTop: -5 }]}>{i18n.t('analysis.carousel.fullReport')}</Text>
                                     <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 4, fontFamily: Typography.fontFamily.medium }}>
-                                        Esporta l'intera analisi
+                                        {i18n.t('analysis.carousel.exportAnalysis')}
                                     </Text>
 
                                     <View style={{ flex: 1 }} />
@@ -164,30 +168,30 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
 
                 {/* 1. VALUTAZIONE GENERALE - Dark Orange -> Light Orange */}
                 {results.valutazioneGenerale && renderDarkCard(
-                    "Valutazione Generale",
+                    i18n.t('analysis.carousel.generalEval'),
                     "pulse",
                     ['#E65100', '#F57C00', '#FFB74D'], // Dark Orange -> Orange -> Light Orange
                     <>
-                        <Text style={styles.subHeader}>Panoramica Completa</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.overview')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.panoramica}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Principali Risultati</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.mainResults')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.risultati}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Tendenze e Pattern</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.trends')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.tendenze}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Correlazioni</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.correlations')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.valutazioneGenerale?.correlazioni}</MarkdownText>
                     </>
                 )}
 
                 {/* 2. FATTORI DI RISCHIO - Dark Red -> Light Red */}
                 {results.fattoriDiRischio && results.fattoriDiRischio.length > 0 && renderDarkCard(
-                    "Fattori di Rischio",
+                    i18n.t('analysis.carousel.riskFactors'),
                     "alert-circle",
                     ['#B71C1C', '#D32F2F', '#EF5350'], // Dark Red -> Red -> Light Red
                     <>
@@ -199,30 +203,30 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
 
                 {/* 3. RACCOMANDAZIONI - Dark Green -> Light Green */}
                 {results.raccomandazioni && renderDarkCard(
-                    "Raccomandazioni",
+                    i18n.t('analysis.carousel.recommendations'),
                     "medkit",
                     ['#1B5E20', '#388E3C', '#66BB6A'], // Dark Green -> Green -> Light Green
                     <>
-                        <Text style={styles.subHeader}>Considerazioni</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.considerations')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.mediche}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Stile di Vita e Dieta</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.lifestyle')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.stileDiVita}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Follow-up Consigliati</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.followUp')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.followUp}</MarkdownText>
 
                         <View style={styles.divider} />
-                        <Text style={styles.subHeader}>Specialisti</Text>
+                        <Text style={styles.subHeader}>{i18n.t('analysis.carousel.specialists')}</Text>
                         <MarkdownText style={styles.bodyText}>{results.raccomandazioni?.specialisti}</MarkdownText>
                     </>
                 )}
 
                 {/* 4. PROFILO LIPIDICO DETTAGLIATO - Dark Blue -> Light Blue */}
                 {results.cholesterolAnalysis && renderDarkCard(
-                    "Profilo Lipidico",
+                    i18n.t('analysis.carousel.lipidProfile'),
                     "water",
                     ['#0D47A1', '#1976D2', '#42A5F5'], // Dark Blue -> Blue -> Light Blue
                     <CholesterolCard data={results.cholesterolAnalysis} textColor="#FFF" />
@@ -230,7 +234,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
 
                 {/* 5. DETTAGLIO BIOMARCATORI - Dark Purple -> Light Purple */}
                 {results.biomarkers && renderDarkCard(
-                    "Dettaglio Biomarcatori",
+                    i18n.t('analysis.carousel.biomarkersDetail'),
                     "list",
                     ['#4A148C', '#7B1FA2', '#AB47BC'], // Dark Purple -> Purple -> Light Purple
                     <>
@@ -253,7 +257,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
 
                 {/* 6. INTEGRATORI - Dark Amber -> Light Amber */}
                 {results.supplements && (results.supplements.recommended.length > 0 || (results.supplements.current && results.supplements.current.length > 0)) && renderDarkCard(
-                    "Integratori",
+                    i18n.t('analysis.carousel.supplements'),
                     "bandage",
                     ['#FF6F00', '#FFA000', '#FFCA28'], // Dark Amber -> Amber -> Light Amber
                     <>
@@ -262,7 +266,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                             <>
                                 <View style={styles.sectionHeaderContainer}>
                                     <Ionicons name="person" size={18} color="#E65100" />
-                                    <Text style={styles.sectionHeaderText}>Integratori Attuali</Text>
+                                    <Text style={styles.sectionHeaderText}>{i18n.t('analysis.carousel.currentSupplements')}</Text>
                                 </View>
                                 {results.supplements.current.map((supp: any, index: number) => (
                                     <CurrentSupplementCard key={`curr-${index}`} supplement={supp} textColor="#FFF" />
@@ -276,7 +280,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                             <>
                                 <View style={styles.sectionHeaderContainer}>
                                     <Ionicons name="star" size={18} color="#E65100" />
-                                    <Text style={styles.sectionHeaderText}>Integratori Consigliati</Text>
+                                    <Text style={styles.sectionHeaderText}>{i18n.t('analysis.carousel.recommendedSupplements')}</Text>
                                 </View>
                                 {results.supplements.recommended.map((supp: any, index: number) => (
                                     <SupplementCard key={`rec-${index}`} supplement={supp} textColor="#FFF" />
@@ -288,7 +292,7 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
 
                 {/* 7. CONCLUSIONE - Dark Gray -> Light Gray */}
                 {results.conclusione && renderDarkCard(
-                    "Conclusione",
+                    i18n.t('analysis.carousel.conclusion'),
                     "checkmark-done-circle",
                     ['#263238', '#455A64', '#78909C'], // Dark Gray -> Gray -> Light Gray
                     <MarkdownText style={styles.bodyText}>{results.conclusione}</MarkdownText>

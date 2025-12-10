@@ -4,6 +4,7 @@ import Svg, { Polygon, Line, Text as SvgText, Circle, G } from 'react-native-svg
 import Animated, { useSharedValue, withTiming, useAnimatedProps, Easing } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
 
@@ -25,11 +26,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({ data, size = 300 }) => {
     const center = size / 2;
     const angleSlice = (Math.PI * 2) / data.length;
 
-    const progress = useSharedValue(0);
+    // const progress = useSharedValue(0);
+    const progress = { value: 1 }; // Static progress
 
-    useEffect(() => {
-        progress.value = withTiming(1, { duration: 1500, easing: Easing.out(Easing.exp) });
-    }, []);
+    // useEffect(() => {
+    //     progress.value = withTiming(1, { duration: 1500, easing: Easing.out(Easing.exp) });
+    // }, []);
 
     // Helper to calculate coordinates
     const getCoordinates = (value: number, index: number, max: number) => {
@@ -40,6 +42,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({ data, size = 300 }) => {
             y: center + r * Math.sin(angle),
         };
     };
+
+    // ... (rest of simple logic)
 
     // Background Grid (Concentric Polygons)
     const gridLevels = 4;
@@ -119,14 +123,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({ data, size = 300 }) => {
         return `${x},${y}`;
     }).join(' ');
 
-    const animatedProps = useAnimatedProps(() => {
-        // We can animate the points if we want complex interpolation, 
-        // but for now let's animate opacity or scale of the whole shape
-        return {
-            opacity: progress.value,
-            transform: [{ scale: progress.value }] // This scales from top-left, need center transform
-        };
-    });
+    // const animatedProps = useAnimatedProps(() => {
+    //     // We can animate the points if we want complex interpolation, 
+    //     // but for now let's animate opacity or scale of the whole shape
+    //     return {
+    //         opacity: progress.value,
+    //         transform: [{ scale: progress.value }] // This scales from top-left, need center transform
+    //     };
+    // });
 
     return (
         <View style={styles.container}>
@@ -178,11 +182,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({ data, size = 300 }) => {
             <View style={styles.legend}>
                 <View style={styles.legendItem}>
                     <View style={[styles.dot, { backgroundColor: '#32D74B' }]} />
-                    <Text style={styles.legendText}>Zona Ideale / Valori OK</Text>
+                    <Text style={styles.legendText}>{i18n.t('analysis.charts.idealZone')}</Text>
                 </View>
                 <View style={styles.legendItem}>
                     <View style={[styles.dot, { backgroundColor: '#FF453A' }]} />
-                    <Text style={styles.legendText}>Fuori Range</Text>
+                    <Text style={styles.legendText}>{i18n.t('analysis.charts.outOfRange')}</Text>
                 </View>
             </View>
         </View>

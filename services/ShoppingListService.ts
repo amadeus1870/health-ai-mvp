@@ -12,7 +12,7 @@ export interface Category {
 }
 
 export const ShoppingListService = {
-    generateList: async (dietPlan: DietPlan): Promise<Category[]> => {
+    generateList: async (dietPlan: DietPlan, language: string = 'it'): Promise<Category[]> => {
         if (!dietPlan || !dietPlan.days) return [];
 
         const allIngredients: string[] = [];
@@ -27,7 +27,7 @@ export const ShoppingListService = {
         const aggregatedIngredients = ShoppingListService.aggregateIngredients(allIngredients);
 
         try {
-            const categorizedData = await categorizeIngredients(aggregatedIngredients);
+            const categorizedData = await categorizeIngredients(aggregatedIngredients, language);
 
             return categorizedData.map(cat => ({
                 name: cat.category,
@@ -38,8 +38,16 @@ export const ShoppingListService = {
             }));
         } catch (error) {
             // Fallback to simple list
+            const fallbackMap: { [key: string]: string } = {
+                it: "Tutti gli ingredienti",
+                en: "All Ingredients",
+                es: "Todos los ingredientes",
+                fr: "Tous les ingrédients",
+                de: "Alle Zutaten"
+            };
+            const fallbackName = fallbackMap[language] || "All Ingredients";
             return [{
-                name: "Tutti gli ingredienti",
+                name: fallbackName,
                 items: aggregatedIngredients.sort().map(name => ({
                     name: name.charAt(0).toUpperCase() + name.slice(1),
                     checked: false

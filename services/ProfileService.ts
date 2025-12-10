@@ -1,48 +1,37 @@
-import { db } from '../config/firebaseConfig';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { UserProfile, initialUserProfile } from '../types/Profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const USER_ID = 'current_user'; // For MVP without Auth
-const PROFILE_COLLECTION = 'profiles';
+const PROFILE_KEY = 'user_profile_v1';
+const DIET_PLAN_KEY = 'user_diet_plan_v1';
 
 export const ProfileService = {
     saveProfile: async (profile: UserProfile): Promise<void> => {
         try {
-            const docRef = doc(db, PROFILE_COLLECTION, USER_ID);
-            await setDoc(docRef, profile);
-            await AsyncStorage.setItem('hasProfile', 'true');
+            await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
         } catch (e) {
-            console.error('Failed to save profile to Firestore', e);
+            console.error('Failed to save profile locally', e);
             throw e;
         }
     },
 
     getProfile: async (): Promise<UserProfile> => {
         try {
-            const docRef = doc(db, PROFILE_COLLECTION, USER_ID);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                await AsyncStorage.setItem('hasProfile', 'true'); // Sync local state
-                return { ...initialUserProfile, ...docSnap.data() } as UserProfile;
+            const jsonValue = await AsyncStorage.getItem(PROFILE_KEY);
+            if (jsonValue != null) {
+                return { ...initialUserProfile, ...JSON.parse(jsonValue) };
             } else {
                 return initialUserProfile;
             }
-        } catch (e: any) {
-            if (e?.code === 'unavailable' || e?.message?.includes('offline')) {
-                console.log('Firestore offline: returning initial profile.');
-            } else {
-                console.error('Failed to fetch profile from Firestore', e);
-            }
+        } catch (e) {
+            console.error('Failed to fetch profile locally', e);
             return initialUserProfile;
         }
     },
 
     hasProfileLocal: async (): Promise<boolean> => {
         try {
-            const value = await AsyncStorage.getItem('hasProfile');
-            return value === 'true';
+            const value = await AsyncStorage.getItem(PROFILE_KEY);
+            return value !== null;
         } catch (e) {
             return false;
         }
@@ -50,47 +39,43 @@ export const ProfileService = {
 
     clearProfile: async (): Promise<void> => {
         try {
-            const docRef = doc(db, PROFILE_COLLECTION, USER_ID);
-            await deleteDoc(docRef);
-            await AsyncStorage.removeItem('hasProfile');
+            await AsyncStorage.removeItem(PROFILE_KEY);
         } catch (e) {
-            console.error('Failed to clear profile from Firestore', e);
+            console.error('Failed to clear profile locally', e);
             throw e;
         }
     },
 
     saveDietPlan: async (dietPlan: any): Promise<void> => {
         try {
-            const docRef = doc(db, 'diet_plans', USER_ID);
-            await setDoc(docRef, { plan: dietPlan, updatedAt: new Date().toISOString() });
+            const data = { plan: dietPlan, updatedAt: new Date().toISOString() };
+            await AsyncStorage.setItem(DIET_PLAN_KEY, JSON.stringify(data));
         } catch (e) {
-            console.error('Failed to save diet plan', e);
+            console.error('Failed to save diet plan locally', e);
             throw e;
         }
     },
 
     getDietPlan: async (): Promise<any | null> => {
         try {
-            const docRef = doc(db, 'diet_plans', USER_ID);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+            const jsonValue = await AsyncStorage.getItem(DIET_PLAN_KEY);
+            if (jsonValue != null) {
+                const data = JSON.parse(jsonValue);
                 // Return plan with updatedAt attached
                 return { ...data.plan, updatedAt: data.updatedAt };
             }
             return null;
         } catch (e) {
-            console.error('Failed to fetch diet plan', e);
+            console.error('Failed to fetch diet plan locally', e);
             return null;
         }
     },
 
     clearDietPlan: async (): Promise<void> => {
         try {
-            const docRef = doc(db, 'diet_plans', USER_ID);
-            await deleteDoc(docRef);
+            await AsyncStorage.removeItem(DIET_PLAN_KEY);
         } catch (e) {
-            console.error('Failed to clear diet plan', e);
+            console.error('Failed to clear diet plan locally', e);
             throw e;
         }
     }

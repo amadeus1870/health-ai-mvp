@@ -1,0 +1,32 @@
+env: load .env
+env: export EXPO_PUBLIC_GEMINI_API_KEY
+Starting Metro Bundler
+Android Bundling failed 1377ms node_modules/expo-router/entry.js (1683 modules)
+Error: Unable to resolve module expo-file-system/legacy from /Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/app/(tabs)/biomarkers.tsx: expo-file-system/legacy could not be found within the project or in these directories:
+  node_modules
+[0m [90m  6 |[39m [36mimport[39m { [33mIonicons[39m } [36mfrom[39m [32m'@expo/vector-icons'[39m[33m;[39m
+ [90m  7 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mImagePicker[39m [36mfrom[39m [32m'expo-image-picker'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mFileSystem[39m [36mfrom[39m [32m'expo-file-system/legacy'[39m[33m;[39m
+ [90m    |[39m                              [31m[1m^[22m[39m
+ [90m  9 |[39m [36mimport[39m { analyzeBiomarkers } [36mfrom[39m [32m'../../services/gemini'[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m { useAnalysis } [36mfrom[39m [32m'../../context/AnalysisContext'[39m[33m;[39m
+ [90m 11 |[39m [36mimport[39m { [33mAnalysisService[39m } [36mfrom[39m [32m'../../services/AnalysisService'[39m[33m;[39m[0m
+Error: Unable to resolve module expo-file-system/legacy from /Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/app/(tabs)/biomarkers.tsx: expo-file-system/legacy could not be found within the project or in these directories:
+  node_modules
+[0m [90m  6 |[39m [36mimport[39m { [33mIonicons[39m } [36mfrom[39m [32m'@expo/vector-icons'[39m[33m;[39m
+ [90m  7 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mImagePicker[39m [36mfrom[39m [32m'expo-image-picker'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mFileSystem[39m [36mfrom[39m [32m'expo-file-system/legacy'[39m[33m;[39m
+ [90m    |[39m                              [31m[1m^[22m[39m
+ [90m  9 |[39m [36mimport[39m { analyzeBiomarkers } [36mfrom[39m [32m'../../services/gemini'[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m { useAnalysis } [36mfrom[39m [32m'../../context/AnalysisContext'[39m[33m;[39m
+ [90m 11 |[39m [36mimport[39m { [33mAnalysisService[39m } [36mfrom[39m [32m'../../services/AnalysisService'[39m[33m;[39m[0m
+    at ModuleResolver.resolveDependency (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/node-haste/DependencyGraph/ModuleResolution.js:150:15)
+    at DependencyGraph.resolveDependency (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/node-haste/DependencyGraph.js:248:43)
+    at /Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/lib/transformHelpers.js:165:21
+    at resolveDependencies (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/DeltaBundler/buildSubgraph.js:42:25)
+    at visit (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/DeltaBundler/buildSubgraph.js:83:30)
+    at async Promise.all (index 1)
+    at visit (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/DeltaBundler/buildSubgraph.js:92:5)
+    at async Promise.all (index 0)
+    at visit (/Users/amedeo/.gemini/antigravity/scratch/health_ai_mvp/node_modules/metro/src/DeltaBundler/buildSubgraph.js:92:5)
+    at async Promise.all (index 1)

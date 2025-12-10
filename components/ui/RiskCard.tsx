@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 import { SoftCard } from './SoftCard';
 import { Ionicons } from '@expo/vector-icons';
 import { MarkdownText } from './MarkdownText';
@@ -31,11 +32,11 @@ const RiskGauge = ({ severity }: { severity: string }) => {
 
     const cleanSeverity = severity?.toLowerCase().replace(/[*_]/g, '').trim();
 
-    if (cleanSeverity?.includes('alto')) {
+    if (cleanSeverity?.includes('alto') || cleanSeverity?.includes('high') || cleanSeverity?.includes('hoch') || cleanSeverity?.includes('élevé')) {
         percentage = 0.85; color = Colors.error;
-    } else if (cleanSeverity?.includes('medio')) {
+    } else if (cleanSeverity?.includes('medio') || cleanSeverity?.includes('medium') || cleanSeverity?.includes('mittel') || cleanSeverity?.includes('moyen')) {
         percentage = 0.5; color = Colors.warning;
-    } else if (cleanSeverity?.includes('basso')) {
+    } else if (cleanSeverity?.includes('basso') || cleanSeverity?.includes('low') || cleanSeverity?.includes('niedrig') || cleanSeverity?.includes('faible')) {
         percentage = 0.2; color = Colors.success;
     } else {
         percentage = 0.1; color = Colors.textSecondary;
@@ -84,10 +85,10 @@ const RiskGauge = ({ severity }: { severity: string }) => {
 export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ risk, textColor }) => {
     const getSeverityColor = (severity: string) => {
         const cleanSeverity = severity?.toLowerCase().replace(/[*_]/g, '').trim();
-        if (cleanSeverity?.includes('alto')) return Colors.error;
-        if (cleanSeverity?.includes('medio') && !cleanSeverity?.includes('basso')) return Colors.warning; // Medio pure
-        if (cleanSeverity?.includes('medio') && cleanSeverity?.includes('basso')) return Colors.warning; // Medio-basso
-        if (cleanSeverity?.includes('basso')) return Colors.success;
+        // Check for English or localized terms
+        if (cleanSeverity?.includes('alto') || cleanSeverity?.includes('high') || cleanSeverity?.includes('hoch') || cleanSeverity?.includes('élevé')) return Colors.error;
+        if ((cleanSeverity?.includes('medio') || cleanSeverity?.includes('medium') || cleanSeverity?.includes('mittel') || cleanSeverity?.includes('moyen')) && !cleanSeverity?.includes('basso')) return Colors.warning;
+        if (cleanSeverity?.includes('basso') || cleanSeverity?.includes('low') || cleanSeverity?.includes('niedrig') || cleanSeverity?.includes('faible')) return Colors.success;
         return Colors.textSecondary;
     };
 
@@ -111,7 +112,7 @@ export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ ris
                 <View style={{ flex: 1 }}>
                     <View style={[styles.badge, { backgroundColor: getSeverityColor(risk.gravita), alignSelf: 'flex-start', marginBottom: 6 }]}>
                         <Text style={[styles.badgeText, { color: '#FFF' }]}>
-                            RISCHIO
+                            {i18n.t(`riskLevels.${risk.gravita.toLowerCase()}`, { defaultValue: risk.gravita })}
                         </Text>
                     </View>
                     <View style={styles.titleRow}>
@@ -122,7 +123,7 @@ export const RiskCard: React.FC<RiskCardProps & { textColor?: string }> = ({ ris
                 <RiskGauge severity={risk.gravita} />
             </View>
 
-            <Text style={[styles.probability, { color: secondaryColor }]}>Probabilità Rischio: {risk.probabilita}</Text>
+            <Text style={[styles.probability, { color: secondaryColor }]}>{i18n.t('analysis.risk.probability')}: {risk.probabilita}</Text>
             <MarkdownText style={[styles.explanation, { color: bodyColor }]}>{risk.spiegazione}</MarkdownText>
         </SoftCard>
     );

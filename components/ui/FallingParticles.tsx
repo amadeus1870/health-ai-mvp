@@ -7,11 +7,9 @@ import Animated, {
     withRepeat,
     withTiming,
     Easing,
-    cancelAnimation,
     withSequence,
     withSpring,
-    SharedValue,
-    interpolate
+    SharedValue
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -70,17 +68,14 @@ const Particle = ({ index, config, touchX, isTouching }: { index: number, config
                 false
             )
         );
-    }, []);
+    }, [delay, duration, opacity, rotate, translateY]);
 
     const animatedStyle = useAnimatedStyle(() => {
         // Stronger attraction logic
         // If touching, target is touchX. If not, target is startX.
         // We interpolate to make it smooth but responsive.
 
-        const targetX = isTouching.value ? touchX.value : startX;
 
-        // Calculate distance to touch
-        const dist = touchX.value - startX;
 
         // Only attract if within a certain range? No, user wants global attraction.
         // Let's make it follow the finger with some "lag" based on particle index/randomness

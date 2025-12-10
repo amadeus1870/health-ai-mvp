@@ -1,21 +1,28 @@
 // LAYOUT FROZEN: Do not modify image alignment or flex ratios without user permission.
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import { Typography } from '../constants/Typography';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ProfileService } from '../services/ProfileService';
-import { PrivacyModal } from '../components/ui/PrivacyModal';
+import { LegalModal } from '../components/ui/PrivacyModal';
 import { BlurView } from 'expo-blur';
+import i18n from '../config/i18n';
 
 export default function WelcomeScreen() {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const [hasProfile, setHasProfile] = React.useState<boolean | null>(null);
+
     const [privacyApproved, setPrivacyApproved] = React.useState(false);
-    const [privacyModalVisible, setPrivacyModalVisible] = React.useState(false);
+    const [termsApproved, setTermsApproved] = React.useState(false);
+    const [disclaimerApproved, setDisclaimerApproved] = React.useState(false);
+
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [modalType, setModalType] = React.useState<'privacy' | 'terms' | 'disclaimer'>('privacy');
 
     useFocusEffect(
         React.useCallback(() => {
@@ -35,6 +42,20 @@ export default function WelcomeScreen() {
         }
     };
 
+    const openModal = (type: 'privacy' | 'terms' | 'disclaimer') => {
+        setModalType(type);
+        setModalVisible(true);
+    };
+
+    const handleModalApprove = () => {
+        if (modalType === 'privacy') setPrivacyApproved(true);
+        if (modalType === 'terms') setTermsApproved(true);
+        if (modalType === 'disclaimer') setDisclaimerApproved(true);
+        setModalVisible(false);
+    };
+
+    const allApproved = privacyApproved && termsApproved && disclaimerApproved;
+
     if (hasProfile === null) return null; // Or loading spinner
 
     return (
@@ -43,7 +64,7 @@ export default function WelcomeScreen() {
             style={styles.container}
             resizeMode="cover"
         >
-            <SafeAreaView style={styles.safeAreaHeader}>
+            <View style={[styles.safeAreaHeader, { paddingTop: insets.top + 20 }]}>
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('../assets/images/logo.png')}
@@ -52,8 +73,6 @@ export default function WelcomeScreen() {
                     />
                 </View>
 
-
-
                 <View style={styles.imageContainer}>
                     <Image
                         source={require('../assets/images/dott_e_dottssa.png')}
@@ -61,24 +80,25 @@ export default function WelcomeScreen() {
                         resizeMode="contain"
                     />
                 </View>
-            </SafeAreaView>
+            </View>
 
             <View style={styles.bottomSheet}>
-                <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
+                <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} experimentalBlurMethod='dimezisBlurView' />
                 <View style={styles.contentContainer}>
                     <Text style={styles.welcomeTitle}>
-                        {hasProfile ? "Bentornato in\nmy Proactive Lab" : "Benvenuto in\nmy Proactive Lab"}
+                        {hasProfile ? i18n.t('welcomeScreen.welcomeBackTitle') : i18n.t('welcomeScreen.welcomeTitle')}
                     </Text>
 
                     <Text style={styles.welcomeText}>
                         {hasProfile
-                            ? "La tua salute è al centro di tutto. Continua a monitorare i tuoi progressi e scopri nuovi insight personalizzati."
-                            : "Inserisci i dati del tuo profilo per permettermi di aiutarti meglio nelle analisi e offrirti consigli più specifici. Potrai modificare i tuoi dati in qualunque momento."
+                            ? i18n.t('welcomeScreen.welcomeBackSubtitle')
+                            : i18n.t('welcomeScreen.welcomeSubtitle')
                         }
                     </Text>
 
-                    <View style={styles.privacyContainer}>
-                        <View style={styles.privacyRow}>
+                    <View style={styles.legalContainer}>
+                        {/* Privacy Policy */}
+                        <View style={styles.checkboxRow}>
                             <TouchableOpacity onPress={() => setPrivacyApproved(!privacyApproved)}>
                                 <Ionicons
                                     name={privacyApproved ? "checkbox" : "square-outline"}
@@ -86,45 +106,64 @@ export default function WelcomeScreen() {
                                     color={privacyApproved ? "#FFB142" : "rgba(255, 255, 255, 0.5)"}
                                 />
                             </TouchableOpacity>
-                            <Text style={styles.privacyText}>
-                                <Text onPress={() => setPrivacyApproved(!privacyApproved)}>Accetto la </Text>
-                                <Text
-                                    style={{ textDecorationLine: 'underline', fontFamily: Typography.fontFamily.bold }}
-                                    onPress={() => setPrivacyModalVisible(true)}
-                                >
-                                    Privacy Policy
-                                </Text>
+                            <Text style={styles.checkboxText}>
+                                {i18n.t('welcomeScreen.accept')} <Text style={styles.linkText} onPress={() => openModal('privacy')}>{i18n.t('welcomeScreen.privacyPolicy')}</Text>
                             </Text>
-                            {!privacyApproved && <Ionicons name="alert-circle" size={20} color="#FF6B6B" style={{ marginLeft: 8 }} />}
+                        </View>
+
+                        {/* Terms of Service */}
+                        <View style={styles.checkboxRow}>
+                            <TouchableOpacity onPress={() => setTermsApproved(!termsApproved)}>
+                                <Ionicons
+                                    name={termsApproved ? "checkbox" : "square-outline"}
+                                    size={24}
+                                    color={termsApproved ? "#FFB142" : "rgba(255, 255, 255, 0.5)"}
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.checkboxText}>
+                                {i18n.t('welcomeScreen.accept')} <Text style={styles.linkText} onPress={() => openModal('terms')}>{i18n.t('welcomeScreen.termsOfService')}</Text>
+                            </Text>
+                        </View>
+
+                        {/* Medical Disclaimer */}
+                        <View style={styles.checkboxRow}>
+                            <TouchableOpacity onPress={() => setDisclaimerApproved(!disclaimerApproved)}>
+                                <Ionicons
+                                    name={disclaimerApproved ? "checkbox" : "square-outline"}
+                                    size={24}
+                                    color={disclaimerApproved ? "#FFB142" : "rgba(255, 255, 255, 0.5)"}
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.checkboxText}>
+                                {i18n.t('welcomeScreen.accept')} <Text style={styles.linkText} onPress={() => openModal('disclaimer')}>{i18n.t('welcomeScreen.medicalDisclaimer')}</Text>
+                            </Text>
                         </View>
                     </View>
 
                     <TouchableOpacity
                         style={[
                             styles.primaryButton,
-                            !privacyApproved && { backgroundColor: 'rgba(255, 255, 255, 0.1)', shadowOpacity: 0 }
+                            !allApproved && { backgroundColor: 'rgba(255, 255, 255, 0.1)', shadowOpacity: 0 }
                         ]}
                         onPress={handleContinue}
-                        disabled={!privacyApproved}
+                        disabled={!allApproved}
                     >
                         <Text style={[
                             styles.primaryButtonText,
-                            !privacyApproved && { color: 'rgba(255, 255, 255, 0.3)' }
+                            !allApproved && { color: 'rgba(255, 255, 255, 0.3)' }
                         ]}>
-                            {hasProfile ? "Continua" : "Completa Profilo"}
+                            {hasProfile ? i18n.t('welcomeScreen.continue') : i18n.t('welcomeScreen.completeProfile')}
                         </Text>
-                        <Ionicons name="arrow-forward" size={20} color={!privacyApproved ? "rgba(255, 255, 255, 0.3)" : "#FFF"} />
+                        <Ionicons name="arrow-forward" size={20} color={!allApproved ? "rgba(255, 255, 255, 0.3)" : "#FFF"} />
                     </TouchableOpacity>
                 </View>
             </View>
 
-            <PrivacyModal
-                visible={privacyModalVisible}
-                onClose={() => setPrivacyModalVisible(false)}
-                onApprove={() => {
-                    setPrivacyApproved(true);
-                    setPrivacyModalVisible(false);
-                }}
+            <LegalModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onApprove={handleModalApprove}
+                type={modalType}
             />
         </ImageBackground>
     );
@@ -135,39 +174,40 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     safeAreaHeader: {
-        flex: 0.5, // Balanced
+        flex: 0.45,
         paddingHorizontal: 10,
         paddingTop: 20,
         alignItems: 'center',
     },
     logoContainer: {
         width: '100%',
-        height: 80, // Reduced height
+        height: 80,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 0,
     },
-
     logoImage: {
         width: '100%',
         height: '100%',
     },
     imageContainer: {
         flex: 1,
-        justifyContent: 'flex-end', // Align to bottom
+        justifyContent: 'flex-end',
         alignItems: 'center',
         overflow: 'visible',
-        marginBottom: -70, // Increased overlap to ensure it rests on card
     },
     centeredImage: {
         width: 400,
         height: 400,
         resizeMode: 'contain',
+        // LAYOUT FROZEN: GOLDEN VALUE (Do not change without user permission)
+        top: 110,
     },
     bottomSheet: {
-        flex: 0.5, // Balanced
-        // marginTop: 52, // Removed margin top
-        backgroundColor: 'transparent', // Transparent for BlurView
+        flex: 0.55,
+        // LAYOUT FROZEN: GOLDEN VALUE (Do not change without user permission)
+        marginTop: 60,
+        backgroundColor: 'transparent',
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         overflow: 'hidden',
@@ -177,14 +217,14 @@ const styles = StyleSheet.create({
     contentContainer: {
         paddingHorizontal: 32,
         paddingTop: 40,
-        paddingBottom: 120, // Increased padding to lift button
+        paddingBottom: 10,
         alignItems: 'center',
         height: '100%',
     },
     welcomeTitle: {
         fontSize: 24,
         fontFamily: Typography.fontFamily.bold,
-        color: '#FFFFFF', // White
+        color: '#FFFFFF',
         marginBottom: 16,
         textAlign: 'center',
         lineHeight: 32,
@@ -195,46 +235,49 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 16,
         fontFamily: Typography.fontFamily.regular,
-        color: 'rgba(255, 255, 255, 0.8)', // White transparent
+        color: 'rgba(255, 255, 255, 0.8)',
         textAlign: 'center',
         lineHeight: 24,
-        marginBottom: 32,
+        marginBottom: 10,
+    },
+    legalContainer: {
+        width: '100%',
+        marginBottom: 0,
+        marginTop: 10,
+    },
+    checkboxRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    checkboxText: {
+        fontSize: 14,
+        fontFamily: Typography.fontFamily.regular,
+        color: '#FFFFFF',
+        marginLeft: 12,
+        flex: 1,
+    },
+    linkText: {
+        textDecorationLine: 'underline',
+        fontFamily: Typography.fontFamily.bold,
     },
     primaryButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFB142', // Orange
+        backgroundColor: '#FFB142',
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 30,
         width: '100%',
-        shadowColor: '#FFB142',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-        elevation: 8,
-        marginTop: 'auto',
+        height: 56,
+        marginTop: 20,
+        marginBottom: 10,
     },
     primaryButtonText: {
         color: '#FFF',
         fontSize: 18,
         fontFamily: Typography.fontFamily.bold,
         marginRight: 8,
-    },
-    privacyContainer: {
-        width: '100%',
-        marginBottom: 24,
-    },
-    privacyRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    privacyText: {
-        fontSize: 14,
-        fontFamily: Typography.fontFamily.regular,
-        color: '#FFFFFF', // White
-        marginLeft: 8,
     },
 });

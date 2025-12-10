@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 import { SoftCard } from './SoftCard';
 import { Ionicons } from '@expo/vector-icons';
@@ -100,7 +101,7 @@ const ComparisonRow = ({ label, value, target, unit, isLowerBetter = true, statu
                 {/* Target Marker */}
                 <View style={[styles.targetMarker, { left: `${targetLeft}%`, zIndex: 3 }]} />
             </View>
-            <Text style={[styles.barLabel, { marginTop: 4, alignSelf: 'flex-end', fontSize: 10, color: secondaryColor }]}>Obiettivo: {isLowerBetter ? '<' : '>'} {target} {unit}</Text>
+            <Text style={[styles.barLabel, { marginTop: 4, alignSelf: 'flex-end', fontSize: 10, color: secondaryColor }]}>{i18n.t('analysis.cholesterol.target')}: {isLowerBetter ? '<' : '>'} {target} {unit}</Text>
         </View>
     );
 };
@@ -108,7 +109,7 @@ const ComparisonRow = ({ label, value, target, unit, isLowerBetter = true, statu
 // RadarChart removed
 
 
-// ... existing imports
+
 
 export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: string }> = ({ data, textColor }) => {
     const parseValue = (val: string) => {
@@ -136,15 +137,16 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
         <View>
             {/* Quantitative Analysis */}
             {/* Quantitative Analysis */}
+            {/* Quantitative Analysis */}
             <View style={[styles.sectionHeaderContainer, { backgroundColor: '#FFFFFF' }]}>
                 <Ionicons name="stats-chart" size={18} color={Colors.orange} />
-                <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>Analisi Quantitativa</Text>
+                <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>{i18n.t('analysis.cholesterol.quantitativeAnalysis')}</Text>
             </View>
             <MarkdownText style={[styles.description, { color: descColor }]}>{data.quantitative.description}</MarkdownText>
 
             <View style={{ marginBottom: 24, marginTop: 10 }}>
                 <ComparisonRow
-                    label="Colesterolo Totale"
+                    label={i18n.t('analysis.cholesterol.total')}
                     value={total}
                     target={200}
                     unit="mg/dL"
@@ -152,7 +154,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                     labelColor={labelColor}
                 />
                 <ComparisonRow
-                    label="Colesterolo LDL (Cattivo)"
+                    label={i18n.t('analysis.cholesterol.ldl')}
                     value={ldl}
                     target={100}
                     unit="mg/dL"
@@ -160,7 +162,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                     labelColor={labelColor}
                 />
                 <ComparisonRow
-                    label="Colesterolo HDL (Buono)"
+                    label={i18n.t('analysis.cholesterol.hdl')}
                     value={hdl}
                     target={50}
                     unit="mg/dL"
@@ -169,7 +171,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
                     labelColor={labelColor}
                 />
                 <ComparisonRow
-                    label="Trigliceridi"
+                    label={i18n.t('analysis.cholesterol.triglycerides')}
                     value={tri}
                     target={150}
                     unit="mg/dL"
@@ -184,7 +186,7 @@ export const CholesterolCard: React.FC<{ data: CholesterolData, textColor?: stri
             {/* Qualitative Analysis */}
             <View style={[styles.sectionHeaderContainer, { backgroundColor: '#FFFFFF' }]}>
                 <Ionicons name="flask" size={18} color={Colors.orange} />
-                <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>Analisi Qualitativa Avanzata</Text>
+                <Text style={[styles.sectionHeaderText, { color: Colors.orange }]}>{i18n.t('analysis.cholesterol.qualitativeAnalysis')}</Text>
             </View>
             <MarkdownText style={[styles.description, { color: descColor }]}>{data.qualitative.description}</MarkdownText>
 

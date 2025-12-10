@@ -4,14 +4,41 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
+import { MarkdownText } from './MarkdownText';
+import i18n from '../../config/i18n';
 
-interface PrivacyModalProps {
+interface LegalModalProps {
     visible: boolean;
     onClose: () => void;
     onApprove: () => void;
+    type: 'privacy' | 'terms' | 'disclaimer';
 }
 
-export const PrivacyModal: React.FC<PrivacyModalProps> = ({ visible, onClose, onApprove }) => {
+export const LegalModal: React.FC<LegalModalProps> = ({ visible, onClose, onApprove, type }) => {
+    const getContent = () => {
+        switch (type) {
+            case 'privacy':
+                return {
+                    title: i18n.t('settings.privacy'),
+                    content: i18n.t('legal.privacyPolicy')
+                };
+            case 'terms':
+                return {
+                    title: i18n.t('settings.terms'),
+                    content: i18n.t('legal.termsOfService')
+                };
+            case 'disclaimer':
+                return {
+                    title: i18n.t('settings.disclaimer'),
+                    content: i18n.t('disclaimer.fullText')
+                };
+            default:
+                return { title: '', content: '' };
+        }
+    };
+
+    const { title, content } = getContent();
+
     return (
         <Modal
             animationType="slide"
@@ -24,35 +51,25 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ visible, onClose, on
                     intensity={60}
                     style={StyleSheet.absoluteFill}
                     tint="dark"
-                    experimentalBlurMethod='dimezisBlurView'
+                   
                 />
                 <View style={styles.modalContent}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>Privacy Policy</Text>
+                        <Text style={styles.title}>{title}</Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <Ionicons name="close" size={24} color="#FFF" />
                         </TouchableOpacity>
                     </View>
 
                     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-                        <Text style={styles.text}>
-                            Informativa sulla Privacy (Placeholder)
-                            {'\n\n'}
-                            La tua privacy è importante per noi. In questa sezione spiegheremo come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali.
-                            {'\n\n'}
-                            1. Raccolta dei dati...
-                            {'\n'}
-                            2. Utilizzo dei dati...
-                            {'\n'}
-                            3. Protezione dei dati...
-                            {'\n\n'}
-                            (Questo è un testo segnaposto. Il contenuto reale verrà aggiunto in seguito.)
-                        </Text>
+                        <MarkdownText style={{ color: '#FFF' }}>
+                            {content}
+                        </MarkdownText>
                     </ScrollView>
 
                     <View style={styles.footer}>
                         <TouchableOpacity style={styles.approveButton} onPress={onApprove}>
-                            <Text style={styles.approveButtonText}>Approva e Continua</Text>
+                            <Text style={styles.approveButtonText}>{i18n.t('disclaimer.accept')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -92,6 +109,8 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontFamily: Typography.fontFamily.bold,
         color: '#FFF',
+        flex: 1, // Allow title to take space
+        marginRight: 10, // Add spacing for close button
     },
     closeButton: {
         padding: 4,

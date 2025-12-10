@@ -4,7 +4,9 @@ import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/Colors';
 import { Typography } from '../constants/Typography';
+import { MarkdownText } from './ui/MarkdownText';
 import { Ionicons } from '@expo/vector-icons';
+import i18n from '../config/i18n';
 
 const { width, height } = Dimensions.get('window');
 const DISCLAIMER_ACCEPTED_KEY = 'disclaimer_accepted_v2';
@@ -46,38 +48,24 @@ export const DisclaimerModal = () => {
             <View style={styles.container}>
                 <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-                <View style={styles.card}>
+                <View style={[styles.card, { backgroundColor: '#1E1E1E', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }]}>
                     <View style={styles.iconContainer}>
                         <Ionicons name="medical" size={40} color="#FF5252" />
                     </View>
 
-                    <Text style={styles.title}>Disclaimer Importante</Text>
+                    <Text style={styles.title}>{i18n.t('disclaimer.title')}</Text>
 
                     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-                        <Text style={styles.text}>
-                            Questa applicazione utilizza l'Intelligenza Artificiale per fornire analisi e suggerimenti basati sui dati forniti dall'utente.
-                        </Text>
-
-                        <Text style={styles.highlight}>
-                            NON È UN DISPOSITIVO MEDICO.
-                        </Text>
-
-                        <Text style={styles.text}>
-                            Le informazioni fornite sono a scopo puramente informativo e di benessere generale. Non costituiscono in alcun modo una diagnosi medica, un trattamento o una prescrizione.
-                        </Text>
-
-                        <Text style={styles.text}>
-                            Non sostituire mai il parere del tuo medico curante con le informazioni ottenute da questa app. In caso di dubbi sulla tua salute, consulta sempre un professionista sanitario.
-                        </Text>
-
-                        <Text style={styles.text}>
-                            Continuando, dichiari di aver letto e compreso che l'uso di questa applicazione è sotto la tua esclusiva responsabilità.
-                        </Text>
+                        <MarkdownText style={{ color: '#FFF' }}>
+                            {i18n.t('disclaimer.fullText')}
+                        </MarkdownText>
                     </ScrollView>
 
-                    <TouchableOpacity style={styles.button} onPress={handleAccept} activeOpacity={0.8}>
-                        <Text style={styles.buttonText}>Ho capito e Accetto</Text>
-                    </TouchableOpacity>
+                    <View style={styles.footer}>
+                        <TouchableOpacity style={styles.button} onPress={handleAccept}>
+                            <Text style={styles.buttonText}>{i18n.t('disclaimer.accept')}</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -95,7 +83,7 @@ const styles = StyleSheet.create({
     card: {
         width: width * 0.85,
         maxHeight: height * 0.7,
-        backgroundColor: '#FFF',
+        backgroundColor: '#1E1E1E',
         borderRadius: 24,
         padding: 24,
         alignItems: 'center',
@@ -117,7 +105,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontFamily: Typography.fontFamily.bold,
-        color: '#333',
+        color: '#FFF',
         marginBottom: 16,
         textAlign: 'center',
     },
@@ -131,7 +119,7 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 16,
         fontFamily: Typography.fontFamily.regular,
-        color: '#555',
+        color: 'rgba(255,255,255,0.8)',
         marginBottom: 16,
         lineHeight: 24,
         textAlign: 'center',
@@ -161,5 +149,12 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 16,
         fontFamily: Typography.fontFamily.bold,
-    }
+    },
+    footer: {
+        padding: 20,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'transparent',
+        width: '100%',
+    },
 });

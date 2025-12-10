@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,8 @@ import { Meal } from '../../types/Diet';
 import { generateAlternativeMeals } from '../../services/gemini';
 import { UserProfile } from '../../types/Profile';
 import { CustomAlert } from './CustomAlert';
+import { useLanguage } from '../../context/LanguageContext';
+import i18n from '../../config/i18n';
 
 interface MealSwapModalProps {
     visible: boolean;
@@ -18,6 +20,7 @@ interface MealSwapModalProps {
 }
 
 export const MealSwapModal: React.FC<MealSwapModalProps> = ({ visible, onClose, originalMeal, userProfile, onSwap }) => {
+    const { language } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [alternatives, setAlternatives] = useState<Meal[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -25,6 +28,32 @@ export const MealSwapModal: React.FC<MealSwapModalProps> = ({ visible, onClose, 
     // Confirmation Alert State
     const [confirmationVisible, setConfirmationVisible] = useState(false);
     const [pendingMeal, setPendingMeal] = useState<Meal | null>(null);
+
+
+
+
+
+
+
+    const loadAlternatives = useCallback(async () => {
+        if (!originalMeal) return;
+
+        setLoading(true);
+        setError(null);
+        try {
+            const results = await generateAlternativeMeals(originalMeal, userProfile, language);
+            setAlternatives(results);
+        } catch (err: any) {
+            console.error("Failed to load alternatives", err);
+            if (err.name === 'AbortError' || err.message?.includes('Aborted')) {
+                setError(i18n.t('nutrition.mealSwap.timeout'));
+            } else {
+                setError(i18n.t('nutrition.mealSwap.error'));
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [originalMeal, userProfile, language]);
 
     useEffect(() => {
         if (visible && originalMeal) {
@@ -35,129 +64,97 @@ export const MealSwapModal: React.FC<MealSwapModalProps> = ({ visible, onClose, 
             setLoading(true);
             setError(null);
         }
-    }, [visible, originalMeal]);
+    }, [visible, originalMeal, loadAlternatives]);
 
-    const loadAlternatives = async () => {
-        if (!originalMeal) return;
-
-        setLoading(true);
-        setError(null);
-        try {
-            const results = await generateAlternativeMeals(originalMeal, userProfile);
-            setAlternatives(results);
-        } catch (err: any) {
-            console.error("Failed to load alternatives", err);
-            if (err.name === 'AbortError' || err.message?.includes('Aborted')) {
-                setError("Tempo scaduto. La connessione è lenta, riprova.");
-            } else {
-                setError("Impossibile generare alternative al momento. Riprova.");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSelect = (meal: Meal) => {
-        setPendingMeal(meal);
-        setConfirmationVisible(true);
-    };
-
-    const confirmSwap = () => {
-        if (pendingMeal) {
-            onSwap(pendingMeal);
-            onClose();
-        }
-        setConfirmationVisible(false);
-        setPendingMeal(null);
-    };
-
-    const cancelSwap = () => {
-        setConfirmationVisible(false);
-        setPendingMeal(null);
-    };
-
-    if (!originalMeal) return null;
+    // ...
 
     return (
-        <>
-            <Modal
-                visible={visible}
-                transparent
-                animationType="fade"
-                onRequestClose={onClose}
-            >
-                <View style={styles.overlay}>
-                    <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
-                        <View style={styles.contentContainer}>
-                            <View style={styles.header}>
-                                <View style={styles.titleRow}>
-                                    <Ionicons name="swap-horizontal" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
-                                    <Text style={styles.title}>Sostituisci Pasto</Text>
-                                </View>
-                                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                                    <Ionicons name="close" size={24} color="#FFF" />
+        <Modal
+            visible={visible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <View style={styles.overlay}>
+                <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
+                    <View style={styles.contentContainer}>
+                        <View style={styles.header}>
+                            <View style={styles.titleRow}>
+                                <Ionicons name="swap-horizontal" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
+                                <Text style={styles.title}>{i18n.t('nutrition.mealSwap.title')}</Text>
+                            </View>
+                            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                                <Ionicons name="close" size={24} color="#FFF" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.subtitle}>
+                            {i18n.t('nutrition.mealSwap.subtitle')} <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.bold }}>{originalMeal?.name}</Text>
+                        </Text>
+
+                        {loading ? (
+                            <View style={styles.loadingContainer}>
+                                <ActivityIndicator size="large" color={Colors.primary} />
+                                <Text style={styles.loadingText}>{i18n.t('nutrition.mealSwap.loading')}</Text>
+                            </View>
+                        ) : error ? (
+                            <View style={styles.errorContainer}>
+                                <Ionicons name="alert-circle-outline" size={48} color="#FF5252" />
+                                <Text style={styles.errorText}>{error}</Text>
+                                <TouchableOpacity style={styles.retryButton} onPress={loadAlternatives}>
+                                    <Text style={styles.retryButtonText}>{i18n.t('nutrition.mealSwap.retry')}</Text>
                                 </TouchableOpacity>
                             </View>
-
-                            <Text style={styles.subtitle}>
-                                Scegli un'alternativa per: <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.bold }}>{originalMeal.name}</Text>
-                            </Text>
-
-                            {loading ? (
-                                <View style={styles.loadingContainer}>
-                                    <ActivityIndicator size="large" color={Colors.primary} />
-                                    <Text style={styles.loadingText}>L'AI sta cercando alternative...</Text>
-                                </View>
-                            ) : error ? (
-                                <View style={styles.errorContainer}>
-                                    <Ionicons name="alert-circle-outline" size={48} color="#FF5252" />
-                                    <Text style={styles.errorText}>{error}</Text>
-                                    <TouchableOpacity style={styles.retryButton} onPress={loadAlternatives}>
-                                        <Text style={styles.retryButtonText}>Riprova</Text>
+                        ) : (
+                            <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+                                {alternatives.map((meal, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={styles.card}
+                                        onPress={() => {
+                                            setPendingMeal(meal);
+                                            setConfirmationVisible(true);
+                                        }}
+                                    >
+                                        <View style={styles.cardHeader}>
+                                            <Text style={styles.cardTitle}>{meal.name}</Text>
+                                            <View style={styles.caloriesBadge}>
+                                                <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
+                                            </View>
+                                        </View>
+                                        <Text style={styles.cardDescription} numberOfLines={2}>
+                                            {meal.description}
+                                        </Text>
+                                        <View style={styles.macrosRow}>
+                                            <Text style={styles.macroText}>P: {meal.macros.protein}g</Text>
+                                            <Text style={styles.macroText}>C: {meal.macros.carbs}g</Text>
+                                            <Text style={styles.macroText}>F: {meal.macros.fats}g</Text>
+                                        </View>
                                     </TouchableOpacity>
-                                </View>
-                            ) : (
-                                <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
-                                    {alternatives.map((meal, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            style={styles.card}
-                                            onPress={() => handleSelect(meal)}
-                                            activeOpacity={0.8}
-                                        >
-                                            <View style={styles.cardHeader}>
-                                                <Text style={styles.cardTitle}>{meal.name}</Text>
-                                                <View style={styles.caloriesBadge}>
-                                                    <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
-                                                </View>
-                                            </View>
-                                            <Text style={styles.cardDescription}>{meal.description}</Text>
-                                            <View style={styles.macrosRow}>
-                                                <Text style={styles.macroText}>P: {meal.macros.protein}g</Text>
-                                                <Text style={styles.macroText}>C: {meal.macros.carbs}g</Text>
-                                                <Text style={styles.macroText}>G: {meal.macros.fats}g</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            )}
-                        </View>
-                    </BlurView>
-                </View>
-            </Modal>
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
+                </BlurView>
+            </View>
 
             <CustomAlert
                 visible={confirmationVisible}
-                onClose={cancelSwap}
-                title="Conferma Sostituzione"
-                message={`Vuoi sostituire "${originalMeal?.name}" con "${pendingMeal?.name}"?`}
+                onClose={() => setConfirmationVisible(false)}
+                title={i18n.t('nutrition.mealSwap.confirmTitle')}
+                message={i18n.t('nutrition.mealSwap.confirmMessage', { old: originalMeal?.name, new: pendingMeal?.name })}
                 type="info"
                 actions={[
-                    { text: "Annulla", onPress: cancelSwap, style: "cancel" },
-                    { text: "Sostituisci", onPress: confirmSwap, style: "default" }
+                    { text: i18n.t('nutrition.mealSwap.cancel'), onPress: () => setConfirmationVisible(false), style: "cancel" },
+                    {
+                        text: i18n.t('nutrition.mealSwap.confirm'), onPress: () => {
+                            if (pendingMeal) onSwap(pendingMeal);
+                            setConfirmationVisible(false);
+                        }, style: "default"
+                    }
                 ]}
             />
-        </>
+        </Modal>
     );
 };
 

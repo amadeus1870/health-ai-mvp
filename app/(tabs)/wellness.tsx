@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,10 +17,11 @@ import { SoftCard } from '../../components/ui/SoftCard';
 const { width, height } = Dimensions.get('window');
 
 import { WellnessService } from '../../services/WellnessService';
-
-// ...
+import i18n from '../../config/i18n';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function WellnessScreen() {
+  const { language } = useLanguage();
   const { results, setResults } = useAnalysis();
   const [selectedOrgan, setSelectedOrgan] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,13 +29,13 @@ export default function WellnessScreen() {
   useEffect(() => {
     const loadData = async () => {
       if (!results) {
-        console.log("WellnessScreen: No results in context, fetching last analysis...");
+
         const lastAnalysis = await AnalysisService.getLastAnalysis();
         if (lastAnalysis) {
-          console.log("WellnessScreen: Analysis loaded.");
+
           setResults(lastAnalysis);
         } else {
-          console.log("WellnessScreen: No analysis found.");
+
         }
       }
     };
@@ -86,19 +87,20 @@ export default function WellnessScreen() {
     //   style={{ flex: 1 }}
     // >
     <ImageBackground
+      key={language}
       source={require('../../assets/images/custom_bg.jpg')}
       style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.content}>
 
           <View style={[GlobalStyles.headerContainer, { marginBottom: 30 }]}>
-            <Text style={GlobalStyles.headerTitle}>Mappa Biomarcatori</Text>
+            <Text style={GlobalStyles.headerTitle}>{i18n.t('map.title')}</Text>
             {!results ? (
-              <Text style={GlobalStyles.headerSubtitle}>Carica le tue analisi nella scheda "Analisi" per attivare la mappa.</Text>
+              <Text style={GlobalStyles.headerSubtitle}>{i18n.t('map.noAnalysis')}</Text>
             ) : (
-              <Text style={GlobalStyles.headerSubtitle}>Esplora lo stato di salute dei tuoi organi basato sui tuoi biomarcatori.</Text>
+              <Text style={GlobalStyles.headerSubtitle}>{i18n.t('map.subtitle')}</Text>
             )}
           </View>
 
@@ -110,12 +112,12 @@ export default function WellnessScreen() {
                   intensity={60}
                   tint="dark"
                   style={StyleSheet.absoluteFill}
-                  experimentalBlurMethod='dimezisBlurView'
+                 
                 />
                 {/* Fixed Header: Title & Status */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingBottom: 10 }}>
                   <Text style={{ fontSize: 22, fontFamily: Typography.fontFamily.bold, color: '#FFF' }}>
-                    {selectedOrgan}
+                    {i18n.t(`organs.${selectedOrgan.toLowerCase()}`, { defaultValue: selectedOrgan })}
                   </Text>
                   <Text style={{
                     fontSize: 12,
@@ -125,7 +127,7 @@ export default function WellnessScreen() {
                         selectedStatus === 'optimal' ? '#2ecc71' : '#4facfe',
                     letterSpacing: 1
                   }}>
-                    {selectedStatus === 'neutral' ? 'DA ANALIZZARE' : selectedStatus?.toUpperCase()}
+                    {selectedStatus === 'neutral' ? i18n.t('map.toAnalyze') : selectedStatus?.toUpperCase()}
                   </Text>
                 </View>
 
@@ -175,13 +177,13 @@ export default function WellnessScreen() {
                     })
                   ) : (
                     <Text style={styles.bioText}>
-                      {results ? "Nessun dato rilevante per questo organo." : "Nessun dato disponibile, carica i tuoi dati."}
+                      {results ? i18n.t('map.noDataOrgan') : i18n.t('map.noData')}
                     </Text>
                   )}
                 </ScrollView>
                 <View style={{ padding: 20, paddingTop: 0, alignItems: 'flex-end' }}>
                   <TouchableOpacity onPress={() => setSelectedOrgan(null)}>
-                    <Text style={styles.closeText}>Chiudi</Text>
+                    <Text style={styles.closeText}>{i18n.t('common.close')}</Text>
                   </TouchableOpacity>
                 </View>
               </SoftCard>

@@ -1,6 +1,7 @@
 import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, ImageBackground, ActivityIndicator, RefreshControl, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ImageBackground, ActivityIndicator, RefreshControl, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { ProfileService } from '../../services/ProfileService';
@@ -13,6 +14,7 @@ import { generateDayDiet, reAnalyzeBiomarkers } from '../../services/gemini';
 import { LoadingEntertainment } from '../../components/ui/LoadingEntertainment';
 import { DietStrategyCards } from '../../components/ui/DietStrategyCards';
 import { useAnalysis } from '../../context/AnalysisContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { DietPlanView } from '../../components/ui/DietPlanView';
 import { DietPlan } from '../../types/Diet';
 import { CustomAlert, AlertType } from '../../components/ui/CustomAlert';
@@ -25,12 +27,16 @@ import { Meal } from '../../types/Diet';
 import { PdfService } from '../../services/PdfService';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlobalStyles } from '../../constants/GlobalStyles';
+import i18n from '../../config/i18n';
+
+// ... imports
 
 export default function NutritionScreen() {
   const { isBackgroundUpdating, results, pendingProfileUpdate, setPendingProfileUpdate, setResults } = useAnalysis();
+  const { language } = useLanguage();
   const isFirstRun = React.useRef(true);
 
-  console.log("NutritionScreen: isBackgroundUpdating =", isBackgroundUpdating);
+
   const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -40,6 +46,8 @@ export default function NutritionScreen() {
   const [dietPlan, setDietPlan] = useState<DietPlan | null>(null);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0); // 0 to 7
+  const [loadingMessage, setLoadingMessage] = useState('');
+
 
   // Info Modal State
   const [infoModalVisible, setInfoModalVisible] = useState(false);
@@ -79,68 +87,6 @@ export default function NutritionScreen() {
     loadData();
   };
 
-  const calculateStrategy = (user: UserProfile, analysis: any) => {
-    const heightM = parseFloat(user.height) / 100;
-    const weightKg = parseFloat(user.weight);
-    let bmi = 0;
-    let bmiStatus = "N/A";
-    let bmiColor = Colors.text;
-
-    if (heightM > 0 && weightKg > 0) {
-      bmi = weightKg / (heightM * heightM);
-      if (bmi < 18.5) { bmiStatus = "Sottopeso"; bmiColor = "#3498db"; }
-      else if (bmi < 25) { bmiStatus = "Normopeso"; bmiColor = "#2ecc71"; }
-      else if (bmi < 30) { bmiStatus = "Sovrappeso"; bmiColor = "#f1c40f"; }
-      else { bmiStatus = "Obeso"; bmiColor = "#e74c3c"; }
-    }
-
-    let bmr = 10 * weightKg + 6.25 * parseFloat(user.height) - 5 * parseFloat(user.age);
-    bmr += user.gender === 'M' ? 5 : -161;
-
-    const activityMultipliers: { [key: string]: number } = {
-      'Sedentario': 1.2,
-      'Leggermente attivo': 1.375,
-      'Moderatamente attivo': 1.55,
-      'Molto attivo': 1.725,
-      'Estremo': 1.9
-    };
-    const multiplier = activityMultipliers[user.activityLevel] || 1.2;
-    const tdee = bmr * multiplier;
-
-    let goalCalories = tdee;
-    let goalType = "Mantenimento";
-
-    if (bmi > 25) {
-      goalCalories = tdee - 500;
-      goalType = "Perdita Peso";
-    } else if (bmi < 18.5) {
-      goalCalories = tdee + 300;
-      goalType = "Aumento Peso";
-    }
-
-    let proteinPct = 30;
-    let carbsPct = 40;
-    let fatsPct = 30;
-
-    const hasDiabetes = user.conditions.includes("Diabete");
-    if (hasDiabetes) {
-      carbsPct = 30;
-      proteinPct = 35;
-      fatsPct = 35;
-      goalType += " (Low Carb)";
-    }
-
-    setStrategy({
-      bmi,
-      bmiStatus,
-      bmiColor,
-      tdee,
-      goalCalories,
-      goalType,
-      macros: { protein: proteinPct, carbs: carbsPct, fats: fatsPct }
-    });
-  };
-
   const handleSwapRequest = (meal: Meal, day: number, index: number) => {
     setMealToSwap({ meal, day, index });
     setSwapModalVisible(true);
@@ -175,7 +121,9 @@ export default function NutritionScreen() {
 
       if (userProfile) {
         setProfile(userProfile);
-        calculateStrategy(userProfile, analysis);
+        // Use centralized AnalysisService for calculations
+        const stra = AnalysisService.calculateNutritionalStrategy(userProfile);
+        setStrategy(stra);
       }
 
       if (savedDietPlan) {
@@ -206,6 +154,7 @@ export default function NutritionScreen() {
   const handleGenerateDiet = async (contextAnalysis: any | null = null) => {
     setLoadingDiet(true);
     setGenerationProgress(0);
+    setLoadingMessage(i18n.t('nutrition.generating'));
     setDietPlan({ days: [] }); // Reset plan
 
     try {
@@ -213,23 +162,32 @@ export default function NutritionScreen() {
       const analysis = contextAnalysis || await AnalysisService.getLastAnalysis();
 
       if (!analysis) {
-        throw new Error("Nessuna analisi disponibile per generare il piano.");
+        throw new Error(i18n.t('nutrition.noAnalysisError'));
       }
 
       let currentDays: any[] = [];
 
       // Incremental Generation Loop
       for (let day = 1; day <= 7; day++) {
+        setLoadingMessage(i18n.t('nutrition.generatingDay', { day: day }));
         // Add delay to avoid hitting Gemini API rate limits (approx 15 RPM)
         if (day > 1) {
           await new Promise(resolve => setTimeout(resolve, 15000));
         }
         try {
-          // Calculate strategy to get targets
+          // Calculate strategy to get targets using centralized service
           const strategy = AnalysisService.calculateNutritionalStrategy(profile);
 
           // Generate single day with strict targets
-          const rawDayPlan = await generateDayDiet(profile, analysis, day, currentDays, strategy.goalCalories, strategy.macros);
+          const rawDayPlan = await generateDayDiet(
+            Number(day),
+            profile,
+            strategy.goalCalories,
+            strategy.macros,
+            currentDays,
+            analysis,
+            language
+          );
 
           // Force correct day number and ensure it's a number
           const dayPlan = { ...rawDayPlan, day: Number(day) };
@@ -253,26 +211,31 @@ export default function NutritionScreen() {
         }
       }
 
-    } catch (error) {
-      console.error("Failed to generate diet plan", error);
-      showInfo("Errore", "Impossibile generare il piano nutrizionale al momento. Riprova più tardi.");
+    } catch (error: any) {
+      if (error.message === i18n.t('nutrition.noAnalysisError')) {
+        showInfo(i18n.t('nutrition.noPlanTitle'), error.message);
+      } else {
+        console.error("Failed to generate diet plan", error);
+        showInfo(i18n.t('nutrition.errorTitle'), i18n.t('nutrition.errorGenerate'));
+      }
     } finally {
       setLoadingDiet(false);
+      setLoadingMessage('');
     }
   };
 
   const handlePrintPdf = async () => {
     if (!dietPlan || !dietPlan.days || dietPlan.days.length === 0) {
-      Alert.alert("Nessun Piano", "Genera prima un piano nutrizionale per poterlo stampare.");
+      Alert.alert(i18n.t('nutrition.noPlanTitle'), i18n.t('nutrition.noPlanExport'));
       return;
     }
     setIsGeneratingPdf(true);
     try {
       // Small delay to allow UI to render the loading state
       await new Promise(resolve => setTimeout(resolve, 100));
-      await PdfService.generateAndShareDietPdf(dietPlan, profile);
+      await PdfService.generateAndShareDietPdf(dietPlan, profile, language);
     } catch (error) {
-      Alert.alert("Errore", "Impossibile generare il PDF. Riprova.");
+      Alert.alert(i18n.t('nutrition.errorTitle'), i18n.t('nutrition.errorPdf'));
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -282,6 +245,7 @@ export default function NutritionScreen() {
   const handleFullRegenerate = async () => {
     setLoadingDiet(true);
     setGenerationProgress(0); // Uses same progress bar, maybe repurpose for "Analysis" phase
+    setLoadingMessage(i18n.t('nutrition.reanalyzing'));
     // Phase 1: Update Analysis
     try {
       const lastAnalysis = results || await AnalysisService.getLastAnalysis();
@@ -290,8 +254,8 @@ export default function NutritionScreen() {
         // Currently LoadingEntertainment just shows "Sto generando..." 
         // We could rely on that generic loading state.
 
-        console.log("FullRegenerate: Re-analyzing...");
-        const newAnalysis = await reAnalyzeBiomarkers(lastAnalysis);
+
+        const newAnalysis = await reAnalyzeBiomarkers(lastAnalysis, language);
         const newId = await AnalysisService.saveAnalysis(newAnalysis);
 
         // Update Global Context
@@ -315,8 +279,9 @@ export default function NutritionScreen() {
 
     } catch (error) {
       console.error("Full Regenerate Failed", error);
-      showInfo("Errore", "Aggiornamento fallito.");
+      showInfo(i18n.t('nutrition.errorTitle'), i18n.t('nutrition.updateFailed'));
       setLoadingDiet(false);
+      setLoadingMessage('');
     } finally {
       // handleGenerateDiet handles the finally block for itself. 
       // If we crash before that, we need to ensure loading is off?
@@ -324,15 +289,51 @@ export default function NutritionScreen() {
     }
   };
 
+  const handleOpenShoppingList = () => {
+    if (!dietPlan) {
+      Alert.alert(i18n.t('nutrition.noPlanTitle'), i18n.t('nutrition.noPlanShopping'));
+      return;
+    }
+    setFilteredShoppingListPlan(null); // Show full list
+    setShoppingListVisible(true);
+  };
+
+  const handleRegenerateDietAlert = () => {
+    showAlert(
+      i18n.t('nutrition.regenerateAlertTitle'),
+      i18n.t('nutrition.regenerateAlertMessage'),
+      "warning",
+      [
+        { text: i18n.t('common.cancel'), onPress: () => { }, style: "cancel" },
+        { text: i18n.t('nutrition.regenerate'), onPress: handleGenerateDiet, style: "destructive" }
+      ]
+    );
+  };
+
+  const handleFullRegenerateAlert = () => {
+    showAlert(
+      i18n.t('nutrition.fullRegenerateAlertTitle'),
+      i18n.t('nutrition.fullRegenerateAlertMessage'),
+      "warning",
+      [
+        { text: i18n.t('common.cancel'), onPress: () => { }, style: "cancel" },
+        { text: i18n.t('nutrition.fullRegenerate'), onPress: handleFullRegenerate, style: "destructive" }
+      ]
+    );
+  };
+
+
   useEffect(() => {
     loadData();
-  }, []);
+  }, [language]);
 
   // Listen for new analysis results
   useEffect(() => {
     if (results) {
-      console.log("NutritionScreen: Analysis results detected.");
-      calculateStrategy(profile, results);
+
+      // Use centralized logic
+      const stra = AnalysisService.calculateNutritionalStrategy(profile);
+      setStrategy(stra);
 
       // Check if we need to prompt for regeneration
       // Trigger if:
@@ -345,18 +346,18 @@ export default function NutritionScreen() {
       // or if we have results but no plan
       // AND we are not currently loading/generating a diet AND initial load is done
       if (!loading && !loadingDiet && ((!dietPlan || !dietPlan.days || dietPlan.days.length === 0) || (analysisTimestamp > planTimestamp + 10000))) {
-        console.log("NutritionScreen: New analysis detected (newer than plan), showing modal.");
+
         setShowNewAnalysisModal(true);
       }
     }
-  }, [results, dietPlan?.updatedAt, loadingDiet, loading]);
+  }, [results, dietPlan?.updatedAt, loadingDiet, loading, profile]); // Added profile dep as strategy depends on it
 
 
   // Check for Pending Profile Update (from Profile Screen)
   useFocusEffect(
     useCallback(() => {
       if (pendingProfileUpdate) {
-        console.log("NutritionScreen: Pending Profile Update detected. Prompting user.");
+
         setShowNewAnalysisModal(true);
         setPendingProfileUpdate(false); // Clear flag immediately so we don't loop
       }
@@ -367,8 +368,8 @@ export default function NutritionScreen() {
     useCallback(() => {
       if (isBackgroundUpdating) {
         showInfo(
-          "Aggiornamento in Corso",
-          "Stiamo analizzando il tuo nuovo profilo e rigenerando il piano nutrizionale su misura per te.\n\nQuesta operazione richiede molta potenza di calcolo e può durare fino a 2 minuti.\n\nPuoi chiudere questa finestra e continuare a usare l'app: la pagina si aggiornerà automaticamente appena finito."
+          i18n.t('nutrition.updatingTitle'),
+          i18n.t('nutrition.updatingMessage')
         );
       } else {
         loadData();
@@ -393,19 +394,19 @@ export default function NutritionScreen() {
   }
 
   return (
-    <ImageBackground source={require('../../assets/images/custom_bg.jpg')} style={styles.container} resizeMode="cover">
+    <ImageBackground key={language} source={require('../../assets/images/custom_bg.jpg')} style={styles.container} resizeMode="cover">
       <SafeAreaView style={{ flex: 1 }}>
         {isBackgroundUpdating && (
           <TouchableOpacity
             style={styles.updatingBanner}
             activeOpacity={0.8}
             onPress={() => showInfo(
-              "Aggiornamento in Corso",
-              "Stiamo analizzando il tuo nuovo profilo e rigenerando il piano nutrizionale su misura per te.\n\nQuesta operazione richiede molta potenza di calcolo e può durare fino a 2 minuti.\n\nPuoi continuare a usare l'app nel frattempo, la pagina si aggiornerà automaticamente appena finito."
+              i18n.t('nutrition.updatingTitle'),
+              i18n.t('nutrition.updatingMessage')
             )}
           >
             <ActivityIndicator size="small" color="#FFF" style={{ marginRight: 10 }} />
-            <Text style={styles.updatingText}>Aggiornamento in corso... (Tocca per info)</Text>
+            <Text style={styles.updatingText}>{i18n.t('nutrition.updatingBannerText')}</Text>
           </TouchableOpacity>
         )}
 
@@ -416,8 +417,8 @@ export default function NutritionScreen() {
 
           {/* Header */}
           <View style={GlobalStyles.headerContainer}>
-            <Text style={GlobalStyles.headerTitle}>Strategia Nutrizionale</Text>
-            <Text style={GlobalStyles.headerSubtitle}>Il tuo piano alimentare personalizzato</Text>
+            <Text style={GlobalStyles.headerTitle}>{i18n.t('nutrition.strategyTitle')}</Text>
+            <Text style={GlobalStyles.headerSubtitle}>{i18n.t('nutrition.strategySubtitle')}</Text>
           </View>
 
           {/* Strategy Section */}
@@ -452,17 +453,18 @@ export default function NutritionScreen() {
                   goalCalories={strategy.goalCalories}
                   goalType={strategy.goalType}
                   onInfoPress={() => showInfo(
-                    "Fabbisogno Calorico",
-                    "Il TDEE è il tuo dispendio energetico giornaliero totale. Le calorie obiettivo sono calcolate per raggiungere il tuo scopo (es. deficit per dimagrire)."
+                    i18n.t('nutrition.caloriesTitle'),
+                    i18n.t('nutrition.caloriesInfo')
                   )}
                 />
                 <MacrosCard
                   protein={strategy.macros.protein}
                   carbs={strategy.macros.carbs}
                   fats={strategy.macros.fats}
+                  totalCalories={strategy.goalCalories} // Pass total calories here!
                   onInfoPress={() => showInfo(
-                    "Ripartizione Macronutrienti",
-                    "Indica la percentuale ideale di Proteine, Carboidrati e Grassi nella tua dieta. Questa ripartizione è ottimizzata in base ai tuoi obiettivi e alle tue condizioni fisiche."
+                    i18n.t('nutrition.macrosTitle'),
+                    i18n.t('nutrition.macrosInfo')
                   )}
                 />
                 <BMICard
@@ -470,8 +472,8 @@ export default function NutritionScreen() {
                   status={strategy.bmiStatus}
                   color={strategy.bmiColor}
                   onInfoPress={() => showInfo(
-                    "Indice di Massa Corporea (BMI)",
-                    "Il BMI è un indicatore che mette in relazione peso e altezza. Sebbene non distingua tra massa grassa e magra, è un utile punto di partenza per valutare il peso forma."
+                    i18n.t('nutrition.bmiTitle'),
+                    i18n.t('nutrition.bmiInfo')
                   )}
                 />
               </ScrollView>
@@ -492,26 +494,19 @@ export default function NutritionScreen() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                     <View>
                       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                        <Text style={styles.sectionTitle}>Piano Nutrizionale</Text>
+                        <Text style={styles.sectionTitle}>{i18n.t('nutrition.dietPlanTitle')}</Text>
                         <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginLeft: 8, fontFamily: Typography.fontFamily.medium }}>
-                          ({dietPlan?.days?.length || 0}/7 Giorni pronti)
+                          ({dietPlan?.days?.length || 0}/7 {i18n.t('nutrition.daysReady')})
                         </Text>
                       </View>
-                      <Text style={styles.sectionSubtitle}>Generato dall'AI su misura per te</Text>
+                      <Text style={styles.sectionSubtitle}>{i18n.t('nutrition.dietPlanSubtitle')}</Text>
                     </View>
                   </View>
 
                   {/* Button Row (Pulsantiera) */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <TouchableOpacity
-                      onPress={() => {
-                        if (dietPlan && dietPlan.days && dietPlan.days.length > 0) {
-                          setFilteredShoppingListPlan(null); // Show full list
-                          setShoppingListVisible(true);
-                        } else {
-                          Alert.alert("Nessun Piano", "Genera prima un piano nutrizionale per vedere la lista della spesa.");
-                        }
-                      }}
+                      onPress={handleOpenShoppingList}
                       style={{
                         backgroundColor: 'rgba(255,255,255,0.2)',
                         borderRadius: 12,
@@ -529,7 +524,7 @@ export default function NutritionScreen() {
                         fontSize: 10,
                         marginLeft: 4
                       }}>
-                        Settimana
+                        {i18n.t('nutrition.shoppingListWeek')}
                       </Text>
                     </TouchableOpacity>
 
@@ -557,22 +552,12 @@ export default function NutritionScreen() {
                         fontFamily: Typography.fontFamily.bold,
                         fontSize: 10,
                       }}>
-                        Esporta
+                        {i18n.t('nutrition.export')}
                       </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => {
-                        showAlert(
-                          "Rigenera Piano",
-                          "Il piano settimanale sarà aggiornato completamente. L'operazione richiederà del tempo (anche minuti). Sei sicuro di voler continuare?",
-                          "warning",
-                          [
-                            { text: "Annulla", onPress: () => { }, style: "cancel" },
-                            { text: "Rigenera", onPress: handleGenerateDiet, style: "destructive" }
-                          ]
-                        );
-                      }}
+                      onPress={handleRegenerateDietAlert}
                       disabled={loadingDiet}
                       style={{
                         backgroundColor: 'rgba(255,255,255,0.2)',
@@ -591,21 +576,21 @@ export default function NutritionScreen() {
                         fontFamily: Typography.fontFamily.bold,
                         fontSize: 10,
                       }}>
-                        Rigenera
+                        {i18n.t('nutrition.regenerate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {loadingDiet && (!dietPlan || !dietPlan.days || dietPlan.days.length === 0) ? (
-                  <LoadingEntertainment />
+                  <LoadingEntertainment message={loadingMessage} />
                 ) : dietPlan && dietPlan.days && dietPlan.days.length > 0 ? (
                   <View>
                     {loadingDiet && (
                       <View style={styles.generatingMoreContainer}>
                         <ActivityIndicator size="small" color={Colors.primary} />
                         <Text style={styles.generatingMoreText}>
-                          Sto generando il giorno {dietPlan.days.length + 1}...
+                          {i18n.t('nutrition.generatingDay', { day: dietPlan.days.length + 1 })}
                         </Text>
                       </View>
                     )}
@@ -622,7 +607,7 @@ export default function NutritionScreen() {
                 ) : (
                   <View style={styles.generateContainer}>
                     <Text style={styles.generateText}>
-                      Genera un piano nutrizionale completo di 7 giorni basato sulle tue analisi e obiettivi.
+                      {i18n.t('nutrition.generatePlanPrompt')}
                     </Text>
                     <TouchableOpacity
                       style={styles.generateButton}
@@ -634,7 +619,7 @@ export default function NutritionScreen() {
                       ) : (
                         <>
                           <Ionicons name="sparkles" size={20} color="#FFF" style={{ marginRight: 8 }} />
-                          <Text style={styles.generateButtonText}>Genera con AI</Text>
+                          <Text style={styles.generateButtonText}>{i18n.t('nutrition.generateAi')}</Text>
                         </>
                       )}
                     </TouchableOpacity>
@@ -705,10 +690,10 @@ export default function NutritionScreen() {
             const isAnalysisFresh = (now - analysisTimestamp) < 60 * 1000; // 1 minute fresh
 
             if (isAnalysisFresh) {
-              console.log("Analysis is fresh, generating diet only.");
+
               handleGenerateDiet(results);
             } else {
-              console.log("Analysis is stale, running full regeneration.");
+
               handleFullRegenerate();
             }
           }}

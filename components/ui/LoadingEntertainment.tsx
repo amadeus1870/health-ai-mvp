@@ -8,34 +8,51 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-const TIPS = [
-    { icon: "water-outline", title: "Idratazione", text: "Bere acqua prima dei pasti può aiutarti a sentirti sazio più velocemente." },
-    { icon: "walk-outline", title: "Movimento", text: "Una passeggiata di 10 minuti dopo mangiato aiuta a regolare la glicemia." },
-    { icon: "moon-outline", title: "Sonno", text: "Dormire 7-8 ore a notte è fondamentale per il recupero muscolare e mentale." },
-    { icon: "nutrition-outline", title: "Fibre", text: "Le fibre aiutano la digestione e mantengono stabile il livello di energia." },
-    { icon: "happy-outline", title: "Stress", text: "Lo stress cronico può influenzare negativamente il metabolismo." },
-    { icon: "restaurant-outline", title: "Masticazione", text: "Masticare lentamente migliora la digestione e l'assorbimento dei nutrienti." },
-];
+const TIPS_KEYS = ['hydration', 'movement', 'sleep', 'fiber', 'stress', 'chewing'];
 
 import { SoftCard } from './SoftCard';
 
-export const LoadingEntertainment = () => {
+import i18n from '../../config/i18n';
+
+interface LoadingEntertainmentProps {
+    message?: string;
+}
+
+const getIcon = (key: string) => {
+    switch (key) {
+        case 'hydration': return 'water-outline';
+        case 'movement': return 'walk-outline';
+        case 'sleep': return 'moon-outline';
+        case 'fiber': return 'nutrition-outline';
+        case 'stress': return 'happy-outline';
+        case 'chewing': return 'restaurant-outline';
+        default: return 'information-circle-outline';
+    }
+};
+
+export const LoadingEntertainment: React.FC<LoadingEntertainmentProps> = ({ message }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % TIPS.length);
+            setCurrentIndex((prev) => (prev + 1) % TIPS_KEYS.length);
         }, 4000); // Change every 4 seconds
 
         return () => clearInterval(interval);
     }, []);
 
-    const currentTip = TIPS[currentIndex];
+    const currentKey = TIPS_KEYS[currentIndex];
 
     return (
         <View style={styles.container}>
-            <SoftCard style={styles.card}>
-                <BlurView intensity={60} tint="dark" style={styles.blurContainer} experimentalBlurMethod='dimezisBlurView'>
+            <View style={styles.card}>
+                <BlurView
+                    intensity={60}
+                    tint="dark"
+                    style={StyleSheet.absoluteFill}
+                   
+                />
+                <View style={styles.contentContainer}>
                     <Animated.View
                         key={currentIndex}
                         entering={FadeIn.duration(500)}
@@ -43,15 +60,15 @@ export const LoadingEntertainment = () => {
                         style={styles.content}
                     >
                         <View style={styles.iconContainer}>
-                            <Ionicons name={currentTip.icon as any} size={32} color="#FFF" />
+                            <Ionicons name={getIcon(currentKey) as any} size={32} color="#FFF" />
                         </View>
-                        <Text style={styles.title}>Lo sapevi che?</Text>
-                        <Text style={styles.tipTitle}>{currentTip.title}</Text>
-                        <Text style={styles.text}>{currentTip.text}</Text>
+                        <Text style={styles.title}>{i18n.t('loading.didYouKnow')}</Text>
+                        <Text style={styles.tipTitle}>{i18n.t(`loading.tips.${currentKey}.title`)}</Text>
+                        <Text style={styles.text}>{i18n.t(`loading.tips.${currentKey}.text`)}</Text>
                     </Animated.View>
 
                     <View style={styles.dotsContainer}>
-                        {TIPS.map((_, index) => (
+                        {TIPS_KEYS.map((_, index) => (
                             <View
                                 key={index}
                                 style={[
@@ -64,10 +81,10 @@ export const LoadingEntertainment = () => {
 
                     <View style={styles.loadingRow}>
                         <ActivityIndicator size="small" color={Colors.primary} style={{ marginRight: 8 }} />
-                        <Text style={styles.loadingText}>Stiamo preparando il tuo piano...</Text>
+                        <Text style={styles.loadingText}>{message || i18n.t('loading.preparing')}</Text>
                     </View>
-                </BlurView>
-            </SoftCard>
+                </View>
+            </View>
         </View>
     );
 };
@@ -86,7 +103,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 255, 255, 0.2)',
         backgroundColor: 'transparent',
     },
-    blurContainer: {
+    contentContainer: {
         padding: 30,
         alignItems: 'center',
         justifyContent: 'center',

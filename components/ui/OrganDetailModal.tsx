@@ -25,7 +25,7 @@ export const OrganDetailModal: React.FC<OrganDetailModalProps> = ({ visible, onC
                     intensity={60}
                     style={StyleSheet.absoluteFill}
                     tint="dark"
-                    experimentalBlurMethod='dimezisBlurView'
+                   
                 />
                 <TouchableOpacity style={styles.backdrop} onPress={onClose} />
 

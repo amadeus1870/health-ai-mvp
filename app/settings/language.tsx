@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, ScrollView, ImageBackground } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { useLanguage } from '../../context/LanguageContext';
+import { SettingsHeader } from '../../components/ui/SettingsHeader';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import i18n from '../../config/i18n';
 
 const LANGUAGES = [
     { code: 'it', name: 'Italiano', flag: '🇮🇹' },
@@ -14,7 +18,14 @@ const LANGUAGES = [
 ];
 
 export default function LanguageScreen() {
-    const [selectedLang, setSelectedLang] = useState('it');
+    const router = useRouter();
+    const { language, setLanguage } = useLanguage();
+    const insets = useSafeAreaInsets();
+
+    const handleSelect = (langCode: string) => {
+        setLanguage(langCode);
+        router.back();
+    };
 
     return (
         <ImageBackground
@@ -22,25 +33,27 @@ export default function LanguageScreen() {
             style={styles.container}
             resizeMode="cover"
         >
-            <ScrollView contentContainerStyle={styles.content}>
+            <SettingsHeader title={i18n.t('settings.language')} />
+            <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 70 }]}>
                 {LANGUAGES.map((lang) => (
                     <TouchableOpacity
                         key={lang.code}
                         style={[
-                            styles.item,
-                            selectedLang === lang.code && styles.selectedItem
+                            styles.option,
+                            language === lang.code && styles.selectedOption
                         ]}
-                        onPress={() => setSelectedLang(lang.code)}
+                        onPress={() => handleSelect(lang.code)}
                     >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={styles.langInfo}>
                             <Text style={styles.flag}>{lang.flag}</Text>
                             <Text style={[
-                                styles.name,
-                                selectedLang === lang.code && styles.selectedText
-                            ]}>{lang.name}</Text>
+                                styles.langName,
+                                language === lang.code && styles.selectedText
+                            ]}>
+                                {lang.name}
+                            </Text>
                         </View>
-
-                        {selectedLang === lang.code && (
+                        {language === lang.code && (
                             <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
                         )}
                     </TouchableOpacity>
@@ -56,34 +69,37 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        paddingTop: 100, // Space for translucent header
     },
-    item: {
+    option: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 20,
-        marginBottom: 12,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        marginBottom: 10,
         borderRadius: 16,
-        // backgroundColor: 'rgba(255,255,255,0.05)', // Removed for uniform style
-        // borderWidth: 1, // Removed
-        // borderColor: 'rgba(255,255,255,0.1)', // Removed
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
-    selectedItem: {
-        backgroundColor: 'rgba(255, 177, 66, 0.1)', // Primary tint
+    selectedOption: {
+        backgroundColor: 'rgba(255, 159, 67, 0.1)', // Primary with opacity
         borderColor: Colors.primary,
+    },
+    langInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     flag: {
         fontSize: 24,
-        marginRight: 16,
+        marginRight: 15,
     },
-    name: {
+    langName: {
         fontSize: 16,
-        color: '#EEE',
+        color: '#FFF',
         fontFamily: Typography.fontFamily.medium,
     },
     selectedText: {
-        color: '#FFF',
+        color: Colors.primary,
         fontFamily: Typography.fontFamily.bold,
     },
 });

@@ -5,11 +5,13 @@ import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
-const SUGGESTIONS = [
-    { id: '1', text: "🥗 Cosa mangio oggi?", icon: "restaurant-outline" },
-    { id: '2', text: "📊 Riepilogo dati", icon: "stats-chart-outline" },
-    { id: '3', text: "💊 La mia routine", icon: "medkit-outline" },
-    { id: '4', text: "💡 Dammi un consiglio", icon: "bulb-outline" },
+import i18n from '../../config/i18n';
+
+const getSuggestions = () => [
+    { id: '1', text: i18n.t('chat.suggestions.food'), icon: "restaurant-outline" },
+    { id: '2', text: i18n.t('chat.suggestions.summary'), icon: "stats-chart-outline" },
+    { id: '3', text: i18n.t('chat.suggestions.routine'), icon: "medkit-outline" },
+    { id: '4', text: i18n.t('chat.suggestions.advice'), icon: "bulb-outline" },
 ];
 
 interface QuickReplyChipsProps {
@@ -20,6 +22,8 @@ interface QuickReplyChipsProps {
 export default function QuickReplyChips({ onSelect, visible }: QuickReplyChipsProps) {
     if (!visible) return null;
 
+    const suggestions = getSuggestions();
+
     return (
         <View style={styles.container}>
             <ScrollView
@@ -28,14 +32,14 @@ export default function QuickReplyChips({ onSelect, visible }: QuickReplyChipsPr
                 contentContainerStyle={styles.scrollContent}
                 keyboardShouldPersistTaps="handled"
             >
-                {SUGGESTIONS.map((item) => (
+                {suggestions.map((item) => (
                     <TouchableOpacity
                         key={item.id}
                         style={styles.chip}
                         onPress={() => onSelect(item.text.replace(/^[^\w]+/, '').trim())} // Remove emoji for sending
                         activeOpacity={0.7}
                     >
-                        <BlurView intensity={30} tint="light" style={styles.blur} experimentalBlurMethod='dimezisBlurView'>
+                        <BlurView intensity={30} tint="light" style={styles.blur}>
                             <Ionicons name={item.icon as any} size={16} color="#FFF" style={styles.icon} />
                             <Text style={styles.text}>{item.text}</Text>
                         </BlurView>

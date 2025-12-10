@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Typography } from '../../constants/Typography';
+import i18n from '../../config/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
             scale.value = 0;
             opacity.value = 0;
         }
-    }, [visible]);
+    }, [visible, scale, opacity]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -53,7 +54,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                        experimentalBlurMethod='dimezisBlurView'
+                       
                     />
                     <View style={styles.contentContainer}>
                         <View style={styles.iconContainer}>
@@ -61,10 +62,20 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
                         </View>
 
                         <Text style={styles.title}>{title}</Text>
-                        <Text style={styles.message}>{message}</Text>
+
+                        <View style={{ maxHeight: Dimensions.get('window').height * 0.5, width: '100%' }}>
+                            <ScrollView
+                                style={{ width: '100%' }}
+                                contentContainerStyle={{ paddingHorizontal: 10 }}
+                                showsVerticalScrollIndicator={true}
+                                indicatorStyle="white"
+                            >
+                                <Text style={styles.message}>{message}</Text>
+                            </ScrollView>
+                        </View>
 
                         <TouchableOpacity style={styles.button} onPress={onClose}>
-                            <Text style={styles.buttonText}>Ho capito</Text>
+                            <Text style={styles.buttonText}>{i18n.t('common.gotIt')}</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>

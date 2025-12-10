@@ -5,6 +5,7 @@ import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { AnalysisService } from '../../services/AnalysisService';
 import { BlurView } from 'expo-blur';
+import i18n from '../../config/i18n';
 
 interface AnalysisHistoryModalProps {
     visible: boolean;
@@ -34,9 +35,9 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
     };
 
     const formatDate = (isoString: string) => {
-        if (!isoString) return 'Data sconosciuta';
+        if (!isoString) return i18n.t('analysis.history.unknownDate');
         const date = new Date(isoString);
-        return date.toLocaleDateString('it-IT', {
+        return date.toLocaleDateString(i18n.locale, {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
@@ -67,7 +68,7 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
             // Remove from local list immediately
             setHistory(prev => prev.filter(item => item.id !== confirmDeleteId));
         } catch (error) {
-            Alert.alert("Errore", "Impossibile eliminare l'analisi.");
+            Alert.alert(i18n.t('common.error'), i18n.t('analysis.history.errorDelete'));
         } finally {
             setDeletingId(null);
         }
@@ -93,10 +94,10 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                     </View>
                     <View style={styles.itemContent}>
                         <Text style={[styles.itemDate, isCurrent && styles.activeText]}>
-                            {formatDate(item.timestamp)} {isCurrent && "(Attuale)"}
+                            {formatDate(item.timestamp)} {isCurrent && i18n.t('analysis.history.current')}
                         </Text>
                         <Text style={[styles.itemSummary, isCurrent && styles.activeTextSecondary]}>
-                            {item.biomarkers?.length || 0} Biomarcatori • {item.fattoriDiRischio?.length || 0} Rischi
+                            {item.biomarkers?.length || 0} {i18n.t('analysis.history.biomarkers')} • {item.fattoriDiRischio?.length || 0} {i18n.t('analysis.history.risks')}
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -130,10 +131,10 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                        experimentalBlurMethod='dimezisBlurView'
+                       
                     />
                     <View style={styles.header}>
-                        <Text style={styles.title}>Storico Analisi</Text>
+                        <Text style={styles.title}>{i18n.t('analysis.history.title')}</Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <Ionicons name="close" size={24} color="#FFF" />
                         </TouchableOpacity>
@@ -146,7 +147,7 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                     ) : history.length === 0 ? (
                         <View style={styles.emptyContainer}>
                             <Ionicons name="file-tray-outline" size={48} color="rgba(255,255,255,0.5)" />
-                            <Text style={styles.emptyText}>Nessuna analisi salvata</Text>
+                            <Text style={styles.emptyText}>{i18n.t('analysis.history.noAnalysis')}</Text>
                         </View>
                     ) : (
                         <FlatList
@@ -166,23 +167,23 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                                 intensity={60}
                                 tint="dark"
                                 style={StyleSheet.absoluteFill}
-                                experimentalBlurMethod='dimezisBlurView'
+                               
                             />
                             <View style={styles.confirmationCard}>
                                 <BlurView
                                     intensity={80}
                                     tint="dark"
                                     style={StyleSheet.absoluteFill}
-                                    experimentalBlurMethod='dimezisBlurView'
+                                   
                                 />
                                 <View style={styles.warningIconContainer}>
                                     <Ionicons name="trash-outline" size={32} color="#FF6B6B" />
                                 </View>
-                                <Text style={styles.confirmationTitle}>Elimina Analisi</Text>
+                                <Text style={styles.confirmationTitle}>{i18n.t('analysis.history.deleteTitle')}</Text>
                                 <Text style={styles.confirmationText}>
                                     {confirmDeleteId === currentAnalysisId
-                                        ? "ATTENZIONE: Questa è l'analisi attualmente in uso. Eliminandola, tutti i dati (grafici, mappa, ecc.) verranno azzerati. Sei sicuro?"
-                                        : "Sei sicuro di voler eliminare questa analisi? L'azione è irreversibile."
+                                        ? i18n.t('analysis.history.deleteConfirmCurrent')
+                                        : i18n.t('analysis.history.deleteConfirm')
                                     }
                                 </Text>
                                 <View style={styles.confirmationActions}>
@@ -190,13 +191,13 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                                         style={styles.cancelButton}
                                         onPress={() => setConfirmDeleteId(null)}
                                     >
-                                        <Text style={styles.cancelButtonText}>Annulla</Text>
+                                        <Text style={styles.cancelButtonText}>{i18n.t('analysis.history.cancel')}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.confirmButton}
                                         onPress={confirmDelete}
                                     >
-                                        <Text style={styles.confirmButtonText}>Elimina</Text>
+                                        <Text style={styles.confirmButtonText}>{i18n.t('analysis.history.delete')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

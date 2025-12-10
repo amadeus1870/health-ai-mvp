@@ -1,21 +1,23 @@
 import { Stack } from 'expo-router';
 import { Colors } from '../../constants/Colors';
+import { BlurView } from 'expo-blur';
+import { StyleSheet } from 'react-native';
 
 export default function SettingsLayout() {
+    const headerBlur = () => (
+        <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+    );
+
     return (
         <Stack screenOptions={{
-            headerTransparent: true, // Transparent header
-            headerStyle: { backgroundColor: 'transparent' },
-            headerTintColor: '#FFF',
-            headerTitleStyle: { color: '#FFF', textShadowColor: 'transparent', textShadowRadius: 0 }, // No "alone"
-            contentStyle: { backgroundColor: Colors.background }, // Global BG
-            headerShadowVisible: false, // Clean look
+            headerShown: false,
+            contentStyle: { backgroundColor: Colors.background },
         }}>
-            <Stack.Screen name="index" options={{ title: 'Impostazioni' }} />
-            <Stack.Screen name="privacy" options={{ title: 'Privacy Policy', presentation: 'modal' }} />
-            <Stack.Screen name="terms" options={{ title: 'Termini di Servizio', presentation: 'modal' }} />
-            <Stack.Screen name="disclaimer" options={{ title: 'Disclaimer Medico', presentation: 'modal' }} />
-            <Stack.Screen name="language" options={{ title: 'Lingua', presentation: 'modal' }} />
+            <Stack.Screen name="index" />
+            <Stack.Screen name="privacy" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="terms" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="disclaimer" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="language" options={{ presentation: 'modal' }} />
         </Stack>
     );
 }

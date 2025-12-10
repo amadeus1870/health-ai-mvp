@@ -5,6 +5,7 @@ import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { MarkdownText } from './MarkdownText';
+import i18n from '../../config/i18n';
 
 if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -27,12 +28,88 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
     const [expanded, setExpanded] = useState(false);
 
     const getStatusColor = () => {
-        switch (status) {
-            case 'optimal': return Colors.success;
-            case 'warning': return Colors.warning;
-            case 'critical': return Colors.error;
-            default: return Colors.textSecondary;
+        // 1. Try mathematical evaluation if value and target are present
+        if (value && target) {
+            try {
+                // Extract numeric value
+                const valMatch = value.match(/[\d.,]+/);
+                if (valMatch) {
+                    const val = parseFloat(valMatch[0].replace(',', '.'));
+
+                    // Parse Target
+                    // Case 1: Range "10 - 20" or "10-20"
+                    if (target.includes('-')) {
+                        const parts = target.split('-').map(p => parseFloat(p.replace(/[^0-9.,]/g, '').replace(',', '.')));
+                        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                            const min = parts[0];
+                            const max = parts[1];
+
+                            if (val >= min && val <= max) return Colors.success; // Inside range
+
+                            // Borderline logic (within 10% of range width or absolute value?)
+                            // Let's use 10% of the limit value as a "warning zone"
+                            const toleranceMin = min * 0.1;
+                            const toleranceMax = max * 0.1;
+
+                            if ((val >= min - toleranceMin && val < min) || (val > max && val <= max + toleranceMax)) {
+                                return Colors.warning;
+                            }
+                            return Colors.error;
+                        }
+                    }
+
+                    // Case 2: Max Limit "< 100"
+                    if (target.includes('<')) {
+                        const max = parseFloat(target.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                        if (!isNaN(max)) {
+                            if (val < max) return Colors.success;
+                            if (val <= max * 1.1) return Colors.warning; // +10% tolerance
+                            return Colors.error;
+                        }
+                    }
+
+                    // Case 3: Min Limit "> 50"
+                    if (target.includes('>')) {
+                        const min = parseFloat(target.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                        if (!isNaN(min)) {
+                            if (val > min) return Colors.success;
+                            if (val >= min * 0.9) return Colors.warning; // -10% tolerance
+                            return Colors.error;
+                        }
+                    }
+                }
+            } catch (e) {
+                // Fallback to text analysis if parsing fails
+            }
         }
+
+        // 2. Fallback to Text Analysis (Existing Logic)
+        const s = status?.toLowerCase().trim() || '';
+
+        // Critical / High Risk
+        // 'alt' covers: alto, alta, alti, alte, alterato, altamente
+        // 'elevat' covers: elevato, elevata
+        // 'carent' covers: carente, carenza
+        // 'insufficien' covers: insufficiente, insufficienza
+        // 'eccessiv' covers: eccessivo, eccessiva
+        if (s.includes('critic') || s.includes('alt') || s.includes('high') || s.includes('élevé') || s.includes('hoch') || s.includes('fuori') || s.includes('out') || s.includes('bad') || s.includes('alert') || s.includes('elevat') || s.includes('eccessiv') || s.includes('carent') || s.includes('insufficien') || s.includes('scars') || s.includes('grav') || s.includes('seri')) return Colors.error;
+
+        // Warning / Medium Risk
+        // 'medi' covers: medio, media, medium
+        // 'moderat' covers: moderato, moderata
+        // 'liev' covers: lieve
+        // 'limit' covers: limite, limitato
+        if (s.includes('warn') || s.includes('attenz') || s.includes('medi') || s.includes('moyen') || s.includes('mittel') || s.includes('moderat') || s.includes('liev') || s.includes('limit') || s.includes('borderline')) return Colors.warning;
+
+        // Optimal / Low Risk
+        // 'bass' covers: basso, bassa (Note: sometimes low is bad, but usually optimal in risk context. If AI puts 'basso' in status, we assume it means 'Low Risk' or 'Normal Low')
+        // 'norm' covers: normal, normale, norma
+        // 'ottim' covers: ottimale, ottimi
+        // 'regolar' covers: regolare
+        // 'negativ' covers: negativo (usually good for tests)
+        if (s.includes('optim') || s.includes('ottim') || s.includes('ok') || s.includes('norm') || s.includes('bass') || s.includes('low') || s.includes('faible') || s.includes('niedrig') || s.includes('buon') || s.includes('eccellent') || s.includes('perfett') || s.includes('regolar') || s.includes('negativ')) return Colors.success;
+
+        return Colors.textSecondary;
     };
 
     const toggleExpand = () => {
@@ -40,7 +117,7 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
         setExpanded(!expanded);
     };
 
-    const isOptimal = status === 'optimal';
+    const isOptimal = getStatusColor() === Colors.success;
     const mainTextColor = textColor || Colors.text;
     const secondaryTextColor = textColor ? 'rgba(255,255,255,0.7)' : Colors.textSecondary;
 
@@ -95,7 +172,7 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                     {/* Meaning - Always show */}
                     {meaning && (
                         <View style={styles.detailRow}>
-                            <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Significato:</Text>
+                            <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>{i18n.t('analysis.biomarkerDetails.meaning')}:</Text>
                             <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{meaning}</MarkdownText>
                         </View>
                     )}
@@ -104,14 +181,20 @@ export const BiomarkerRow: React.FC<BiomarkerRowProps & { textColor?: string }> 
                     {!isOptimal && (
                         <>
                             {cause && (
-                                <View style={styles.detailRow}>
-                                    <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Possibili Cause:</Text>
+                                <View style={styles.detailSection}>
+                                    <View style={styles.detailHeader}>
+                                        <Ionicons name="alert-circle-outline" size={20} color="#FF9500" />
+                                        <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>{i18n.t('analysis.biomarkerDetails.causes')}:</Text>
+                                    </View>
                                     <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{cause}</MarkdownText>
                                 </View>
                             )}
                             {remedy && (
-                                <View style={styles.detailRow}>
-                                    <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>Rimedi Consigliati:</Text>
+                                <View style={styles.detailSection}>
+                                    <View style={styles.detailHeader}>
+                                        <Ionicons name="medkit-outline" size={20} color="#34C759" />
+                                        <Text style={[styles.detailLabel, { color: secondaryTextColor }]}>{i18n.t('analysis.biomarkerDetails.remedies')}:</Text>
+                                    </View>
                                     <MarkdownText style={[styles.detailValue, { color: mainTextColor }]}>{remedy}</MarkdownText>
                                 </View>
                             )}
@@ -219,5 +302,14 @@ const styles = StyleSheet.create({
         color: Colors.text,
         lineHeight: 20,
         fontFamily: Typography.fontFamily.regular,
+    },
+    detailSection: {
+        marginBottom: 12,
+    },
+    detailHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+        gap: 8,
     }
 });

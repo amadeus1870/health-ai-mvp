@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Switch, Platform, KeyboardAvoidingView, Alert, findNodeHandle, UIManager, ImageBackground, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Platform, KeyboardAvoidingView, Alert, findNodeHandle, UIManager, ImageBackground, Modal } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { SoftCard } from '../../components/ui/SoftCard';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,65 +18,28 @@ import { reAnalyzeBiomarkers, generateDietPlan } from '../../services/gemini';
 import { AnalysisService } from '../../services/AnalysisService';
 import { ActivityIndicator } from 'react-native';
 import { useAnalysis } from '../../context/AnalysisContext';
+import i18n from '../../config/i18n';
 
 type SelectionOption = { label: string; value: string };
 
-const CONDITIONS_LIST = [
-  "Fegato Grasso", "Ipertensione", "Predisposizione Ipertensione", "Diabete",
-  "Cardiopatia", "Reni", "Colon Irritabile (IBS)", "Ipotiroidismo",
-  "Ipertiroidismo", "Colesterolo alto (LDL)", "Altro"
-];
-
-const SYMPTOMS_LIST = [
-  "Affaticamento", "Dolori Addominali", "Emicrania", "Dolori Muscolari",
-  "Mal di Schiena", "Dolore Pelvico", "Ittero", "Stanchezza",
-  "Insonnia", "Perdita di Peso", "Cambiamento Fisico", "Nausea", "Vertigini"
-];
-
-const HABITS_LIST = [
-  "Docce Fredde", "Meditazione", "Passeggiate", "Palestra", "Sauna", "Digiuno"
-];
-
-const SUPPLEMENTS_LIST = [
-  "Multivitaminico", "Multi-integratore in polvere", "Vitamina D", "Vitamina C",
-  "Vitamina E", "Omega-3", "Magnesio", "Potassio", "Sali Minerali",
-  "Probiotici", "Zinco", "Ferro", "Complesso B", "Proteine in polvere",
-  "Creatina", "Melatonina"
-];
-
-const PHYSICAL_DESCRIPTION_LIST = [
-  "Molto Definito/Vene visibili (Addominali scolpiti, vascolarizzazione)",
-  "Atletico/Tonico (Addominali visibili, muscolatura delineata)",
-  "Forma Media (Pancia piatta o quasi, aspetto sano)",
-  "Morbido/Qualche chilo in più (Rotolini, pancia morbida)",
-  "Sovrappeso/Robusto (Addome prominente, rotondità)"
-];
-
-const ACTIVITY_LEVELS = [
-  "Sedentario",
-  "Leggermente attivo",
-  "Moderatamente attivo",
-  "Molto attivo",
-  "Estremo"
-];
-
-const MEALS_PER_DAY_LIST = ["1", "2", "3", "4", "5+"];
-const SNACKS_PER_DAY_LIST = ["0", "1", "2", "3+"];
-const DIET_TYPES_LIST = [
-  "Onnivora", "Vegetariana", "Vegana", "Pescatariana", "Chetogenica", "Paleo", "Senza Glutine", "Senza Lattosio", "Altro"
-];
-
-const DIETARY_RESTRICTIONS_LIST = [
-  "Nessuno",
-  "Vegetariano",
-  "Vegano",
-  "Senza glutine",
-  "Senza latticini",
-  "Non mi piace la carne rossa",
-  "Allergia alle noci",
-  "Restrizione religiosa",
-  "Altro"
-];
+import {
+  GENDER_OPTIONS,
+  ACTIVITY_LEVELS,
+  DIET_TYPES,
+  DIETARY_RESTRICTIONS,
+  CONDITIONS,
+  SYMPTOMS,
+  HABITS,
+  SUPPLEMENTS,
+  PHYSICAL_DESCRIPTIONS,
+  SLEEP_QUALITY,
+  STRESS_LEVELS,
+  SMOKE_OPTS,
+  ALCOHOL_OPTS,
+  COFFEE_OPTS,
+  MEALS_PER_DAY,
+  SNACKS_PER_DAY
+} from '../../constants/ProfileConstants';
 
 // Helper for Glass Card
 const GlassCard = ({ children, style }: { children: React.ReactNode, style?: any }) => (
@@ -87,7 +51,14 @@ const GlassCard = ({ children, style }: { children: React.ReactNode, style?: any
   </SoftCard>
 );
 
+import { useLanguage } from '../../context/LanguageContext';
+
 export default function ProfileScreen() {
+  const { language } = useLanguage(); // Trigger re-render on language change
+
+
+
+
   const router = useRouter();
   const { setResults, setIsBackgroundUpdating, setPendingProfileUpdate } = useAnalysis();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -96,11 +67,16 @@ export default function ProfileScreen() {
   const [originalProfile, setOriginalProfile] = useState<UserProfile>(initialUserProfile);
   const [errors, setErrors] = useState<Partial<Record<keyof UserProfile, boolean>>>({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("Profilo salvato correttamente!");
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Custom Alert State
   const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({ title: '', message: '', type: 'info' as AlertType });
+  const [alertConfig, setAlertConfig] = useState<{
+    title: string;
+    message: string;
+    type: AlertType;
+    actions?: { text: string; onPress: () => void; style?: 'default' | 'cancel' | 'destructive' }[];
+  }>({ title: '', message: '', type: 'info' });
 
   const showAlert = (title: string, message: string, type: AlertType = 'info') => {
     setAlertConfig({ title, message, type });
@@ -134,7 +110,7 @@ export default function ProfileScreen() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      showAlert("Attenzione", "Compila tutti i campi obbligatori contrassegnati con *", "warning");
+      showAlert(i18n.t('userProfile.warning'), i18n.t('userProfile.fillRequired'), "warning");
 
       // Auto-scroll to first error
       const firstErrorField = Object.keys(newErrors)[0];
@@ -161,6 +137,15 @@ export default function ProfileScreen() {
     try {
       await ProfileService.saveProfile(formData);
 
+      // Check if analysis exists (New User Flow)
+      const hasAnalysis = await AnalysisService.getLastAnalysis();
+
+      if (!hasAnalysis) {
+        // Direct redirect for new users, but pass flag to show success message there
+        router.push('/(tabs)/biomarkers?upload=true&profileSaved=true');
+        return;
+      }
+
       // Check if profile actually changed (excluding profile picture)
       const { profilePicture: newPic, ...newProfileData } = formData;
       const { profilePicture: oldPic, ...oldProfileData } = originalProfile;
@@ -169,7 +154,7 @@ export default function ProfileScreen() {
       const hasPictureChange = newPic !== oldPic;
 
       if (hasSignificantChanges) {
-        console.log("Profile has significant changes, flagging for update...");
+
 
         // Notify context that profile changed
         setPendingProfileUpdate(true);
@@ -181,12 +166,12 @@ export default function ProfileScreen() {
       } else {
         // No significant changes (maybe just picture)
         setOriginalProfile(formData);
-        setSuccessMessage("Profilo salvato correttamente!");
+        setSuccessMessage(i18n.t('userProfile.success'));
         setShowSuccessModal(true);
       }
 
     } catch (error) {
-      showAlert("Errore", "Impossibile salvare il profilo.", "error");
+      showAlert(i18n.t('common.error'), i18n.t('userProfile.errorSave'), "error");
     }
   };
 
@@ -206,7 +191,7 @@ export default function ProfileScreen() {
         updateField('profilePicture', base64Image);
       }
     } catch (error) {
-      showAlert("Errore", "Impossibile selezionare l'immagine.", "error");
+      showAlert(i18n.t('common.error'), i18n.t('userProfile.errorImage'), "error");
     }
   };
 
@@ -260,7 +245,7 @@ export default function ProfileScreen() {
     </View>
   );
 
-  const renderSegmentedControl = (label: string, field: keyof UserProfile, options: string[]) => (
+  const renderSegmentedControl = (label: string, field: keyof UserProfile, options: string[], translationPrefix?: string) => (
     <View
       style={styles.inputContainer}
       ref={(el) => { fieldRefs.current[field] = el; }}
@@ -282,14 +267,14 @@ export default function ProfileScreen() {
             <Text style={[
               styles.segmentText,
               (formData as any)[field] === opt && styles.segmentTextActive
-            ]}>{opt}</Text>
+            ]}>{translationPrefix ? i18n.t(`${translationPrefix}.${opt}`, { locale: language }) : opt}</Text>
           </TouchableOpacity>
         ))}
       </View>
     </View>
   );
 
-  const renderCheckboxList = (list: string[], field: 'conditions' | 'symptoms' | 'habits' | 'supplements' | 'dietaryRestrictions') => (
+  const renderCheckboxList = (list: string[], field: 'conditions' | 'symptoms' | 'habits' | 'supplements' | 'dietaryRestrictions', translationPrefix: string) => (
     <View style={styles.checkboxContainer}>
       {list.map((item) => {
         const isSelected = formData[field].includes(item);
@@ -304,7 +289,9 @@ export default function ProfileScreen() {
               size={24}
               color={isSelected ? "#FFB142" : "rgba(255, 255, 255, 0.6)"}
             />
-            <Text style={[styles.checkboxLabel, isSelected && styles.checkboxLabelActive]}>{item}</Text>
+            <Text style={[styles.checkboxLabel, isSelected && styles.checkboxLabelActive]}>
+              {i18n.t(`${translationPrefix}.${item}`, { locale: language })}
+            </Text>
           </TouchableOpacity>
         );
       })}
@@ -313,6 +300,7 @@ export default function ProfileScreen() {
 
   return (
     <ImageBackground
+      key={language}
       source={require('../../assets/images/custom_bg.jpg')}
       style={{ flex: 1 }}
       resizeMode="cover"
@@ -324,8 +312,9 @@ export default function ProfileScreen() {
             contentContainerStyle={styles.scrollContent}
           >
 
-            <Text style={styles.headerTitle}>Il Tuo Profilo</Text>
-            <Text style={styles.headerSubtitle}>Completa i dati per un'analisi precisa.</Text>
+
+            <Text style={styles.headerTitle}>{i18n.t('userProfile.title')}</Text>
+            <Text style={styles.headerSubtitle}>{i18n.t('userProfile.subtitle')}</Text>
 
             {/* Profile Picture */}
             <View style={{ alignItems: 'center', marginBottom: 24 }}>
@@ -341,32 +330,32 @@ export default function ProfileScreen() {
                   <Ionicons name="camera" size={16} color="#FFF" />
                 </View>
               </TouchableOpacity>
-              <Text style={styles.changePhotoText}>Modifica Foto</Text>
+              <Text style={styles.changePhotoText}>{i18n.t('userProfile.changePhoto')}</Text>
             </View>
 
             {/* DATI PERSONALI */}
             <GlassCard>
-              {renderSectionTitle("Dati Personali", "person")}
-              {renderInput("Nome o Nickname", "name", "Il tuo nome", "default", true)}
+              {renderSectionTitle(i18n.t('userProfile.personalInfo'), "person")}
+              {renderInput(i18n.t('userProfile.name'), "name", i18n.t('userProfile.namePlaceholder'), "default", true)}
               <View style={styles.row}>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  {renderInput("Età", "age", "Anni", "numeric", true)}
+                  {renderInput(i18n.t('userProfile.age'), "age", i18n.t('userProfile.agePlaceholder'), "numeric", true)}
                 </View>
                 <View style={{ flex: 1, marginLeft: 8 }}>
-                  {renderSegmentedControl("Sesso *", "gender", ["M", "F"])}
+                  {renderSegmentedControl(i18n.t('userProfile.gender'), "gender", GENDER_OPTIONS, "profileOptions.gender")}
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  {renderInput("Altezza (cm)", "height", "cm", "numeric", true)}
+                  {renderInput(i18n.t('userProfile.height'), "height", i18n.t('userProfile.heightPlaceholder'), "numeric", true)}
                 </View>
                 <View style={{ flex: 1, marginLeft: 8 }}>
-                  {renderInput("Peso (kg)", "weight", "kg", "numeric", true)}
+                  {renderInput(i18n.t('userProfile.weight'), "weight", i18n.t('userProfile.weightPlaceholder'), "numeric", true)}
                 </View>
               </View>
               <View style={[styles.row, { marginTop: 0 }]}>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  {renderInput("Girovita (cm)", "waistCircumference", "cm", "numeric")}
+                  {renderInput(i18n.t('userProfile.waist'), "waistCircumference", i18n.t('userProfile.waistPlaceholder'), "numeric")}
                 </View>
                 <View style={{ flex: 1, marginLeft: 8 }} />
               </View>
@@ -374,9 +363,9 @@ export default function ProfileScreen() {
 
             {/* DESCRIZIONE FISICA */}
             <GlassCard>
-              {renderSectionTitle("Descrizione Fisica", "body")}
+              {renderSectionTitle(i18n.t('userProfile.physicalDescription'), "body")}
               <View style={styles.wrapContainer}>
-                {PHYSICAL_DESCRIPTION_LIST.map((desc) => (
+                {PHYSICAL_DESCRIPTIONS.map((desc) => (
                   <TouchableOpacity
                     key={desc}
                     style={[
@@ -387,7 +376,7 @@ export default function ProfileScreen() {
                     onPress={() => updateField("physicalDescription", desc)}
                   >
                     <Text style={[styles.chipText, formData.physicalDescription === desc && styles.chipTextActive]}>
-                      {desc}
+                      {i18n.t(`profileOptions.physical.${desc}`, { locale: language })}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -396,12 +385,12 @@ export default function ProfileScreen() {
 
             {/* STILE DI VITA */}
             <GlassCard>
-              {renderSectionTitle("Stile di Vita", "leaf")}
-              {renderSegmentedControl("Fumo", "smoke", ["No", "Sì"])}
-              {renderSegmentedControl("Alcol", "alcohol", ["No", "Occasionale", "Frequente"])}
-              {renderSegmentedControl("Caffè", "coffee", ["No", "1-2", "3+"])}
+              {renderSectionTitle(i18n.t('userProfile.lifestyle'), "leaf")}
+              {renderSegmentedControl(i18n.t('userProfile.smoke'), "smoke", SMOKE_OPTS, "profileOptions.smoke")}
+              {renderSegmentedControl(i18n.t('userProfile.alcohol'), "alcohol", ALCOHOL_OPTS, "profileOptions.alcohol")}
+              {renderSegmentedControl(i18n.t('userProfile.coffee'), "coffee", COFFEE_OPTS, "profileOptions.coffee")}
 
-              <Text style={[styles.label, { marginTop: 12 }]}>Livello di Attività</Text>
+              <Text style={[styles.label, { marginTop: 12 }]}>{i18n.t('userProfile.activityLevel')}</Text>
               <View style={styles.activityContainer}>
                 {ACTIVITY_LEVELS.map((level) => (
                   <TouchableOpacity
@@ -418,33 +407,37 @@ export default function ProfileScreen() {
                     <Text style={[
                       styles.activityText,
                       formData.activityLevel === level && styles.activityTextActive
-                    ]}>{level}</Text>
+                    ]}>{i18n.t(`profileOptions.activity.${level}`, { locale: language })}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              <Text style={[styles.label, { marginTop: 12 }]}>Qualità del Sonno</Text>
+              <Text style={[styles.label, { marginTop: 12 }]}>{i18n.t('userProfile.sleepQuality')}</Text>
               <View style={styles.wrapContainer}>
-                {["Buono", "Medio", "Scarso", "Insonnia"].map(opt => (
+                {SLEEP_QUALITY.map(opt => (
                   <TouchableOpacity
                     key={opt}
                     style={[styles.chip, formData.sleep === opt && styles.chipActive]}
                     onPress={() => updateField("sleep", opt)}
                   >
-                    <Text style={[styles.chipText, formData.sleep === opt && styles.chipTextActive]}>{opt}</Text>
+                    <Text style={[styles.chipText, formData.sleep === opt && styles.chipTextActive]}>
+                      {i18n.t(`profileOptions.sleep.${opt}`, { locale: language })}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              <Text style={[styles.label, { marginTop: 12 }]}>Livello di Stress</Text>
+              <Text style={[styles.label, { marginTop: 12 }]}>{i18n.t('userProfile.stressLevel')}</Text>
               <View style={styles.wrapContainer}>
-                {["Basso", "Moderato", "Alto", "Estremo"].map(opt => (
+                {STRESS_LEVELS.map(opt => (
                   <TouchableOpacity
                     key={opt}
                     style={[styles.chip, formData.stress === opt && styles.chipActive]}
                     onPress={() => updateField("stress", opt)}
                   >
-                    <Text style={[styles.chipText, formData.stress === opt && styles.chipTextActive]}>{opt}</Text>
+                    <Text style={[styles.chipText, formData.stress === opt && styles.chipTextActive]}>
+                      {i18n.t(`profileOptions.stress.${opt}`, { locale: language })}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -452,29 +445,29 @@ export default function ProfileScreen() {
 
             {/* ABITUDINI */}
             <GlassCard>
-              {renderSectionTitle("Abitudini", "fitness")}
-              {renderCheckboxList(HABITS_LIST, "habits")}
+              {renderSectionTitle(i18n.t('userProfile.habits'), "fitness")}
+              {renderCheckboxList(HABITS, "habits", "profileOptions.habits")}
             </GlassCard>
 
             {/* DIETA E NUTRIZIONE */}
             <GlassCard>
-              {renderSectionTitle("Dieta e Nutrizione", "restaurant")}
+              {renderSectionTitle(i18n.t('userProfile.dietNutrition'), "restaurant")}
 
               <View style={styles.row}>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  {renderSegmentedControl("Pasti al Giorno", "mealsPerDay", MEALS_PER_DAY_LIST)}
+                  {renderSegmentedControl(i18n.t('userProfile.mealsPerDay'), "mealsPerDay", MEALS_PER_DAY)}
                 </View>
               </View>
 
               <View style={styles.row}>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  {renderSegmentedControl("Numero Spuntini", "snacksPerDay", SNACKS_PER_DAY_LIST)}
+                  {renderSegmentedControl(i18n.t('userProfile.snacksPerDay'), "snacksPerDay", SNACKS_PER_DAY)}
                 </View>
               </View>
 
-              <Text style={[styles.label, { marginTop: 12 }]}>Tipo di Dieta Attuale</Text>
+              <Text style={[styles.label, { marginTop: 12 }]}>{i18n.t('userProfile.dietType')}</Text>
               <View style={styles.wrapContainer}>
-                {DIET_TYPES_LIST.map((diet) => (
+                {DIET_TYPES.map((diet) => (
                   <TouchableOpacity
                     key={diet}
                     style={[
@@ -484,50 +477,50 @@ export default function ProfileScreen() {
                     onPress={() => updateField("dietType", diet)}
                   >
                     <Text style={[styles.chipText, formData.dietType === diet && styles.chipTextActive]}>
-                      {diet}
+                      {i18n.t(`profileOptions.diet.${diet}`, { locale: language })}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              <Text style={[styles.label, { marginTop: 16, marginBottom: 8 }]}>Hai restrizioni dietetiche, allergie o cibi che non ti piacciono?</Text>
-              {renderCheckboxList(DIETARY_RESTRICTIONS_LIST, "dietaryRestrictions")}
-              {formData.dietaryRestrictions.includes("Altro") && (
-                renderInput("Specifica Altro", "otherDietaryRestriction", "Descrivi...")
+              <Text style={[styles.label, { marginTop: 16, marginBottom: 8 }]}>{i18n.t('userProfile.dietaryRestrictionsQuestion')}</Text>
+              {renderCheckboxList(DIETARY_RESTRICTIONS, "dietaryRestrictions", "profileOptions.restrictions")}
+              {formData.dietaryRestrictions.includes("other") && (
+                renderInput(i18n.t('userProfile.other'), "otherDietaryRestriction", i18n.t('userProfile.describe'))
               )}
 
               <View style={{ marginTop: 16 }}>
-                {renderInput("Giornata Tipo (Colazione/Pranzo/Cena)", "dailyDiet", "Colazione: latte, caffe...\nPranzo: pasta...\nCena: carne...", "default", false, true)}
+                {renderInput(i18n.t('userProfile.typicalDay'), "dailyDiet", i18n.t('userProfile.typicalDayPlaceholder'), "default", false, true)}
               </View>
             </GlassCard>
 
             {/* INTEGRATORI */}
             <GlassCard>
-              {renderSectionTitle("Integratori che prendo", "nutrition")}
-              {renderCheckboxList(SUPPLEMENTS_LIST, "supplements")}
-              {renderInput("Altro", "otherSupplement", "Altri integratori...")}
+              {renderSectionTitle(i18n.t('userProfile.supplements'), "nutrition")}
+              {renderCheckboxList(SUPPLEMENTS, "supplements", "profileOptions.supplements")}
+              {renderInput(i18n.t('userProfile.other'), "otherSupplement", i18n.t('userProfile.describe'))}
             </GlassCard>
 
             {/* CONDIZIONI NOTE */}
             <GlassCard>
-              {renderSectionTitle("Condizioni Note", "medical")}
-              {renderCheckboxList(CONDITIONS_LIST, "conditions")}
-              {formData.conditions.includes("Altro") && (
-                renderInput("Specifica Altro", "otherCondition", "Descrivi...")
+              {renderSectionTitle(i18n.t('userProfile.conditions'), "medical")}
+              {renderCheckboxList(CONDITIONS, "conditions", "profileOptions.conditions")}
+              {formData.conditions.includes("other") && (
+                renderInput(i18n.t('userProfile.other'), "otherCondition", i18n.t('userProfile.describe'))
               )}
             </GlassCard>
 
             {/* SINTOMI */}
             <GlassCard>
-              {renderSectionTitle("Sintomi Recenti", "warning")}
-              {renderCheckboxList(SYMPTOMS_LIST, "symptoms")}
+              {renderSectionTitle(i18n.t('userProfile.symptoms'), "warning")}
+              {renderCheckboxList(SYMPTOMS, "symptoms", "profileOptions.symptoms")}
             </GlassCard>
 
             {/* FARMACI */}
             <GlassCard>
-              {renderSectionTitle("Farmaci", "medkit")}
+              {renderSectionTitle(i18n.t('userProfile.medications'), "medkit")}
               <View style={styles.switchRow}>
-                <Text style={styles.label}>Assumi Farmaci?</Text>
+                <Text style={styles.label}>{i18n.t('userProfile.medicationsQuestion')}</Text>
                 <Switch
                   value={formData.medications}
                   onValueChange={(val) => updateField("medications", val)}
@@ -537,21 +530,23 @@ export default function ProfileScreen() {
                 />
               </View>
               {formData.medications && (
-                renderInput("Quali farmaci assumi?", "medicationsList", "Elenca i farmaci...")
+                renderInput(i18n.t('userProfile.medicationsList'), "medicationsList", i18n.t('userProfile.medicationsPlaceholder'))
               )}
             </GlassCard>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>CONFERMA PROFILO</Text>
+              <Text style={styles.saveButtonText}>{i18n.t('userProfile.saveButton')}</Text>
             </TouchableOpacity>
 
             <View style={styles.legalContainer}>
-              <TouchableOpacity onPress={() => router.push('/legal/privacy')}>
-                <Text style={styles.legalLink}>Privacy Policy</Text>
+              <TouchableOpacity onPress={() => router.push('/legal/privacy')} style={styles.legalLinkContainer}>
+                <Text style={styles.legalLink}>{i18n.t('settings.privacy')}</Text>
               </TouchableOpacity>
-              <Text style={styles.legalSeparator}>•</Text>
-              <TouchableOpacity onPress={() => router.push('/legal/terms')}>
-                <Text style={styles.legalLink}>Termini di Servizio</Text>
+              <TouchableOpacity onPress={() => router.push('/legal/terms')} style={styles.legalLinkContainer}>
+                <Text style={styles.legalLink}>{i18n.t('settings.terms')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/settings/disclaimer')} style={styles.legalLinkContainer}>
+                <Text style={styles.legalLink}>{i18n.t('settings.disclaimer')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -590,7 +585,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#FFF',
     marginBottom: 8,
-    marginTop: 40,
     fontFamily: Typography.fontFamily.bold,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
@@ -609,7 +603,7 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 20,
     padding: 0, // Removed padding for BlurView
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fallback for BlurView
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
@@ -801,21 +795,20 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily.bold,
   },
   legalContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
     marginBottom: 10,
+    gap: 12,
+  },
+  legalLinkContainer: {
+    paddingVertical: 4,
   },
   legalLink: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.6)',
     fontFamily: Typography.fontFamily.medium,
     textDecorationLine: 'underline',
-  },
-  legalSeparator: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.4)',
-    marginHorizontal: 10,
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { SoftCard } from '../../components/ui/SoftCard';
@@ -10,6 +11,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { InfoModal } from '../../components/ui/InfoModal';
 import { ShoppingListModal } from '../../components/ui/ShoppingListModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../config/i18n';
 
 // Services & Context
 import { ProfileService } from '../../services/ProfileService';
@@ -21,8 +23,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { VitalScoreChart } from '../../components/ui/VitalScoreChart';
 // Note: VitalScoreChart component is used here.
 
+import { useLanguage } from '../../context/LanguageContext';
+
 export default function Dashboard() {
     const router = useRouter();
+    const { language } = useLanguage();
     const { results } = useAnalysis(); // Get analysis from context (or fetch if missing)
 
     // State for Data
@@ -89,7 +94,7 @@ export default function Dashboard() {
             setFilteredShoppingListPlan(dailyPlan);
             setShoppingListVisible(true);
         } else {
-            Alert.alert("Nessun Piano", "Non c'è un piano nutrizionale per oggi.");
+            Alert.alert(i18n.t('dashboard.noPlanAlertTitle'), i18n.t('dashboard.noPlanAlertMessage'));
         }
     };
 
@@ -202,7 +207,7 @@ export default function Dashboard() {
 
     const userName = profile?.name?.split(' ')[0] || 'Utente';
     // Randomized tip for now (or could be fetched)
-    const dailyTip = "Bere acqua prima dei pasti aiuta idratazione e digestione."; // Can randomize later
+    const dailyTip = i18n.t('dashboard.dailyTip'); // Can randomize later
 
     return (
         <ImageBackground
@@ -219,8 +224,8 @@ export default function Dashboard() {
                     {/* 1. HEADER PERSONALE */}
                     <View style={[GlobalStyles.headerContainer, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }]}>
                         <View style={{ flex: 1 }}>
-                            <Text style={GlobalStyles.headerTitle}>Ciao, {userName}</Text>
-                            <Text style={GlobalStyles.headerSubtitle}>{new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
+                            <Text style={GlobalStyles.headerTitle}>{i18n.t('dashboard.greeting', { name: userName })}</Text>
+                            <Text style={GlobalStyles.headerSubtitle}>{new Date().toLocaleDateString(i18n.locale, { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -259,11 +264,11 @@ export default function Dashboard() {
                         <View style={{ padding: 24, flex: 1, justifyContent: 'space-between', zIndex: 10 }}>
                             {/* Header Row */}
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={styles.vitalTitle}>Vital Score (by AI)</Text>
+                                <Text style={styles.vitalTitle}>{i18n.t('dashboard.vitalScoreTitle')}</Text>
                                 <TouchableOpacity
                                     onPress={() => showInfo(
-                                        "Vital Score",
-                                        "Il Vital Score è un indice sintetico del tuo stato di salute (0-100), calcolato analizzando biomarcatori, fattori di rischio e profilo lipidico. Un punteggio alto indica un ottimo stato di salute generale."
+                                        i18n.t('dashboard.vitalScoreTitle'),
+                                        i18n.t('dashboard.vitalScoreInfo')
                                     )}
                                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                 >
@@ -284,7 +289,7 @@ export default function Dashboard() {
                                         style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
                                         onPress={() => router.push('/(tabs)/biomarkers')}
                                     >
-                                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>Visualizza</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>{i18n.t('common.view')}</Text>
                                         <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
                                     </TouchableOpacity>
                                 </View>
@@ -313,12 +318,12 @@ export default function Dashboard() {
                         <View style={{ padding: 20, flex: 1 }}>
                             <View style={styles.row}>
                                 <View style={{ zIndex: 10, flex: 1 }}>
-                                    <Text style={[styles.vitalTitle, { fontSize: 24 }]}>Mappa della tua salute</Text>
+                                    <Text style={[styles.vitalTitle, { fontSize: 24 }]}>{i18n.t('dashboard.healthMapTitle')}</Text>
                                     <TouchableOpacity
                                         style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}
                                         onPress={() => router.push('/(tabs)/wellness')}
                                     >
-                                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>Visualizza</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>{i18n.t('common.view')}</Text>
                                         <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
                                     </TouchableOpacity>
                                 </View>
@@ -345,11 +350,11 @@ export default function Dashboard() {
                             <View style={{ marginBottom: 16 }}>
                                 {/* Row 1: Title + Info */}
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                                    <Text style={[styles.vitalTitle, { fontSize: 22 }]}>Strategia Nutrizionale</Text>
+                                    <Text style={[styles.vitalTitle, { fontSize: 22 }]}>{i18n.t('dashboard.nutritionStrategyTitle')}</Text>
                                     <TouchableOpacity
                                         onPress={() => showInfo(
-                                            "Strategia Nutrizionale",
-                                            "Questi sono i tuoi obiettivi giornalieri calcolati in base al tuo profilo (TDEE, obiettivo peso, ecc.)."
+                                            i18n.t('dashboard.nutritionStrategyTitle'),
+                                            i18n.t('dashboard.nutritionStrategyInfo')
                                         )}
                                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                     >
@@ -359,14 +364,14 @@ export default function Dashboard() {
 
                                 {/* Row 2: Subtitle + Shopping List Button */}
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={styles.vitalSubtitle}>Obiettivi Giornalieri</Text>
+                                    <Text style={styles.vitalSubtitle}>{i18n.t('dashboard.dailyGoals')}</Text>
 
                                     <TouchableOpacity
                                         onPress={handleOpenDailyShoppingList}
                                         style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}
                                     >
                                         <Ionicons name="cart-outline" size={14} color="#FFF" style={{ marginRight: 4 }} />
-                                        <Text style={{ color: '#FFF', fontSize: 12, fontFamily: Typography.fontFamily.medium }}>Spesa giorno</Text>
+                                        <Text style={{ color: '#FFF', fontSize: 12, fontFamily: Typography.fontFamily.medium }}>{i18n.t('dashboard.dailyShopping')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -427,11 +432,11 @@ export default function Dashboard() {
                                     intensity={60}
                                     tint="dark"
                                     style={StyleSheet.absoluteFill}
-                                    experimentalBlurMethod='dimezisBlurView'
+                                   
                                 />
                                 <View style={{ padding: 24 }}>
                                     {/* Title Inside */}
-                                    <Text style={[styles.vitalTitle, { fontSize: 22, marginBottom: 16 }]}>Prossimo Pasto</Text>
+                                    <Text style={[styles.vitalTitle, { fontSize: 22, marginBottom: 16 }]}>{i18n.t('dashboard.nextMeal')}</Text>
 
                                     {/* Logic: Show Next Meal OR Success if all eaten */}
                                     {dietPlan && !nextMeal && eatenMeals.length > 0 ? (
@@ -444,9 +449,9 @@ export default function Dashboard() {
                                             }}>
                                                 <Ionicons name="checkmark" size={30} color="#4caf50" />
                                             </View>
-                                            <Text style={[styles.vitalTitle, { fontSize: 18, marginBottom: 4, textAlign: 'center' }]}>Obiettivi completati! 🎉</Text>
+                                            <Text style={[styles.vitalTitle, { fontSize: 18, marginBottom: 4, textAlign: 'center' }]}>{i18n.t('dashboard.goalsCompleted')}</Text>
                                             <Text style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'center', fontSize: 13 }}>
-                                                Hai consumato tutti i pasti di oggi. Ottimo lavoro!
+                                                {i18n.t('dashboard.allMealsEaten')}
                                             </Text>
                                         </View>
                                     ) : nextMeal ? (
@@ -466,14 +471,14 @@ export default function Dashboard() {
                                                 onPress={() => markMealAsEaten(nextMealIndex)}
                                             >
                                                 <Ionicons name="checkmark-circle-outline" size={18} color="#FFF" style={{ marginRight: 6 }} />
-                                                <Text style={[styles.actionButtonText, { fontSize: 13 }]}>Segna come mangiato</Text>
+                                                <Text style={[styles.actionButtonText, { fontSize: 13 }]}>{i18n.t('dashboard.markAsEaten')}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     ) : (
                                         // NO PLAN
                                         <View style={{ padding: 20, alignItems: 'center', justifyContent: 'center' }}>
                                             <Ionicons name="restaurant-outline" size={24} color="rgba(255,255,255,0.3)" style={{ marginBottom: 6 }} />
-                                            <Text style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: 12 }}>Nessun piano nutrizionale attivo.</Text>
+                                            <Text style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: 12 }}>{i18n.t('dashboard.noPlan')}</Text>
                                         </View>
                                     )}
                                 </View>
@@ -484,7 +489,7 @@ export default function Dashboard() {
                                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 16 }}
                                 onPress={() => router.push('/(tabs)/nutrition')}
                             >
-                                <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>Visualizza</Text>
+                                <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.medium, marginRight: 4 }}>{i18n.t('common.view')}</Text>
                                 <Ionicons name="chevron-forward" size={16} color="#FFF" />
                             </TouchableOpacity>
                         </View>
@@ -493,6 +498,19 @@ export default function Dashboard() {
 
 
 
+
+                    {/* Legal Links Footer */}
+                    <View style={styles.legalContainer}>
+                        <TouchableOpacity onPress={() => router.push('/legal/privacy')} style={styles.legalLinkContainer}>
+                            <Text style={styles.legalLink}>{i18n.t('settings.privacy')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push('/legal/terms')} style={styles.legalLinkContainer}>
+                            <Text style={styles.legalLink}>{i18n.t('settings.terms')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push('/settings/disclaimer')} style={styles.legalLinkContainer}>
+                            <Text style={styles.legalLink}>{i18n.t('settings.disclaimer')}</Text>
+                        </TouchableOpacity>
+                    </View>
 
                     <View style={{ height: 100 }} />
                 </ScrollView>
@@ -530,7 +548,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 30,
-        marginTop: 10,
     },
     greeting: {
         fontSize: 28,
@@ -794,8 +811,24 @@ const styles = StyleSheet.create({
     },
     actionButtonText: {
         color: '#FFF',
-        fontSize: 15,
+        fontSize: 14,
         fontFamily: Typography.fontFamily.bold,
+    },
+    legalContainer: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 10,
+        gap: 12,
+    },
+    legalLinkContainer: {
+        paddingVertical: 4,
+    },
+    legalLink: {
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontFamily: Typography.fontFamily.medium,
     },
     // Actions Grid
     section: {

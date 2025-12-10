@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Typography } from '../../constants/Typography';
 import { Colors } from '../../constants/Colors';
+import i18n from '../../config/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ export const NewAnalysisModal: React.FC<NewAnalysisModalProps> = ({ visible, onC
             scale.value = 0;
             opacity.value = 0;
         }
-    }, [visible]);
+    }, [visible, scale, opacity]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -59,20 +60,18 @@ export const NewAnalysisModal: React.FC<NewAnalysisModalProps> = ({ visible, onC
                             <Ionicons name="medical" size={32} color="#FFF" />
                         </View>
 
-                        <Text style={styles.title}>Nuova Analisi Rilevata</Text>
+                        <Text style={styles.title}>{i18n.t('nutrition.newAnalysis.title')}</Text>
                         <Text style={styles.message}>
-                            I tuoi dati clinici sono cambiati. I calcoli calorici sono stati aggiornati automaticamente.
-                            {'\n\n'}
-                            Vuoi rigenerare anche il piano pasti settimanale per adattarlo ai nuovi risultati?
+                            {i18n.t('nutrition.newAnalysis.message')}
                         </Text>
 
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.secondaryButton} onPress={onClose}>
-                                <Text style={styles.secondaryButtonText}>No, mantieni</Text>
+                                <Text style={styles.secondaryButtonText}>{i18n.t('nutrition.newAnalysis.keep')}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity style={styles.primaryButton} onPress={onConfirm}>
-                                <Text style={styles.primaryButtonText}>Sì, rigenera</Text>
+                                <Text style={styles.primaryButtonText}>{i18n.t('nutrition.newAnalysis.regenerate')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

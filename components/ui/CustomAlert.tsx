@@ -54,7 +54,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
         switch (type) {
             case 'success': return { icon: 'checkmark', color: Colors.success };
             case 'error': return { icon: 'close', color: Colors.error };
-            case 'warning': return { icon: 'alert', color: Colors.warning };
+            case 'warning': return { icon: 'alert', color: Colors.primary };
             case 'info': default: return { icon: 'information', color: '#FFB142' }; // Orange
         }
     };
@@ -73,7 +73,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                     intensity={60}
                     style={StyleSheet.absoluteFill}
                     tint="dark"
-                    experimentalBlurMethod='dimezisBlurView'
+                   
                 />
 
                 <Animated.View style={[styles.card, animatedStyle]}>
@@ -81,7 +81,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                        experimentalBlurMethod='dimezisBlurView'
+                       
                     />
                     <View style={styles.contentContainer}>
                         <View style={[styles.iconContainer, { backgroundColor: config.color, shadowColor: config.color }]}>
