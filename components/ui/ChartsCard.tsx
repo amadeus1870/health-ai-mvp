@@ -8,6 +8,7 @@ import { VitalScoreChart } from './VitalScoreChart';
 import { RadarChart } from '../charts/RadarChart';
 import { GlobalRiskChart } from '../charts/GlobalRiskChart';
 
+
 import { LinearGradient } from 'expo-linear-gradient';
 import i18n from '../../config/i18n';
 

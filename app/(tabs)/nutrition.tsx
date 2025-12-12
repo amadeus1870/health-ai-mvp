@@ -29,7 +29,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GlobalStyles } from '../../constants/GlobalStyles';
 import i18n from '../../config/i18n';
 
-// ... imports
 
 export default function NutritionScreen() {
   const { isBackgroundUpdating, results, pendingProfileUpdate, setPendingProfileUpdate, setResults } = useAnalysis();
@@ -86,6 +85,7 @@ export default function NutritionScreen() {
     setRefreshing(true);
     loadData();
   };
+
 
   const handleSwapRequest = (meal: Meal, day: number, index: number) => {
     setMealToSwap({ meal, day, index });

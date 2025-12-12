@@ -81,6 +81,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
                                 </TouchableOpacity>
                             </View>
                         </View>
+
                     </View>
                 ) : (
                     <Animated.View style={[styles.card, animatedStyle]}>

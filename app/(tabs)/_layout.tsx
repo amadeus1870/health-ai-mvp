@@ -205,10 +205,8 @@ export default function TabLayout() {
                 </View>
               </TouchableOpacity>
             ),
-
           }}
         />
-
         < Tabs.Screen
           name="nutrition"
           options={{

@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
         overflow: 'visible',
+
     },
     centeredImage: {
         width: 400,

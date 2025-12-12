@@ -224,9 +224,10 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
                             )}
                         </View>
                     </GlassView>
-                )}
-            </View>
-        </Modal>
+                )
+                }
+            </View >
+        </Modal >
     );
 };
 

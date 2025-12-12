@@ -19,7 +19,6 @@ export const VitalScoreChart: React.FC<VitalScoreChartProps> = ({ score, size = 
     const numSegments = 60; // Number of ticks
     const segmentLength = 15;
 
-
     // useEffect(() => {
     //     animatedScore.value = withTiming(score, {
     //         duration: 1500,

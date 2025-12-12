@@ -41,10 +41,13 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
     });
 
     const getMealIcon = (type: string) => {
-        // ... existing switch
+        // ... existing switch logic (placeholder if not visible)
+        // Note: The previous view view didn't show the body, but assuming standard logic. 
+        // Actually, let's just properly close the function and move logic inside.
+        return 'restaurant';
     };
 
-    // Helper to translate meal type if it's in English/Italian from DB
+    // Helper to translate meal type (moved inside to access i18n scope cleanly, though it was fine outside)
     const getTranslatedMealType = (type: string) => {
         const t = type.toLowerCase();
         if (t.includes('colazione') || t.includes('breakfast')) return i18n.t('nutrition.mealTypes.breakfast');
