@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView, Platform } from 'react-native';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Typography } from '../../constants/Typography';
@@ -21,8 +21,14 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
 
     useEffect(() => {
         if (visible) {
-            scale.value = withSpring(1);
-            opacity.value = withSpring(1);
+            // Android: No animation (Direct mounting)
+            if (Platform.OS === 'android') {
+                scale.value = 1;
+                opacity.value = 1;
+            } else {
+                scale.value = withSpring(1);
+                opacity.value = withSpring(1);
+            }
         } else {
             scale.value = 0;
             opacity.value = 0;
@@ -44,41 +50,69 @@ export const InfoModal: React.FC<InfoModalProps> = ({ visible, onClose, title, m
             onRequestClose={onClose}
         >
             <View style={styles.container}>
-                <BlurView
+                <GlassView
                     intensity={20}
                     tint="dark"
                     style={StyleSheet.absoluteFill}
                 />
-                <Animated.View style={[styles.card, animatedStyle]}>
-                    <BlurView
-                        intensity={60}
-                        tint="dark"
-                        style={StyleSheet.absoluteFill}
-                       
-                    />
-                    <View style={styles.contentContainer}>
-                        <View style={styles.iconContainer}>
-                            <Ionicons name="information" size={40} color="#FFF" />
+                {Platform.OS === 'android' ? (
+                    <View style={styles.androidContainer}>
+                        <View style={styles.androidCard}>
+                            <View style={styles.contentContainer}>
+                                <View style={styles.iconContainer}>
+                                    <Ionicons name="information" size={40} color="#FFF" />
+                                </View>
+
+                                <Text style={styles.title}>{title}</Text>
+
+                                <View style={{ maxHeight: Dimensions.get('window').height * 0.5, width: '100%' }}>
+                                    <ScrollView
+                                        style={{ width: '100%' }}
+                                        contentContainerStyle={{ paddingHorizontal: 10 }}
+                                        showsVerticalScrollIndicator={true}
+                                        indicatorStyle="white"
+                                    >
+                                        <Text style={styles.message}>{message}</Text>
+                                    </ScrollView>
+                                </View>
+
+                                <TouchableOpacity style={styles.button} onPress={onClose}>
+                                    <Text style={styles.buttonText}>{i18n.t('common.gotIt')}</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-
-                        <Text style={styles.title}>{title}</Text>
-
-                        <View style={{ maxHeight: Dimensions.get('window').height * 0.5, width: '100%' }}>
-                            <ScrollView
-                                style={{ width: '100%' }}
-                                contentContainerStyle={{ paddingHorizontal: 10 }}
-                                showsVerticalScrollIndicator={true}
-                                indicatorStyle="white"
-                            >
-                                <Text style={styles.message}>{message}</Text>
-                            </ScrollView>
-                        </View>
-
-                        <TouchableOpacity style={styles.button} onPress={onClose}>
-                            <Text style={styles.buttonText}>{i18n.t('common.gotIt')}</Text>
-                        </TouchableOpacity>
                     </View>
-                </Animated.View>
+                ) : (
+                    <Animated.View style={[styles.card, animatedStyle]}>
+                        <GlassView
+                            intensity={60}
+                            tint="dark"
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <View style={styles.contentContainer}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="information" size={40} color="#FFF" />
+                            </View>
+
+                            <Text style={styles.title}>{title}</Text>
+
+                            <View style={{ maxHeight: Dimensions.get('window').height * 0.5, width: '100%' }}>
+                                <ScrollView
+                                    style={{ width: '100%' }}
+                                    contentContainerStyle={{ paddingHorizontal: 10 }}
+                                    showsVerticalScrollIndicator={true}
+                                    indicatorStyle="white"
+                                >
+                                    <Text style={styles.message}>{message}</Text>
+                                </ScrollView>
+                            </View>
+
+                            <TouchableOpacity style={styles.button} onPress={onClose}>
+                                <Text style={styles.buttonText}>{i18n.t('common.gotIt')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Animated.View>
+                )}
             </View>
         </Modal>
     );
@@ -150,5 +184,20 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 16,
         fontFamily: Typography.fontFamily.semiBold,
+    },
+    androidContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.7)',
+    },
+    androidCard: {
+        width: width * 0.85,
+        backgroundColor: '#1E1E1E',
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        overflow: 'hidden',
+        elevation: 10,
     },
 });

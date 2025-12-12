@@ -13,7 +13,7 @@ import { UserProfile, initialUserProfile } from '../../types/Profile';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SuccessModal } from '../../components/ui/SuccessModal';
 import { CustomAlert, AlertType } from '../../components/ui/CustomAlert';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { reAnalyzeBiomarkers, generateDietPlan } from '../../services/gemini';
 import { AnalysisService } from '../../services/AnalysisService';
 import { ActivityIndicator } from 'react-native';
@@ -44,7 +44,7 @@ import {
 // Helper for Glass Card
 const GlassCard = ({ children, style }: { children: React.ReactNode, style?: any }) => (
   <SoftCard style={[styles.card, style]}>
-    <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
+    <GlassView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
     <View style={styles.cardContent}>
       {children}
     </View>

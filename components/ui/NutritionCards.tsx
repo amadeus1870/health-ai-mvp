@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInRight } from 'react-native-reanimated';
@@ -40,6 +40,53 @@ export const BMICard: React.FC<BMICardProps> = ({ bmi, status, color, onInfoPres
     const minBMI = 15;
     const maxBMI = 40;
     const percentage = Math.min(Math.max((bmi - minBMI) / (maxBMI - minBMI), 0), 1);
+
+    if (Platform.OS === 'android') {
+        return (
+            <View style={styles.cardContainer}>
+                <LinearGradient
+                    colors={['#002b19', '#2e7d32', '#aeea00']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                >
+                    <View style={styles.headerRow}>
+                        <View style={styles.headerLeft}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="body" size={24} color="#FFF" />
+                            </View>
+                            <Text style={styles.cardTitle}>{i18n.t('nutrition.bmiTitle')}</Text>
+                        </View>
+                        <TouchableOpacity onPress={onInfoPress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.mainValue}>{bmi.toFixed(1)}</Text>
+                        <Text style={[styles.subValue, { color: '#FFF' }]}>{status}</Text>
+                    </View>
+
+                    {/* BMI Bar */}
+                    <View style={styles.barContainer}>
+                        <LinearGradient
+                            colors={['#3498db', '#2ecc71', '#f1c40f', '#e67e22', '#e74c3c']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.gradientBar}
+                        />
+                        <View style={[styles.indicator, { left: `${percentage * 100}%` }]} />
+                    </View>
+                    <View style={styles.labelsContainer}>
+                        <Text style={styles.barLabel}>{i18n.t('nutrition.bmi.underweight')}</Text>
+                        <Text style={styles.barLabel}>{i18n.t('nutrition.bmi.normal')}</Text>
+                        <Text style={styles.barLabel}>{i18n.t('nutrition.bmi.overweight')}</Text>
+                        <Text style={styles.barLabel}>{i18n.t('nutrition.bmi.obese')}</Text>
+                    </View>
+                </LinearGradient>
+            </View>
+        );
+    }
 
     return (
         <Animated.View entering={FadeInRight.delay(100)} style={styles.cardContainer}>
@@ -93,6 +140,54 @@ export const CaloriesCard: React.FC<CaloriesCardProps> = ({ tdee, goalCalories, 
     const { language } = useLanguage();
     const isDeficit = goalCalories < tdee;
     const diff = Math.abs(tdee - goalCalories);
+
+    if (Platform.OS === 'android') {
+        return (
+            <View style={styles.cardContainer}>
+                <LinearGradient
+                    colors={['#1a2a6c', '#b21f1f', '#fdbb2d']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                >
+                    <View style={styles.headerRow}>
+                        <View style={styles.headerLeft}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="flame" size={24} color="#FFF" />
+                            </View>
+                            <Text style={styles.cardTitle}>{i18n.t('nutrition.calories')}</Text>
+                        </View>
+                        <TouchableOpacity onPress={onInfoPress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.contentContainer}>
+                        {/* Obiettivo Row */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 12 }}>
+                            <Text style={[styles.subValue, { fontSize: 16, color: 'rgba(255,255,255,0.9)' }]}>{i18n.t('nutrition.target')}:</Text>
+                            <Text style={styles.mainValue} adjustsFontSizeToFit numberOfLines={1}>
+                                {Math.round(goalCalories)} <Text style={styles.unit}>kcal</Text>
+                            </Text>
+                        </View>
+
+                        {/* Fabbisogno Row */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                            <Text style={[styles.subValue, { fontSize: 14, color: 'rgba(255,255,255,0.8)' }]}>{i18n.t('nutrition.tdee')}:</Text>
+                            <Text style={[styles.mainValue, { fontSize: 20 }]}>{Math.round(tdee)}</Text>
+                        </View>
+
+                        {/* Deficit/Surplus Indicator */}
+                        <View style={{ marginTop: 16, backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+                            <Text style={{ color: '#FFF', fontSize: 12, fontFamily: Typography.fontFamily.medium }}>
+                                {isDeficit ? i18n.t('nutrition.deficit') : i18n.t('nutrition.surplus')} {isDeficit ? '-' : '+'}{Math.round(diff)}
+                            </Text>
+                        </View>
+                    </View>
+                </LinearGradient>
+            </View>
+        );
+    }
 
     return (
         <Animated.View entering={FadeInRight.delay(200)} style={styles.cardContainer}>
@@ -166,6 +261,63 @@ export const MacrosCard: React.FC<MacrosCardProps> = ({ protein, carbs, fats, to
     const proteinGrams = Math.round((totalCalories * (pP / 100)) / 4);
     const carbsGrams = Math.round((totalCalories * (cP / 100)) / 4);
     const fatsGrams = Math.round((totalCalories * (fP / 100)) / 9);
+
+    if (Platform.OS === 'android') {
+        return (
+            <View style={styles.cardContainer}>
+                <LinearGradient
+                    colors={['#8E0E00', '#EA384D', '#fdbb2d']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                >
+                    <View style={styles.headerRow}>
+                        <View style={styles.headerLeft}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="pie-chart" size={24} color="#FFF" />
+                            </View>
+                            <Text style={styles.cardTitle}>{i18n.t('nutrition.macrosTitle')}</Text>
+                        </View>
+                        <TouchableOpacity onPress={onInfoPress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.macrosContainer}>
+                        {/* Protein */}
+                        <View style={styles.macroItem}>
+                            <Text style={[styles.macroLabel, { color: '#4FC3F7', width: 80 }]} numberOfLines={1}>{i18n.t('nutrition.protein')}</Text>
+                            <View style={[styles.macroBar, { flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 16 }]}>
+                                <View style={[styles.macroFill, { width: `${Math.min(pP + 15, 100)}%`, backgroundColor: '#4FC3F7' }]} />
+                                <Text style={styles.percentageText}>{Math.round(pP)}%</Text>
+                            </View>
+                            <Text style={[styles.macroValue, { color: '#4FC3F7', width: 50, textAlign: 'right' }]}>{proteinGrams}g</Text>
+                        </View>
+
+                        {/* Carbs */}
+                        <View style={styles.macroItem}>
+                            <Text style={[styles.macroLabel, { color: '#2ecc71', width: 80 }]} numberOfLines={1}>{i18n.t('nutrition.carbs')}</Text>
+                            <View style={[styles.macroBar, { flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 16 }]}>
+                                <View style={[styles.macroFill, { width: `${Math.min(cP + 15, 100)}%`, backgroundColor: '#2ecc71' }]} />
+                                <Text style={styles.percentageText}>{Math.round(cP)}%</Text>
+                            </View>
+                            <Text style={[styles.macroValue, { color: '#2ecc71', width: 50, textAlign: 'right' }]}>{carbsGrams}g</Text>
+                        </View>
+
+                        {/* Fats */}
+                        <View style={styles.macroItem}>
+                            <Text style={[styles.macroLabel, { color: '#f1c40f', width: 80 }]} numberOfLines={1}>{i18n.t('nutrition.fats')}</Text>
+                            <View style={[styles.macroBar, { flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 16 }]}>
+                                <View style={[styles.macroFill, { width: `${Math.min(fP + 15, 100)}%`, backgroundColor: '#f1c40f' }]} />
+                                <Text style={styles.percentageText}>{Math.round(fP)}%</Text>
+                            </View>
+                            <Text style={[styles.macroValue, { color: '#f1c40f', width: 50, textAlign: 'right' }]}>{fatsGrams}g</Text>
+                        </View>
+                    </View>
+                </LinearGradient>
+            </View>
+        );
+    }
 
     return (
         <Animated.View entering={FadeInRight.delay(300)} style={styles.cardContainer}>

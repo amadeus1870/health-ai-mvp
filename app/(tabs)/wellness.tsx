@@ -11,7 +11,7 @@ import { AnalysisService } from '../../services/AnalysisService';
 import Svg, { Line, Circle } from 'react-native-svg';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { GlobalStyles } from '../../constants/GlobalStyles';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { SoftCard } from '../../components/ui/SoftCard';
 
 const { width, height } = Dimensions.get('window');
@@ -108,11 +108,10 @@ export default function WellnessScreen() {
           {selectedOrgan && (
             <Animated.View entering={FadeIn} exiting={FadeOut} style={{ position: 'absolute', top: CARD_TOP, left: 20, right: 20, zIndex: 20, height: CARD_HEIGHT }}>
               <SoftCard style={styles.explanationCard}>
-                <BlurView
+                <GlassView
                   intensity={60}
                   tint="dark"
                   style={StyleSheet.absoluteFill}
-                 
                 />
                 {/* Fixed Header: Title & Status */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingBottom: 10 }}>

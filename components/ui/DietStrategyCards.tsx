@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SoftCard } from './SoftCard';
 
@@ -53,9 +53,9 @@ const DietCard = ({ title, icon, color, children, onInfoPress, gradientColors, g
                     <Content />
                 </LinearGradient>
             ) : (
-                <BlurView intensity={60} tint="dark" style={styles.cardContent}>
+                <GlassView disableBlurEffect={Platform.OS === 'android'} intensity={60} tint="dark" style={styles.cardContent}>
                     <Content />
-                </BlurView>
+                </GlassView>
             )}
         </SoftCard>
     );

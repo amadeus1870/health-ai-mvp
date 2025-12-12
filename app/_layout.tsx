@@ -8,7 +8,7 @@ import { AnalysisProvider } from '../context/AnalysisContext';
 import { LanguageProvider } from '../context/LanguageContext';
 import { DisclaimerModal } from '../components/DisclaimerModal';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../components/ui/GlassView';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,7 +31,7 @@ export default function RootLayout() {
   }
 
   const headerBlur = () => (
-    <BlurView intensity={90} tint="dark" style={{ flex: 1 }} />
+    <GlassView intensity={90} tint="dark" style={{ flex: 1 }} />
   );
 
   return (
@@ -62,7 +62,7 @@ export default function RootLayout() {
                 }}
               />
             </Stack>
-            <DisclaimerModal />
+            {/* <DisclaimerModal /> */}
           </View>
         </AnalysisProvider>
       </LanguageProvider>

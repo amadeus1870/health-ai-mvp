@@ -9,7 +9,7 @@ import * as FileSystem from 'expo-file-system';
 import { analyzeBiomarkers } from '../../services/gemini';
 import { useAnalysis } from '../../context/AnalysisContext';
 import { AnalysisService } from '../../services/AnalysisService';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { FallingParticles } from '../../components/ui/FallingParticles';
 import { AnalysisHistoryModal } from '../../components/ui/AnalysisHistoryModal';
 import { QuoteCard } from '../../components/ui/QuoteCard';
@@ -273,7 +273,7 @@ export default function BiomarkersScreen() {
       resizeMode="cover"
     >
       <SafeAreaView style={styles.container}>
-        {/* <FallingParticles isActive={isAnalyzing} touchX={touchX} isTouching={isTouching} /> */}
+        <FallingParticles isActive={isAnalyzing} touchX={touchX} isTouching={isTouching} />
         <View style={styles.headerSection}>
           <View style={[GlobalStyles.headerContainer, { marginBottom: 30 }]}>
             <Text style={GlobalStyles.headerTitle}>{i18n.t('analysis.title')}</Text>
@@ -294,11 +294,10 @@ export default function BiomarkersScreen() {
           )}
         </View>
         <View style={styles.bottomSheet}>
-          <BlurView
+          <GlassView
             intensity={60}
             tint="dark"
             style={StyleSheet.absoluteFill}
-            experimentalBlurMethod='dimezisBlurView'
           />
           <View style={styles.bottomSheetContent}>
             {isAnalyzing ? (

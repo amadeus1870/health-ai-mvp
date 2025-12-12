@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { AnalysisService } from '../../services/AnalysisService';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import i18n from '../../config/i18n';
 
 interface AnalysisHistoryModalProps {
@@ -127,11 +127,10 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
-                    <BlurView
+                    <GlassView
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                       
                     />
                     <View style={styles.header}>
                         <Text style={styles.title}>{i18n.t('analysis.history.title')}</Text>
@@ -163,18 +162,16 @@ export const AnalysisHistoryModal = ({ visible, onClose, onSelect, currentAnalys
                     {/* Confirmation Overlay */}
                     {confirmDeleteId && (
                         <View style={styles.confirmationOverlay}>
-                            <BlurView
+                            <GlassView
                                 intensity={60}
                                 tint="dark"
                                 style={StyleSheet.absoluteFill}
-                               
                             />
                             <View style={styles.confirmationCard}>
-                                <BlurView
+                                <GlassView
                                     intensity={80}
                                     tint="dark"
                                     style={StyleSheet.absoluteFill}
-                                   
                                 />
                                 <View style={styles.warningIconContainer}>
                                     <Ionicons name="trash-outline" size={32} color="#FF6B6B" />

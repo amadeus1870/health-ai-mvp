@@ -6,7 +6,7 @@ import { DietPlan, DayPlan, Meal } from '../../types/Diet';
 import { MealCard } from './MealCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { SoftCard } from './SoftCard';
 import i18n from '../../config/i18n';
 
@@ -54,13 +54,13 @@ export const DietPlanView: React.FC<DietPlanViewProps> = ({ plan, onSwapMeal, on
                     isSelected && styles.timelineItemActive,
                     !isGenerated && styles.timelineItemDisabled
                 ]}>
-                    <BlurView intensity={isSelected ? 60 : 40} tint="dark" style={styles.timelineContentInner}>
+                    <GlassView intensity={isSelected ? 60 : 40} tint="dark" style={styles.timelineContentInner}>
                         <Text style={[styles.dayName, isSelected && styles.textActive, !isGenerated && styles.textDisabled]}>{dayName}</Text>
                         <Text style={[styles.dayNumber, isSelected && styles.textActive, !isGenerated && styles.textDisabled]}>{day}</Text>
                         {!isGenerated && (
                             <View style={styles.loadingDot} />
                         )}
-                    </BlurView>
+                    </GlassView>
                 </SoftCard>
             </TouchableOpacity>
         );

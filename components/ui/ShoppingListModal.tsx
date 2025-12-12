@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform, Dimensions } from 'react-native';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { Colors } from '../../constants/Colors';
@@ -70,82 +70,161 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({ visible, o
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
-                    <View style={styles.contentContainer}>
-                        <View style={styles.header}>
-                            <View style={styles.titleRow}>
-                                <Ionicons name="cart" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
-                                <Text style={styles.title}>{i18n.t('shoppingList.title')}</Text>
+                {Platform.OS === 'android' ? (
+                    <View style={[styles.blurContainer, styles.androidFallback]}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.header}>
+                                <View style={styles.titleRow}>
+                                    <Ionicons name="cart" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
+                                    <Text style={styles.title}>{i18n.t('shoppingList.title')}</Text>
+                                </View>
+                                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                                    <Ionicons name="close" size={24} color="#FFF" />
+                                </TouchableOpacity>
                             </View>
-                            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                                <Ionicons name="close" size={24} color="#FFF" />
-                            </TouchableOpacity>
+
+                            <Text style={styles.subtitle}>
+                                {dietPlan?.days?.length === 1
+                                    ? i18n.t('shoppingList.subtitleDaily')
+                                    : i18n.t('shoppingList.subtitleWeekly')}
+                            </Text>
+
+                            {loading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color={Colors.primary} />
+                                    <Text style={styles.loadingText}>{i18n.t('shoppingList.loading')}</Text>
+                                </View>
+                            ) : (
+                                <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+                                    {categories.length > 0 ? (
+                                        categories.map((category, catIndex) => (
+                                            <View key={catIndex} style={styles.categorySection}>
+                                                <Text style={styles.categoryTitle}>{category.name}</Text>
+                                                {category.items.map((item, itemIndex) => (
+                                                    <TouchableOpacity
+                                                        key={itemIndex}
+                                                        style={styles.itemRow}
+                                                        onPress={() => toggleIngredient(catIndex, itemIndex)}
+                                                        activeOpacity={0.7}
+                                                    >
+                                                        <Ionicons
+                                                            name={item.checked ? "checkbox" : "square-outline"}
+                                                            size={24}
+                                                            color={item.checked ? Colors.primary : Colors.textSecondary}
+                                                            style={{ marginRight: 12 }}
+                                                        />
+                                                        <Text style={[
+                                                            styles.itemText,
+                                                            item.checked && styles.itemTextChecked
+                                                        ]}>
+                                                            {item.name}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.emptyText}>{i18n.t('shoppingList.empty')}</Text>
+                                    )}
+                                </ScrollView>
+                            )}
+
+                            <View style={styles.footer}>
+                                <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+                                    <Ionicons name="copy-outline" size={20} color="#FFF" style={{ marginRight: 8 }} />
+                                    <Text style={styles.copyButtonText}>{i18n.t('shoppingList.copyAll')}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Custom Toast Notification */}
+                            {showToast && (
+                                <View style={styles.toastContainer}>
+                                    <View style={[styles.toastBlur, { backgroundColor: 'rgba(255,255,255,0.9)' }]}>
+                                        <Ionicons name="checkmark-circle" size={24} color="#4caf50" style={{ marginRight: 8 }} />
+                                        <Text style={styles.toastText}>{i18n.t('shoppingList.copied')}</Text>
+                                    </View>
+                                </View>
+                            )}
                         </View>
-
-                        <Text style={styles.subtitle}>
-                            {dietPlan?.days?.length === 1
-                                ? i18n.t('shoppingList.subtitleDaily')
-                                : i18n.t('shoppingList.subtitleWeekly')}
-                        </Text>
-
-                        {loading ? (
-                            <View style={styles.loadingContainer}>
-                                <ActivityIndicator size="large" color={Colors.primary} />
-                                <Text style={styles.loadingText}>{i18n.t('shoppingList.loading')}</Text>
-                            </View>
-                        ) : (
-                            <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
-                                {categories.length > 0 ? (
-                                    categories.map((category, catIndex) => (
-                                        <View key={catIndex} style={styles.categorySection}>
-                                            <Text style={styles.categoryTitle}>{category.name}</Text>
-                                            {category.items.map((item, itemIndex) => (
-                                                <TouchableOpacity
-                                                    key={itemIndex}
-                                                    style={styles.itemRow}
-                                                    onPress={() => toggleIngredient(catIndex, itemIndex)}
-                                                    activeOpacity={0.7}
-                                                >
-                                                    <Ionicons
-                                                        name={item.checked ? "checkbox" : "square-outline"}
-                                                        size={24}
-                                                        color={item.checked ? Colors.primary : Colors.textSecondary}
-                                                        style={{ marginRight: 12 }}
-                                                    />
-                                                    <Text style={[
-                                                        styles.itemText,
-                                                        item.checked && styles.itemTextChecked
-                                                    ]}>
-                                                        {item.name}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            ))}
-                                        </View>
-                                    ))
-                                ) : (
-                                    <Text style={styles.emptyText}>{i18n.t('shoppingList.empty')}</Text>
-                                )}
-                            </ScrollView>
-                        )}
-
-                        <View style={styles.footer}>
-                            <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
-                                <Ionicons name="copy-outline" size={20} color="#FFF" style={{ marginRight: 8 }} />
-                                <Text style={styles.copyButtonText}>{i18n.t('shoppingList.copyAll')}</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Custom Toast Notification */}
-                        {showToast && (
-                            <View style={styles.toastContainer}>
-                                <BlurView intensity={90} tint="light" style={styles.toastBlur}>
-                                    <Ionicons name="checkmark-circle" size={24} color="#4caf50" style={{ marginRight: 8 }} />
-                                    <Text style={styles.toastText}>{i18n.t('shoppingList.copied')}</Text>
-                                </BlurView>
-                            </View>
-                        )}
                     </View>
-                </BlurView>
+                ) : (
+                    <GlassView intensity={80} tint="dark" style={styles.blurContainer}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.header}>
+                                <View style={styles.titleRow}>
+                                    <Ionicons name="cart" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
+                                    <Text style={styles.title}>{i18n.t('shoppingList.title')}</Text>
+                                </View>
+                                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                                    <Ionicons name="close" size={24} color="#FFF" />
+                                </TouchableOpacity>
+                            </View>
+
+                            <Text style={styles.subtitle}>
+                                {dietPlan?.days?.length === 1
+                                    ? i18n.t('shoppingList.subtitleDaily')
+                                    : i18n.t('shoppingList.subtitleWeekly')}
+                            </Text>
+
+                            {loading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color={Colors.primary} />
+                                    <Text style={styles.loadingText}>{i18n.t('shoppingList.loading')}</Text>
+                                </View>
+                            ) : (
+                                <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+                                    {categories.length > 0 ? (
+                                        categories.map((category, catIndex) => (
+                                            <View key={catIndex} style={styles.categorySection}>
+                                                <Text style={styles.categoryTitle}>{category.name}</Text>
+                                                {category.items.map((item, itemIndex) => (
+                                                    <TouchableOpacity
+                                                        key={itemIndex}
+                                                        style={styles.itemRow}
+                                                        onPress={() => toggleIngredient(catIndex, itemIndex)}
+                                                        activeOpacity={0.7}
+                                                    >
+                                                        <Ionicons
+                                                            name={item.checked ? "checkbox" : "square-outline"}
+                                                            size={24}
+                                                            color={item.checked ? Colors.primary : Colors.textSecondary}
+                                                            style={{ marginRight: 12 }}
+                                                        />
+                                                        <Text style={[
+                                                            styles.itemText,
+                                                            item.checked && styles.itemTextChecked
+                                                        ]}>
+                                                            {item.name}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.emptyText}>{i18n.t('shoppingList.empty')}</Text>
+                                    )}
+                                </ScrollView>
+                            )}
+
+                            <View style={styles.footer}>
+                                <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+                                    <Ionicons name="copy-outline" size={20} color="#FFF" style={{ marginRight: 8 }} />
+                                    <Text style={styles.copyButtonText}>{i18n.t('shoppingList.copyAll')}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Custom Toast Notification */}
+                            {showToast && (
+                                <View style={styles.toastContainer}>
+                                    <GlassView intensity={90} tint="light" style={styles.toastBlur}>
+                                        <Ionicons name="checkmark-circle" size={24} color="#4caf50" style={{ marginRight: 8 }} />
+                                        <Text style={styles.toastText}>{i18n.t('shoppingList.copied')}</Text>
+                                    </GlassView>
+                                </View>
+                            )}
+                        </View>
+                    </GlassView>
+                )}
             </View>
         </Modal>
     );
@@ -161,7 +240,8 @@ const styles = StyleSheet.create({
     },
     blurContainer: {
         width: '100%',
-        maxHeight: '80%',
+        height: '85%', // Increased for iOS
+        maxHeight: '90%',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -170,7 +250,7 @@ const styles = StyleSheet.create({
     contentContainer: {
         padding: 24,
         backgroundColor: 'rgba(30, 30, 30, 0.6)',
-        height: '100%',
+        flex: 1,
     },
     header: {
         flexDirection: 'row',
@@ -288,5 +368,12 @@ const styles = StyleSheet.create({
         color: '#333',
         fontFamily: Typography.fontFamily.bold,
         fontSize: 14,
+    },
+    androidFallback: {
+        backgroundColor: 'rgba(20, 20, 20, 0.98)',
+        width: '100%',
+        height: '80%', // Reduced to avoid footer overlap
+        maxHeight: '85%',
+        alignSelf: 'center',
     },
 });

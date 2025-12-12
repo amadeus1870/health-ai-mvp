@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-nat
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -46,11 +46,10 @@ export const LoadingEntertainment: React.FC<LoadingEntertainmentProps> = ({ mess
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <BlurView
+                <GlassView
                     intensity={60}
                     tint="dark"
                     style={StyleSheet.absoluteFill}
-                   
                 />
                 <View style={styles.contentContainer}>
                     <Animated.View

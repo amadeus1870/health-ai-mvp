@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
@@ -21,11 +21,10 @@ export const OrganDetailModal: React.FC<OrganDetailModalProps> = ({ visible, onC
             onRequestClose={onClose}
         >
             <View style={styles.container}>
-                <BlurView
+                <GlassView
                     intensity={60}
                     style={StyleSheet.absoluteFill}
                     tint="dark"
-                   
                 />
                 <TouchableOpacity style={styles.backdrop} onPress={onClose} />
 

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { SoftCard } from '../../components/ui/SoftCard';
-import { BlurView } from 'expo-blur'; import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from '../../components/ui/GlassView'; import { Ionicons } from '@expo/vector-icons';
 import { GlobalStyles } from '../../constants/GlobalStyles';
 
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -428,11 +428,10 @@ export default function Dashboard() {
 
                             {/* 5. PROSSIMO PASTO (Nested - Map Page Style / Glass) */}
                             <SoftCard style={[styles.vitalCard, { height: 'auto', minHeight: 180, marginTop: 24, marginBottom: 0, padding: 0, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'transparent', marginHorizontal: 10 }]}>
-                                <BlurView
+                                <GlassView
                                     intensity={60}
                                     tint="dark"
                                     style={StyleSheet.absoluteFill}
-                                   
                                 />
                                 <View style={{ padding: 24 }}>
                                     {/* Title Inside */}

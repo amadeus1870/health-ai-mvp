@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform, Dimensions } from 'react-native';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
@@ -76,66 +76,129 @@ export const MealSwapModal: React.FC<MealSwapModalProps> = ({ visible, onClose, 
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
-                    <View style={styles.contentContainer}>
-                        <View style={styles.header}>
-                            <View style={styles.titleRow}>
-                                <Ionicons name="swap-horizontal" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
-                                <Text style={styles.title}>{i18n.t('nutrition.mealSwap.title')}</Text>
-                            </View>
-                            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                                <Ionicons name="close" size={24} color="#FFF" />
-                            </TouchableOpacity>
-                        </View>
-
-                        <Text style={styles.subtitle}>
-                            {i18n.t('nutrition.mealSwap.subtitle')} <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.bold }}>{originalMeal?.name}</Text>
-                        </Text>
-
-                        {loading ? (
-                            <View style={styles.loadingContainer}>
-                                <ActivityIndicator size="large" color={Colors.primary} />
-                                <Text style={styles.loadingText}>{i18n.t('nutrition.mealSwap.loading')}</Text>
-                            </View>
-                        ) : error ? (
-                            <View style={styles.errorContainer}>
-                                <Ionicons name="alert-circle-outline" size={48} color="#FF5252" />
-                                <Text style={styles.errorText}>{error}</Text>
-                                <TouchableOpacity style={styles.retryButton} onPress={loadAlternatives}>
-                                    <Text style={styles.retryButtonText}>{i18n.t('nutrition.mealSwap.retry')}</Text>
+                {Platform.OS === 'android' ? (
+                    <View style={[styles.blurContainer, styles.androidFallback]}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.header}>
+                                <View style={styles.titleRow}>
+                                    <Ionicons name="swap-horizontal" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
+                                    <Text style={styles.title}>{i18n.t('nutrition.mealSwap.title')}</Text>
+                                </View>
+                                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                                    <Ionicons name="close" size={24} color="#FFF" />
                                 </TouchableOpacity>
                             </View>
-                        ) : (
-                            <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
-                                {alternatives.map((meal, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.card}
-                                        onPress={() => {
-                                            setPendingMeal(meal);
-                                            setConfirmationVisible(true);
-                                        }}
-                                    >
-                                        <View style={styles.cardHeader}>
-                                            <Text style={styles.cardTitle}>{meal.name}</Text>
-                                            <View style={styles.caloriesBadge}>
-                                                <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
-                                            </View>
-                                        </View>
-                                        <Text style={styles.cardDescription} numberOfLines={2}>
-                                            {meal.description}
-                                        </Text>
-                                        <View style={styles.macrosRow}>
-                                            <Text style={styles.macroText}>P: {meal.macros.protein}g</Text>
-                                            <Text style={styles.macroText}>C: {meal.macros.carbs}g</Text>
-                                            <Text style={styles.macroText}>F: {meal.macros.fats}g</Text>
-                                        </View>
+
+                            <Text style={styles.subtitle}>
+                                {i18n.t('nutrition.mealSwap.subtitle')} <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.bold }}>{originalMeal?.name}</Text>
+                            </Text>
+
+                            {loading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color={Colors.primary} />
+                                    <Text style={styles.loadingText}>{i18n.t('nutrition.mealSwap.loading')}</Text>
+                                </View>
+                            ) : error ? (
+                                <View style={styles.errorContainer}>
+                                    <Ionicons name="alert-circle-outline" size={48} color="#FF5252" />
+                                    <Text style={styles.errorText}>{error}</Text>
+                                    <TouchableOpacity style={styles.retryButton} onPress={loadAlternatives}>
+                                        <Text style={styles.retryButtonText}>{i18n.t('nutrition.mealSwap.retry')}</Text>
                                     </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                        )}
+                                </View>
+                            ) : (
+                                <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+                                    {alternatives.map((meal, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.card}
+                                            onPress={() => {
+                                                setPendingMeal(meal);
+                                                setConfirmationVisible(true);
+                                            }}
+                                        >
+                                            <View style={styles.cardHeader}>
+                                                <Text style={styles.cardTitle}>{meal.name}</Text>
+                                                <View style={styles.caloriesBadge}>
+                                                    <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
+                                                </View>
+                                            </View>
+                                            <Text style={styles.cardDescription} numberOfLines={2}>
+                                                {meal.description}
+                                            </Text>
+                                            <View style={styles.macrosRow}>
+                                                <Text style={styles.macroText}>P: {meal.macros.protein}g</Text>
+                                                <Text style={styles.macroText}>C: {meal.macros.carbs}g</Text>
+                                                <Text style={styles.macroText}>F: {meal.macros.fats}g</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            )}
+                        </View>
                     </View>
-                </BlurView>
+                ) : (
+                    <GlassView intensity={80} tint="dark" style={styles.blurContainer}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.header}>
+                                <View style={styles.titleRow}>
+                                    <Ionicons name="swap-horizontal" size={24} color={Colors.primary} style={{ marginRight: 10 }} />
+                                    <Text style={styles.title}>{i18n.t('nutrition.mealSwap.title')}</Text>
+                                </View>
+                                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                                    <Ionicons name="close" size={24} color="#FFF" />
+                                </TouchableOpacity>
+                            </View>
+
+                            <Text style={styles.subtitle}>
+                                {i18n.t('nutrition.mealSwap.subtitle')} <Text style={{ color: '#FFF', fontFamily: Typography.fontFamily.bold }}>{originalMeal?.name}</Text>
+                            </Text>
+
+                            {loading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color={Colors.primary} />
+                                    <Text style={styles.loadingText}>{i18n.t('nutrition.mealSwap.loading')}</Text>
+                                </View>
+                            ) : error ? (
+                                <View style={styles.errorContainer}>
+                                    <Ionicons name="alert-circle-outline" size={48} color="#FF5252" />
+                                    <Text style={styles.errorText}>{error}</Text>
+                                    <TouchableOpacity style={styles.retryButton} onPress={loadAlternatives}>
+                                        <Text style={styles.retryButtonText}>{i18n.t('nutrition.mealSwap.retry')}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ) : (
+                                <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+                                    {alternatives.map((meal, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.card}
+                                            onPress={() => {
+                                                setPendingMeal(meal);
+                                                setConfirmationVisible(true);
+                                            }}
+                                        >
+                                            <View style={styles.cardHeader}>
+                                                <Text style={styles.cardTitle}>{meal.name}</Text>
+                                                <View style={styles.caloriesBadge}>
+                                                    <Text style={styles.caloriesText}>{meal.calories} kcal</Text>
+                                                </View>
+                                            </View>
+                                            <Text style={styles.cardDescription} numberOfLines={2}>
+                                                {meal.description}
+                                            </Text>
+                                            <View style={styles.macrosRow}>
+                                                <Text style={styles.macroText}>P: {meal.macros.protein}g</Text>
+                                                <Text style={styles.macroText}>C: {meal.macros.carbs}g</Text>
+                                                <Text style={styles.macroText}>F: {meal.macros.fats}g</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            )}
+                        </View>
+                    </GlassView>
+                )}
             </View>
 
             <CustomAlert
@@ -177,7 +240,7 @@ const styles = StyleSheet.create({
     contentContainer: {
         padding: 24,
         backgroundColor: 'rgba(30, 30, 30, 0.6)',
-        height: '100%',
+        flex: 1,
     },
     header: {
         flexDirection: 'row',
@@ -289,5 +352,11 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: 'rgba(255,255,255,0.6)',
         fontFamily: Typography.fontFamily.medium,
+    },
+    androidFallback: {
+        backgroundColor: 'rgba(30, 30, 30, 0.95)',
+        width: Dimensions.get('window').width * 0.9,
+        maxHeight: Dimensions.get('window').height * 0.8,
+        alignSelf: 'center',
     },
 });

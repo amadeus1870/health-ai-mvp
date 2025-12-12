@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,11 +15,10 @@ export const SettingsHeader = ({ title, showBack = true }: SettingsHeaderProps) 
     const router = useRouter();
 
     return (
-        <BlurView
+        <GlassView
             intensity={50}
             tint="dark"
             style={styles.container}
-            experimentalBlurMethod='dimezisBlurView'
         >
             <View style={styles.content}>
                 {showBack && (
@@ -33,7 +32,7 @@ export const SettingsHeader = ({ title, showBack = true }: SettingsHeaderProps) 
                 )}
                 <Text style={[styles.title, !showBack && styles.titleNoBack]}>{title}</Text>
             </View>
-        </BlurView>
+        </GlassView>
     );
 };
 

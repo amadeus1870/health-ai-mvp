@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -104,6 +104,9 @@ const Particle = ({ index, config, touchX, isTouching }: { index: number, config
 
 export const FallingParticles = ({ isActive, touchX, isTouching }: { isActive: boolean, touchX: SharedValue<number>, isTouching: SharedValue<boolean> }) => {
     if (!isActive) return null;
+
+    // Disabled on Android to prevent freezing with GlassView
+    if (Platform.OS === 'android') return null;
 
     // Generate a set of particles
     const particles = Array.from({ length: 30 }).map((_, i) => ({

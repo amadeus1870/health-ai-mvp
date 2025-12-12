@@ -1,11 +1,11 @@
 import { Stack } from 'expo-router';
 import { Colors } from '../../constants/Colors';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { StyleSheet } from 'react-native';
 
 export default function SettingsLayout() {
     const headerBlur = () => (
-        <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+        <GlassView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
     );
 
     return (

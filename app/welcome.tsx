@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ProfileService } from '../services/ProfileService';
 import { LegalModal } from '../components/ui/PrivacyModal';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../components/ui/GlassView';
 import i18n from '../config/i18n';
 
 export default function WelcomeScreen() {
@@ -83,7 +83,7 @@ export default function WelcomeScreen() {
             </View>
 
             <View style={styles.bottomSheet}>
-                <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} experimentalBlurMethod='dimezisBlurView' />
+                <GlassView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
                 <View style={styles.contentContainer}>
                     <Text style={styles.welcomeTitle}>
                         {hasProfile ? i18n.t('welcomeScreen.welcomeBackTitle') : i18n.t('welcomeScreen.welcomeTitle')}

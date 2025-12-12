@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { Colors } from '../../constants/Colors';
 import { SoftCard } from './SoftCard';
 
@@ -28,11 +28,10 @@ export const QuoteCard = () => {
                 style={{ width: '100%', alignItems: 'center' }}
             >
                 <SoftCard style={styles.card}>
-                    <BlurView
+                    <GlassView
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                       
                     />
                     <View style={styles.cardContent}>
                         <Text style={styles.quoteMark}>“</Text>

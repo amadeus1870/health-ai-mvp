@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence } from 'react-native-reanimated';
 
@@ -50,11 +50,10 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ visible, onClose, me
 
 
                 <Animated.View style={[styles.card, animatedStyle]}>
-                    <BlurView
+                    <GlassView
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                       
                     />
                     <View style={styles.contentContainer}>
                         <View style={styles.iconContainer}>

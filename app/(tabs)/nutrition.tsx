@@ -19,7 +19,7 @@ import { DietPlanView } from '../../components/ui/DietPlanView';
 import { DietPlan } from '../../types/Diet';
 import { CustomAlert, AlertType } from '../../components/ui/CustomAlert';
 import { SoftCard } from '../../components/ui/SoftCard';
-import { BlurView } from 'expo-blur';
+
 import { ShoppingListModal } from '../../components/ui/ShoppingListModal';
 import { NewAnalysisModal } from '../../components/ui/NewAnalysisModal';
 import { MealSwapModal } from '../../components/ui/MealSwapModal';
@@ -347,7 +347,7 @@ export default function NutritionScreen() {
       // AND we are not currently loading/generating a diet AND initial load is done
       if (!loading && !loadingDiet && ((!dietPlan || !dietPlan.days || dietPlan.days.length === 0) || (analysisTimestamp > planTimestamp + 10000))) {
 
-        setShowNewAnalysisModal(true);
+        // setShowNewAnalysisModal(true);  // TEMPORARILY DISABLED FOR ANDROID DEBUGGING
       }
     }
   }, [results, dietPlan?.updatedAt, loadingDiet, loading, profile]); // Added profile dep as strategy depends on it
@@ -358,7 +358,7 @@ export default function NutritionScreen() {
     useCallback(() => {
       if (pendingProfileUpdate) {
 
-        setShowNewAnalysisModal(true);
+        // setShowNewAnalysisModal(true);  // TEMPORARILY DISABLED FOR ANDROID DEBUGGING
         setPendingProfileUpdate(false); // Clear flag immediately so we don't loop
       }
     }, [pendingProfileUpdate])
@@ -367,10 +367,10 @@ export default function NutritionScreen() {
   useFocusEffect(
     useCallback(() => {
       if (isBackgroundUpdating) {
-        showInfo(
-          i18n.t('nutrition.updatingTitle'),
-          i18n.t('nutrition.updatingMessage')
-        );
+        // showInfo(
+        //   i18n.t('nutrition.updatingTitle'),
+        //   i18n.t('nutrition.updatingMessage')
+        // );  // TEMPORARILY DISABLED FOR ANDROID DEBUGGING
       } else {
         loadData();
       }
@@ -393,6 +393,7 @@ export default function NutritionScreen() {
     );
   }
 
+  /* SAFE MODE REMOVED - RESTORING CONTENT WITH FIXES */
   return (
     <ImageBackground key={language} source={require('../../assets/images/custom_bg.jpg')} style={styles.container} resizeMode="cover">
       <SafeAreaView style={{ flex: 1 }}>
@@ -415,13 +416,13 @@ export default function NutritionScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
         >
 
-          {/* Header */}
+
           <View style={GlobalStyles.headerContainer}>
             <Text style={GlobalStyles.headerTitle}>{i18n.t('nutrition.strategyTitle')}</Text>
             <Text style={GlobalStyles.headerSubtitle}>{i18n.t('nutrition.strategySubtitle')}</Text>
           </View>
 
-          {/* Strategy Section */}
+
           <View style={styles.sectionContainer}>
 
 
@@ -480,7 +481,7 @@ export default function NutritionScreen() {
             )}
           </View>
 
-          {/* Diet Plan Section */}
+
           <View style={styles.sectionContainer}>
             <SoftCard style={[styles.dietPlanCard, { padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
               <LinearGradient
@@ -503,7 +504,7 @@ export default function NutritionScreen() {
                     </View>
                   </View>
 
-                  {/* Button Row (Pulsantiera) */}
+
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <TouchableOpacity
                       onPress={handleOpenShoppingList}
@@ -654,37 +655,6 @@ export default function NutritionScreen() {
           onClose={() => setShowNewAnalysisModal(false)}
           onConfirm={() => {
             setShowNewAnalysisModal(false);
-            // If we came here from Profile Update (pendingProfileUpdate was true -> Modal), we want FULL REGEN
-            // If we came here from Context Update (results changed)?
-            // Actually, context update happens AFTER re-analysis.
-            // So if `pendingProfileUpdate` triggered this, we need `handleFullRegenerate`.
-            // If `results` triggered this, we just need `handleGenerateDiet`.
-            // BUT we cleared `pendingProfileUpdate` in the effect.
-            // We can check if `results` is "fresh" (timestamp very recent).
-            // Actually, easiest way: Default to FullRegenerate if we suspect profile change?
-            // Better: NewAnalysisModal just confirms "Rigenera".
-            // If we are in this flow, re-analyzing again (if results just updated) is wasteful.
-
-            // Logic:
-            // 1. If we pressed "Rigenera" because of "New Analysis Detected" (background update finished), we just need Diet Gen.
-            // 2. If we pressed "Rigenera" because of "Profile Updated" (pending flag), we need Full Regen (Analysis + Diet).
-
-            // Wait, I cleared `pendingProfileUpdate` immediately. I lost the state.
-            // I should reset it ONLY after decision? Or track "why" the modal is open.
-
-            // Let's rely on timestamps?
-            // If Analysis is NEW (> diet), we just need Diet.
-            // If Analysis is OLD (< now - small buffer) but Profile Changed?
-            // The `pendingProfileUpdate` logic handles the case where Analysis is OLD because we skipped background update.
-            // So identifying that case is easy: Analysis is older than "now".
-            // BUT Analysis might be older than Diet if we haven't updated it yet.
-
-            // Let's assume: If user confirms, run FullRegenerate IF analysis is seemingly old?
-            // Safer: Just always run FullRegenerate? 
-            // - If analysis IS fresh, re-analyzing is redundant (cost/time).
-            // - If analysis IS old, we MUST re-analyze.
-
-            // Check logic:
             const analysisTimestamp = results?.timestamp ? new Date(results.timestamp).getTime() : 0;
             const now = Date.now();
             const isAnalysisFresh = (now - analysisTimestamp) < 60 * 1000; // 1 minute fresh

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { ChatService, ChatMessage } from '../../services/ChatService';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -61,16 +61,15 @@ const AnimatedMessage = ({ item }: { item: ChatMessage }) => {
                     </Text>
                 </View>
             ) : (
-                <BlurView
+                <GlassView
                     intensity={60}
                     tint="dark"
                     style={[styles.messageBubble, styles.aiBubble]}
-                   
                 >
                     <Markdown style={markdownStyles}>
                         {item.content}
                     </Markdown>
-                </BlurView>
+                </GlassView>
             )}
         </Reanimated.View>
     );
@@ -280,7 +279,7 @@ export default function ChatScreen() {
                     />
 
                     {/* Input Area */}
-                    <BlurView intensity={80} tint="dark" style={styles.inputContainer}>
+                    <GlassView intensity={80} tint="dark" style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
                             placeholder={i18n.t('chat.placeholder')}
@@ -304,7 +303,7 @@ export default function ChatScreen() {
                                 <Ionicons name="send" size={20} color="#FFF" />
                             )}
                         </TouchableOpacity>
-                    </BlurView>
+                    </GlassView>
                 </Animated.View>
             </View>
         </ImageBackground>

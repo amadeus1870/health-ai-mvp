@@ -3,7 +3,7 @@ import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-nati
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 
 import i18n from '../../config/i18n';
 
@@ -39,10 +39,10 @@ export default function QuickReplyChips({ onSelect, visible }: QuickReplyChipsPr
                         onPress={() => onSelect(item.text.replace(/^[^\w]+/, '').trim())} // Remove emoji for sending
                         activeOpacity={0.7}
                     >
-                        <BlurView intensity={30} tint="light" style={styles.blur}>
+                        <GlassView intensity={30} tint="light" style={styles.blur}>
                             <Ionicons name={item.icon as any} size={16} color="#FFF" style={styles.icon} />
                             <Text style={styles.text}>{item.text}</Text>
-                        </BlurView>
+                        </GlassView>
                     </TouchableOpacity>
                 ))}
             </ScrollView>

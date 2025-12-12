@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Platform } from 'react-native';
+import { GlassView } from './ui/GlassView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/Colors';
 import { Typography } from '../constants/Typography';
@@ -46,7 +46,13 @@ export const DisclaimerModal = () => {
             onRequestClose={() => { }} // Prevent closing with back button
         >
             <View style={styles.container}>
-                <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+                <GlassView
+                    intensity={80}
+                    tint="dark"
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents="none" // Ensure background doesn't intercept touches
+                    disableBlurEffect={Platform.OS === 'android'} // Optimize for Android
+                />
 
                 <View style={[styles.card, { backgroundColor: '#1E1E1E', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }]}>
                     <View style={styles.iconContainer}>

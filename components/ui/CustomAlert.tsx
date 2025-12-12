@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
@@ -69,19 +69,17 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
             onRequestClose={onClose}
         >
             <View style={styles.container}>
-                <BlurView
+                <GlassView
                     intensity={60}
                     style={StyleSheet.absoluteFill}
                     tint="dark"
-                   
                 />
 
                 <Animated.View style={[styles.card, animatedStyle]}>
-                    <BlurView
+                    <GlassView
                         intensity={60}
                         tint="dark"
                         style={StyleSheet.absoluteFill}
-                       
                     />
                     <View style={styles.contentContainer}>
                         <View style={[styles.iconContainer, { backgroundColor: config.color, shadowColor: config.color }]}>

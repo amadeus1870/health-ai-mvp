@@ -2,8 +2,8 @@ import React from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { View, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { GlassView } from '../../components/ui/GlassView';
 import i18n from '../../config/i18n';
 import { ProfileService } from '../../services/ProfileService';
 import { AnalysisService } from '../../services/AnalysisService';
@@ -66,7 +66,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarShowLabel: false, // Hide labels
           tabBarBackground: () => (
-            <BlurView
+            <GlassView
               intensity={95}
               tint="dark"
               style={{
@@ -89,6 +89,7 @@ export default function TabLayout() {
             height: 85, // Compensate for the -5 bottom
             paddingTop: 8,
             paddingHorizontal: 5,
+            overflow: 'visible', // Essential for floating button on Android
           },
           tabBarActiveTintColor: '#FFB142',
           tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.5)',
@@ -133,11 +134,26 @@ export default function TabLayout() {
               <TouchableOpacity
                 {...(props as any)}
                 style={[
-                  {
-                    top: -30, // Float higher
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  },
+                  Platform.select({
+                    ios: {
+                      top: -30,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      zIndex: 10,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 4,
+                    },
+                    android: {
+                      top: -20, // Lower position for container
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      zIndex: 999,
+                      elevation: 20,
+                      overflow: 'visible',
+                    }
+                  }),
                   props.style, // Keep original layout props but override positioning
                 ]}
                 onPress={async () => {
@@ -162,7 +178,11 @@ export default function TabLayout() {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                  <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+                  {Platform.OS === 'android' ? (
+                    <View style={{ width: '100%', height: '100%', backgroundColor: 'rgba(30,30,30,0.9)' }} />
+                  ) : (
+                    <GlassView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+                  )}
                   <View style={{
                     width: 60,
                     height: 60,
@@ -175,12 +195,17 @@ export default function TabLayout() {
                     shadowOpacity: 0.3,
                     shadowRadius: 8,
                     elevation: 5,
+                    ...Platform.select({
+                      android: { top: -35 }, // Lifted further (-35px) as requested
+                      ios: { top: 0 } // Standard position on iOS
+                    })
                   }}>
                     <Ionicons name="add" size={36} color="#FFFFFF" />
                   </View>
                 </View>
               </TouchableOpacity>
             ),
+
           }}
         />
 

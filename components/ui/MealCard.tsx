@@ -2,10 +2,10 @@ import i18n from '../../config/i18n';
 import { useLanguage } from '../../context/LanguageContext';
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { GlassView } from './GlassView';
 import { SoftCard } from './SoftCard';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
@@ -54,10 +54,71 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
         return type; // Fallback
     };
 
+    // Android: Use standard State rendering to avoid Reanimated freeze
+    if (Platform.OS === 'android') {
+        return (
+            <TouchableOpacity activeOpacity={0.9} onPress={() => setExpanded(!expanded)} style={styles.container}>
+                <SoftCard style={styles.cardContainer}>
+                    <View style={[styles.cardContent, { backgroundColor: 'rgba(30,30,30,0.95)' }]}>
+                        {/* Header */}
+                        <View style={styles.header}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                <View style={styles.typeBadge}>
+                                    <Text style={styles.typeText}>{getTranslatedMealType(meal.type)}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={styles.caloriesText}>{meal.calories} {i18n.t('nutrition.calories')}</Text>
+                                    <View style={{ marginLeft: 8 }}>
+                                        <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={20} color="rgba(255,255,255,0.6)" />
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+
+                        <Text style={styles.mealName}>{meal.name}</Text>
+
+                        {/* Macros Badges (Visible always) */}
+                        <View style={styles.macrosRow}>
+                            <View style={[styles.macroBadge, { backgroundColor: 'rgba(79, 195, 247, 0.2)' }]}>
+                                <Text style={[styles.macroText, { color: '#4FC3F7' }]}>{meal.macros.protein}g {i18n.t('nutrition.protein')}</Text>
+                            </View>
+                            <View style={[styles.macroBadge, { backgroundColor: 'rgba(46, 204, 113, 0.2)' }]}>
+                                <Text style={[styles.macroText, { color: '#2ecc71' }]}>{meal.macros.carbs}g {i18n.t('nutrition.carbs')}</Text>
+                            </View>
+                            <View style={[styles.macroBadge, { backgroundColor: 'rgba(241, 196, 15, 0.2)' }]}>
+                                <Text style={[styles.macroText, { color: '#f1c40f' }]}>{meal.macros.fats}g {i18n.t('nutrition.fats')}</Text>
+                            </View>
+                        </View>
+
+                        {/* Expanded Content */}
+                        {expanded && (
+                            <View style={styles.body}>
+                                <View style={styles.divider} />
+                                <Text style={styles.sectionTitle}>{i18n.t('nutrition.ingredients')}</Text>
+                                <View style={styles.ingredientsList}>
+                                    {meal.ingredients.map((ing, i) => (
+                                        <Text key={i} style={styles.ingredientText}>• {ing}</Text>
+                                    ))}
+                                </View>
+
+                                {meal.description && (
+                                    <>
+                                        <Text style={[styles.sectionTitle, { marginTop: 12 }]}>{i18n.t('nutrition.preparation')}</Text>
+                                        <Text style={styles.descriptionText}>{meal.description}</Text>
+                                    </>
+                                )}
+                            </View>
+                        )}
+                    </View>
+                </SoftCard>
+            </TouchableOpacity>
+        );
+    }
+
     return (
         <TouchableOpacity activeOpacity={0.9} onPress={toggleExpand} style={styles.container}>
             <SoftCard style={styles.cardContainer}>
-                <BlurView intensity={40} tint="dark" style={styles.cardContent}>
+                <GlassView intensity={40} tint="dark" style={styles.cardContent}>
                     {/* Header */}
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -107,7 +168,7 @@ export const MealCard: React.FC<MealCardProps> = ({ meal, index, onSwap }) => {
                             </>
                         )}
                     </Animated.View>
-                </BlurView>
+                </GlassView>
             </SoftCard>
         </TouchableOpacity>
     );

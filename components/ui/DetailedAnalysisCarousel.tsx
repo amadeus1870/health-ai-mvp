@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Dimensions, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, StyleSheet, Text, ScrollView, Dimensions, TouchableOpacity, Modal, SafeAreaView, Platform } from 'react-native';
+import { GlassView } from './GlassView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/Colors';
 import { Typography } from '../../constants/Typography';
@@ -310,11 +310,11 @@ export const DetailedAnalysisCarousel: React.FC<DetailedAnalysisCarouselProps> =
                 <View style={styles.modalContainer}>
 
                     <View style={styles.modalContent}>
-                        <BlurView
+                        <GlassView
+                            disableBlurEffect={Platform.OS === 'android'}
                             intensity={60}
                             tint="dark"
                             style={StyleSheet.absoluteFill}
-                            experimentalBlurMethod='dimezisBlurView'
                         />
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>{selectedCard?.title}</Text>

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Typography } from '../../constants/Typography';
-import { BlurView } from 'expo-blur';
+import { GlassView } from '../../components/ui/GlassView';
 import { MarkdownText } from '../../components/ui/MarkdownText';
 import { SettingsHeader } from '../../components/ui/SettingsHeader';
 import i18n from '../../config/i18n';
@@ -14,7 +14,7 @@ export default function PrivacyPolicyScreen() {
             style={{ flex: 1 }}
             resizeMode="cover"
         >
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <GlassView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
             <SafeAreaView style={styles.container}>
                 <SettingsHeader title={i18n.t('settings.privacy')} />
                 <ScrollView contentContainerStyle={styles.content}>
